@@ -1,8 +1,8 @@
 # Docker
-How to setup a docker, can be found here; https://docs.docker.com/engine/reference/commandline/stack_deploy/
+Decision to use just docker swarm was made since it was recommended and stil utilizes the docker-compose. 
 
 ## Docker Swarm
-
+How to setup a docker swarm, can be found here, https://docs.docker.com/engine/reference/commandline/stack_deploy/.
 ### Setup: 
 > docker swarm init
 ### Deploy: 
@@ -13,7 +13,7 @@ How to setup a docker, can be found here; https://docs.docker.com/engine/referen
 > docker swarm leave --force
 
 ## Docker-Compose
-
+Docker compose information can be found here, https://docs.docker.com/compose/reference/.
 ### Setup & Deploy 
 > docker compose up -d
 ### Status
