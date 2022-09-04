@@ -1,9 +1,13 @@
 package kademlia
 
+import (
+	"D7024E/src/node"
+)
+
 type Kademlia struct {
 }
 
-func (kademlia *Kademlia) LookupContact(target *Contact) {
+func (kademlia *Kademlia) LookupContact(target *node.Contact) {
 	// TODO
 }
 
