@@ -1,7 +1,9 @@
-package d7024e
+package node
 
 import (
 	"container/list"
+
+	"D7024E/src/kademlia/id"
 )
 
 // bucket definition
@@ -40,7 +42,7 @@ func (bucket *bucket) AddContact(contact Contact) {
 
 // GetContactAndCalcDistance returns an array of Contacts where
 // the distance has already been calculated
-func (bucket *bucket) GetContactAndCalcDistance(target *KademliaID) []Contact {
+func (bucket *bucket) GetContactAndCalcDistance(target *id.KademliaID) []Contact {
 	var contacts []Contact
 
 	for elt := bucket.list.Front(); elt != nil; elt = elt.Next() {
