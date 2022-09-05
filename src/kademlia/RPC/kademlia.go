@@ -1,7 +1,7 @@
 package kademlia
 
 import (
-	"D7024E/src/node"
+	"D7024E/node"
 )
 
 type Kademlia struct {

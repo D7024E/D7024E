@@ -3,7 +3,7 @@ package node
 import (
 	"container/list"
 
-	"D7024E/src/kademlia/id"
+	"D7024E/kademlia/id"
 )
 
 // bucket definition

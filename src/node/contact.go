@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sort"
 
-	"D7024E/src/kademlia/id"
+	"D7024E/kademlia/id"
 )
 
 // Contact definition

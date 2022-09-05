@@ -1,7 +1,7 @@
 package network
 
 import (
-	"D7024E/src/node"
+	"D7024E/node"
 )
 
 type Network struct {

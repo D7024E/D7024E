@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"D7024E/src/kademlia/id"
+	"D7024E/kademlia/id"
 )
 
 func TestRoutingTable(t *testing.T) {

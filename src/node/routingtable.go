@@ -2,7 +2,7 @@ package node
 
 import (
 	// id was already used in this file so an alias for the kademlia-id was needed
-	kademliaID "D7024E/src/kademlia/id"
+	kademliaID "D7024E/kademlia/id"
 )
 
 const bucketSize = 20
