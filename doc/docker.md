@@ -1,6 +1,9 @@
 # Docker
 Decision to use just docker swarm was made since it was recommended and stil utilizes the docker-compose. 
 
+## Docker Build 
+> docker build . -t kadlab
+
 ## Docker Swarm
 How to setup a docker swarm, can be found here, https://docs.docker.com/engine/reference/commandline/stack_deploy/.
 ### Setup: 
