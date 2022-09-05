@@ -28,7 +28,7 @@ import (<br />
 We now import the article package under the name "fakeNews", simple as that.
 
 # Tips and tricks
-If you want go to stop complaining that you import something but don't use it, you can set a wildcard alias for the package. This is done by setting a underscore, "_", as the package alias. E.g: <br />
+If you want go to stop complaining that you import something but don't use it, you can set a wildcard alias for the package. This is done by setting a underscore, "_", as the package alias. For example, if we want to import the article folders package but wont use it yet: <br />
 import (<br />
 &nbsp;&nbsp;&nbsp;&nbsp; _ "D7024E/article"<br />
 )<br />
