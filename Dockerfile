@@ -1,5 +1,3 @@
-# FROM alpine:latest
-
 FROM golang:1.19-alpine
 
 # Add the commands needed to put your compiled go binary in the container and
