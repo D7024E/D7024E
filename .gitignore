@@ -1,2 +1,5 @@
 #ignore the compiled node
 *.exe
+
+#ignore log
+logs.txt
