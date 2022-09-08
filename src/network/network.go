@@ -5,14 +5,16 @@ import (
 )
 
 type Network struct {
+	Ip   string
+	Port string
 }
 
 func Listen(ip string, port int) {
 	// TODO
+
 }
 
 func (network *Network) SendPingMessage(contact *node.Contact) {
-	// TODO
 }
 
 func (network *Network) SendFindContactMessage(contact *node.Contact) {
