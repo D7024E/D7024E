@@ -2,4 +2,4 @@
 *.exe
 
 #ignore log
-logs.md
+logs.txt
