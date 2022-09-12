@@ -18,7 +18,6 @@ type Object struct {
 var objects []Object
 
 func createObject(w http.ResponseWriter, r *http.Request) {
-	// w.Header().Set("Content-Type", "application/json")
 	var object Object
 	_ = json.NewDecoder(r.Body).Decode(&object)
 	objects = append(objects, object)
@@ -27,13 +26,11 @@ func createObject(w http.ResponseWriter, r *http.Request) {
 }
 
 func getObjects(w http.ResponseWriter, r *http.Request) {
-	// w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(objects)
 }
 
 func getObject(w http.ResponseWriter, r *http.Request) {
-	// w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
 
 	for i, item := range objects {
