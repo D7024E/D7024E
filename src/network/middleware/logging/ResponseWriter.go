@@ -1,6 +1,8 @@
 package loggingMiddleware
 
-import http "net/http"
+// https://stackoverflow.com/questions/64243247/go-gorilla-log-each-request-duration-and-status-code
+
+import "net/http"
 
 type LogResponseWriter struct {
 	http.ResponseWriter
