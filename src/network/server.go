@@ -36,13 +36,16 @@ func getObject(w http.ResponseWriter, r *http.Request) {
 	// w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
 
-	for _, item := range objects {
+	for i, item := range objects {
 		if item.Hash == params["hash"] {
+			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(item)
+			return
+		} else if i == len(objects)-1 {
+			w.WriteHeader(http.StatusNotFound)
 			return
 		}
 	}
-	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(&Object{})
 }
 
