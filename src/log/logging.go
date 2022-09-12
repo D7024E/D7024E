@@ -22,14 +22,9 @@ func init() {
 
 	multiWriter := io.MultiWriter(os.Stdout, file)
 
-	InfoLogger = log.New(file, "[INFO]    ", log.Ldate|log.Ltime)
-	InfoLogger.SetOutput(multiWriter)
-
-	WarningLogger = log.New(file, "[WARNING] ", log.Ldate|log.Ltime)
-	InfoLogger.SetOutput(multiWriter)
-
-	ErrorLogger = log.New(file, "[ERROR]   ", log.Ldate|log.Ltime|log.Lshortfile)
-	InfoLogger.SetOutput(multiWriter)
+	InfoLogger = log.New(multiWriter, "[INFO]    ", log.Ldate|log.Ltime)
+	WarningLogger = log.New(multiWriter, "[WARNING] ", log.Ldate|log.Ltime)
+	ErrorLogger = log.New(multiWriter, "[ERROR]   ", log.Ldate|log.Ltime|log.Lshortfile)
 }
 
 func INFO(message string, v ...any) {
