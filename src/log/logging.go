@@ -35,3 +35,7 @@ func WARN(message string, v ...any) {
 func ERROR(message string, v ...any) {
 	ErrorLogger.Printf(message, v...)
 }
+
+func FATAL(message string, v ...any) {
+	ErrorLogger.Fatalf(message, v...)
+}
