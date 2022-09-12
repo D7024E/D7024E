@@ -3,6 +3,7 @@ package log
 // https://www.youtube.com/watch?v=p45_9nOpD4k
 
 import (
+	"io"
 	"log"
 	"os"
 )
@@ -19,9 +20,11 @@ func init() {
 		log.Fatal(err)
 	}
 
-	InfoLogger = log.New(file, "[INFO]    ", log.Ldate|log.Ltime)
-	WarningLogger = log.New(file, "[WARNING] ", log.Ldate|log.Ltime)
-	ErrorLogger = log.New(file, "[ERROR]   ", log.Ldate|log.Ltime|log.Lshortfile)
+	multiWriter := io.MultiWriter(os.Stdout, file)
+
+	InfoLogger = log.New(multiWriter, "[INFO]    ", log.Ldate|log.Ltime)
+	WarningLogger = log.New(multiWriter, "[WARNING] ", log.Ldate|log.Ltime)
+	ErrorLogger = log.New(multiWriter, "[ERROR]   ", log.Ldate|log.Ltime|log.Lshortfile)
 }
 
 func INFO(message string, v ...any) {
