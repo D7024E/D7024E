@@ -9,9 +9,9 @@ import (
 )
 
 var (
-	WarningLogger *log.Logger
-	InfoLogger    *log.Logger
-	ErrorLogger   *log.Logger
+	warningLogger *log.Logger
+	infoLogger    *log.Logger
+	errorLogger   *log.Logger
 )
 
 func init() {
@@ -22,23 +22,23 @@ func init() {
 
 	multiWriter := io.MultiWriter(os.Stdout, file)
 
-	InfoLogger = log.New(multiWriter, "[INFO]    ", log.Ldate|log.Ltime)
-	WarningLogger = log.New(multiWriter, "[WARNING] ", log.Ldate|log.Ltime)
-	ErrorLogger = log.New(multiWriter, "[ERROR]   ", log.Ldate|log.Ltime|log.Lshortfile)
+	infoLogger = log.New(multiWriter, "[INFO]    ", log.Ldate|log.Ltime)
+	warningLogger = log.New(multiWriter, "[WARNING] ", log.Ldate|log.Ltime)
+	errorLogger = log.New(multiWriter, "[ERROR]   ", log.Ldate|log.Ltime|log.Lshortfile)
 }
 
 func INFO(message string, v ...any) {
-	InfoLogger.Printf(message, v...)
+	infoLogger.Printf(message, v...)
 }
 
 func WARN(message string, v ...any) {
-	WarningLogger.Printf(message, v...)
+	warningLogger.Printf(message, v...)
 }
 
 func ERROR(message string, v ...any) {
-	ErrorLogger.Printf(message, v...)
+	errorLogger.Printf(message, v...)
 }
 
 func FATAL(message string, v ...any) {
-	ErrorLogger.Fatalf(message, v...)
+	errorLogger.Fatalf(message, v...)
 }
