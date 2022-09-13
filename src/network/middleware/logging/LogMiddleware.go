@@ -1,7 +1,5 @@
 package loggingMiddleware
 
-// https://stackoverflow.com/questions/64243247/go-gorilla-log-each-request-duration-and-status-code
-
 import (
 	"D7024E/log"
 	"net/http"
@@ -10,15 +8,19 @@ import (
 	"github.com/gorilla/mux"
 )
 
+/**
+ * Start logging middleware which logs start and end of request.
+ * Insperation: https://stackoverflow.com/questions/64243247/go-gorilla-log-each-request-duration-and-status-code
+ */
 func Start() mux.MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			startTime := time.Now()
-			logRespWriter := NewLogResponseWriter(w)
-
 			log.INFO(
 				"STATUS - [---] ROUTE - [%s]",
 				r.RequestURI)
+
+			startTime := time.Now()
+			logRespWriter := NewLogResponseWriter(w)
 
 			next.ServeHTTP(logRespWriter, r)
 

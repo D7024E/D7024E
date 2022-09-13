@@ -7,6 +7,9 @@ import (
 	"github.com/gorilla/mux"
 )
 
+/**
+ * Get a object with given hash as request parameter.
+ */
 func GetObject(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 

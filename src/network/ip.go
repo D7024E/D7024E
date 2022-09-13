@@ -5,6 +5,9 @@ import (
 	"net"
 )
 
+/**
+ * Get of ip and port currently used.
+ */
 func GetAddress() net.Addr {
 	conn, err := net.Dial("udp", "8.8.8.8:80")
 	if err != nil {

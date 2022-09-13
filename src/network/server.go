@@ -8,6 +8,9 @@ import (
 	"github.com/gorilla/mux"
 )
 
+/**
+ * Start a server with REST http strucutre.
+ */
 func Start() {
 	log.INFO("Initiated on %v", GetAddress())
 	router := mux.NewRouter()

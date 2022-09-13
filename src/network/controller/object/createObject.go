@@ -5,6 +5,9 @@ import (
 	"net/http"
 )
 
+/**
+ * Create a object from json given in request body.
+ */
 func CreateObject(w http.ResponseWriter, r *http.Request) {
 	var object Object
 	_ = json.NewDecoder(r.Body).Decode(&object)

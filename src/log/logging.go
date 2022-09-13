@@ -9,11 +9,15 @@ import (
 )
 
 var (
-	warningLogger *log.Logger
-	infoLogger    *log.Logger
-	errorLogger   *log.Logger
+	infoLogger    *log.Logger // Logger for info messages
+	warningLogger *log.Logger // Logger for warnings messages
+	errorLogger   *log.Logger // Logger for error messages including fatal
 )
 
+/**
+ * Initialize the log writers as multiwriters meaning that they both write to
+ * file logs.txt and to the console being the os.Stdout.
+ */
 func init() {
 	file, err := os.OpenFile("logs.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
 	if err != nil {
@@ -27,18 +31,30 @@ func init() {
 	errorLogger = log.New(multiWriter, "[ERROR]   ", log.Ldate|log.Ltime|log.Lshortfile)
 }
 
+/**
+ * Log info messages.
+ */
 func INFO(message string, v ...any) {
 	infoLogger.Printf(message, v...)
 }
 
+/**
+ * Log warning messages.
+ */
 func WARN(message string, v ...any) {
 	warningLogger.Printf(message, v...)
 }
 
+/**
+ * Log error messages.
+ */
 func ERROR(message string, v ...any) {
 	errorLogger.Printf(message, v...)
 }
 
+/**
+ * Log fatal messages which then exit.
+ */
 func FATAL(message string, v ...any) {
 	errorLogger.Fatalf(message, v...)
 }

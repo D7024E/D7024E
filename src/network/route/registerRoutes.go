@@ -8,6 +8,9 @@ import (
 	"github.com/gorilla/mux"
 )
 
+/**
+ * Register the routes and middlewares to the router.
+ */
 func RegisterRoutes(router *mux.Router) {
 	router.HandleFunc("/objects", objectController.CreateObject).Methods("POST")
 	router.HandleFunc("/all/objects", objectController.GetObjects).Methods("GET")
