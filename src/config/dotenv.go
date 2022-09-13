@@ -7,8 +7,11 @@ import (
 	"github.com/joho/godotenv"
 )
 
-var Debug bool
+var Debug bool // Debug mode
 
+/**
+ * Load enviroment variables
+ */
 func init() {
 	err := godotenv.Load("../.env")
 
