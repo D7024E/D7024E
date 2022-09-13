@@ -3,12 +3,14 @@ package log
 // https://www.youtube.com/watch?v=p45_9nOpD4k
 
 import (
+	"D7024E/config"
 	"io"
 	"log"
 	"os"
 )
 
 var (
+	multiWriter   io.Writer   // MultiWrtier for log
 	infoLogger    *log.Logger // Logger for info messages
 	warningLogger *log.Logger // Logger for warnings messages
 	errorLogger   *log.Logger // Logger for error messages including fatal
@@ -24,7 +26,11 @@ func init() {
 		log.Fatal(err)
 	}
 
-	multiWriter := io.MultiWriter(os.Stdout, file)
+	if config.Debug {
+		multiWriter = io.MultiWriter(os.Stdout, file)
+	} else {
+		multiWriter = io.MultiWriter(file)
+	}
 
 	infoLogger = log.New(multiWriter, "[INFO]    ", log.Ldate|log.Ltime)
 	warningLogger = log.New(multiWriter, "[WARNING] ", log.Ldate|log.Ltime)
