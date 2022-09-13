@@ -3,6 +3,7 @@
 while getopts ':usd' OPTION; do
     case "$OPTION" in 
     u)  
+        docker build . -t kadlab
         docker-compose up -d --scale kademliaNodes=1 --no-recreate
         docker-compose up -d --no-recreate
         echo "Started docker with default settings"
