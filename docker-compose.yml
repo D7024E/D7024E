@@ -25,8 +25,8 @@ services:
         window: 10s
     # ports:
     #   - "4000:80"
-    # environment:
-    #   - DEBUG=false
+    environment:
+      - DEBUG=false
     networks:
       - kademlia_network
       
