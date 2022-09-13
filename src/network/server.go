@@ -2,60 +2,23 @@ package network
 
 import (
 	"D7024E/log"
+	objectController "D7024E/network/controller/object"
 	headerMiddleware "D7024E/network/middleware/header"
 	loggingMiddleware "D7024E/network/middleware/logging"
-	"encoding/json"
 	"net/http"
 
 	"github.com/gorilla/mux"
 )
 
-type Object struct {
-	Name string `json:"name"`
-	Hash string `json:"hash"`
-}
-
-var objects []Object
-
-func createObject(w http.ResponseWriter, r *http.Request) {
-	var object Object
-	_ = json.NewDecoder(r.Body).Decode(&object)
-	objects = append(objects, object)
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(object)
-}
-
-func getObjects(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(objects)
-}
-
-func getObject(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-
-	for i, item := range objects {
-		if item.Hash == params["hash"] {
-			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode(item)
-			return
-		} else if i == len(objects)-1 {
-			w.WriteHeader(http.StatusNotFound)
-			return
-		}
-	}
-	json.NewEncoder(w).Encode(&Object{})
-}
-
 func StartRouter() {
 	log.INFO("Initiated on %v", GetAddress())
 	router := mux.NewRouter()
 
-	objects = append(objects, Object{Name: "Test_Object", Hash: "TEST_HASH"})
-	// objects = append(objects, Object{Name: "THIS_IS_NAME", Hash: "THIS_IS_HASH"})
+	objectController.Objects = append(objectController.Objects, objectController.Object{Name: "Test_Object", Hash: "TEST_HASH"})
 
-	router.HandleFunc("/objects", createObject).Methods("POST")
-	router.HandleFunc("/all/objects", getObjects).Methods("GET")
-	router.HandleFunc("/objects/{hash}", getObject).Methods("GET")
+	router.HandleFunc("/objects", objectController.CreateObject).Methods("POST")
+	router.HandleFunc("/all/objects", objectController.GetObjects).Methods("GET")
+	router.HandleFunc("/objects/{hash}", objectController.GetObject).Methods("GET")
 
 	router.Use(headerMiddleware.HeaderMiddleware)
 
