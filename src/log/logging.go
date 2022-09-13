@@ -9,32 +9,52 @@ import (
 )
 
 var (
-	WarningLogger *log.Logger
-	InfoLogger    *log.Logger
-	ErrorLogger   *log.Logger
+	infoLogger    *log.Logger // Logger for info messages
+	warningLogger *log.Logger // Logger for warnings messages
+	errorLogger   *log.Logger // Logger for error messages including fatal
 )
 
+/**
+ * Initialize the log writers as multiwriters meaning that they both write to
+ * file logs.txt and to the console being the os.Stdout.
+ */
 func init() {
-	file, err := os.OpenFile("log/logs.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+	file, err := os.OpenFile("logs.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	multiWriter := io.MultiWriter(os.Stdout, file)
 
-	InfoLogger = log.New(multiWriter, "[INFO]    ", log.Ldate|log.Ltime)
-	WarningLogger = log.New(multiWriter, "[WARNING] ", log.Ldate|log.Ltime)
-	ErrorLogger = log.New(multiWriter, "[ERROR]   ", log.Ldate|log.Ltime|log.Lshortfile)
+	infoLogger = log.New(multiWriter, "[INFO]    ", log.Ldate|log.Ltime)
+	warningLogger = log.New(multiWriter, "[WARNING] ", log.Ldate|log.Ltime)
+	errorLogger = log.New(multiWriter, "[ERROR]   ", log.Ldate|log.Ltime|log.Lshortfile)
 }
 
+/**
+ * Log info messages.
+ */
 func INFO(message string, v ...any) {
-	InfoLogger.Printf(message, v...)
+	infoLogger.Printf(message, v...)
 }
 
+/**
+ * Log warning messages.
+ */
 func WARN(message string, v ...any) {
-	WarningLogger.Printf(message, v...)
+	warningLogger.Printf(message, v...)
 }
 
+/**
+ * Log error messages.
+ */
 func ERROR(message string, v ...any) {
-	ErrorLogger.Printf(message, v...)
+	errorLogger.Printf(message, v...)
+}
+
+/**
+ * Log fatal messages which then exit.
+ */
+func FATAL(message string, v ...any) {
+	errorLogger.Fatalf(message, v...)
 }
