@@ -1,4 +1,4 @@
-# Script
+# Bash Script
 The start up script is "dock.sh", it uses the flags:
 
 
