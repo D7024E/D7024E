@@ -14,11 +14,11 @@ Docker compose information can be found here, https://docs.docker.com/compose/re
 ### Status
 > docker compose ps -a
 ### Exit 
-> docker compose down
+> docker-compose down
 ### Add Nodes
-> docker compose scale kademliaNodes=<Total Number Of Nodes>
+> docker-compose scale kademliaNodes=<Total Number Of Nodes>
 ### Add Nodes And Update
-> docker compose up --scale kademliaNodes=<Total Number Of Nodes>
+> docker-compose up --scale kademliaNodes=<Total Number Of Nodes>
 
 
 ## Docker Swarm
