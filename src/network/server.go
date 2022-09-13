@@ -10,7 +10,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func StartRouter() {
+func Start() {
 	log.INFO("Initiated on %v", GetAddress())
 	router := mux.NewRouter()
 

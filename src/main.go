@@ -16,5 +16,5 @@ func main() {
 	// time.Sleep(1 * time.Second)
 	// network.Sender("127.0.0.1", "Hello world!")
 	// wg.Wait()
-	network.StartRouter()
+	network.Start()
 }
