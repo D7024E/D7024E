@@ -10,7 +10,7 @@ type Kademlia struct {
 var KandemliaNode Kademlia
 
 func init() {
-	KandemliaNode.routingTable = NewRoutingTable(NewContact(NewKademliaID("STRING FOR ID"), "172.0.0.2"))
+	// KandemliaNode.routingTable = NewRoutingTable(NewContact(NewKademliaID("STRING FOR ID"), "172.0.0.2"))
 }
 
 func (kademlia *Kademlia) LookupContact(target *Contact) {
@@ -27,5 +27,5 @@ func (kademlia *Kademlia) LookupObject(hash string) (Object, error) {
 }
 
 func (kademlia *Kademlia) Store(object Object) {
-	// TODO
+	kademlia.objects = append(kademlia.objects, object)
 }
