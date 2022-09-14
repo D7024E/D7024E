@@ -3,26 +3,24 @@ package node
 import (
 	"fmt"
 	"sort"
-
-	"D7024E/kademlia/id"
 )
 
 // Contact definition
 // stores the KademliaID, the ip address and the distance
 type Contact struct {
-	ID       *id.KademliaID
+	ID       *KademliaID
 	Address  string
-	distance *id.KademliaID
+	distance *KademliaID
 }
 
 // NewContact returns a new instance of a Contact
-func NewContact(id *id.KademliaID, address string) Contact {
+func NewContact(id *KademliaID, address string) Contact {
 	return Contact{id, address, nil}
 }
 
 // CalcDistance calculates the distance to the target and
 // fills the contacts distance field
-func (contact *Contact) CalcDistance(target *id.KademliaID) {
+func (contact *Contact) CalcDistance(target *KademliaID) {
 	contact.distance = contact.ID.CalcDistance(target)
 }
 

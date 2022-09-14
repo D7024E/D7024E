@@ -1,13 +1,10 @@
-package kademlia
-
-import (
-	"D7024E/node"
-)
+package node
 
 type Kademlia struct {
+	routingTable RoutingTable
 }
 
-func (kademlia *Kademlia) LookupContact(target *node.Contact) {
+func (kademlia *Kademlia) LookupContact(target *Contact) {
 	// TODO
 }
 
