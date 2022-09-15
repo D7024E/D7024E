@@ -2,7 +2,7 @@ package rest
 
 import (
 	"D7024E/log"
-	"D7024E/network/route"
+	"D7024E/network/REST/route"
 	"net/http"
 
 	"github.com/gorilla/mux"

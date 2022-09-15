@@ -1,8 +1,8 @@
 package route
 
 import (
-	headerMiddleware "D7024E/network/middleware/header"
-	loggingMiddleware "D7024E/network/middleware/logging"
+	headerMiddleware "D7024E/network/REST/middleware/header"
+	loggingMiddleware "D7024E/network/REST/middleware/logging"
 
 	"github.com/gorilla/mux"
 )
