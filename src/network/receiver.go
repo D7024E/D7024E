@@ -8,7 +8,7 @@ import (
 
 func Receiver() {
 	// Activate a listener on port 4001.
-	ln, err := net.Listen("tcp", ":4001")
+	ln, err := net.Listen("udp", ":4001")
 	fmt.Println("Listening on port: 4001")
 
 	if err != nil {
