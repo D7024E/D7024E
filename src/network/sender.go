@@ -7,7 +7,7 @@ import (
 
 func Sender(ip string, message string) {
 	// Define the network.
-	conn, _ := net.Dial("tcp", ip+":4001")
+	conn, _ := net.Dial("tcp", "127.0.0.1:4001")
 
 	// Send a message to the client.
 	fmt.Println("Sending message...")
