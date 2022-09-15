@@ -10,6 +10,7 @@ type Kademlia struct {
 var KandemliaNode Kademlia
 
 func init() {
+	// Start routing table here
 	// KandemliaNode.routingTable = NewRoutingTable(NewContact(NewKademliaID("STRING FOR ID"), "172.0.0.2"))
 }
 
