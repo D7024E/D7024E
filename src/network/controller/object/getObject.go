@@ -1,6 +1,7 @@
 package objectController
 
 import (
+	"D7024E/node"
 	"encoding/json"
 	"net/http"
 
@@ -12,16 +13,12 @@ import (
  */
 func GetObject(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-
-	for i, item := range Objects {
-		if item.Hash == params["hash"] {
-			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode(item)
-			return
-		} else if i == len(Objects)-1 {
-			w.WriteHeader(http.StatusNotFound)
-			return
-		}
+	object, err := node.KandemliaNode.LookupObject(params["hash"])
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+	} else {
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(object)
 	}
-	json.NewEncoder(w).Encode(&Object{})
+
 }
