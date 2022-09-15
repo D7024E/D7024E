@@ -7,15 +7,18 @@ import (
 )
 
 func Receiver() {
+	ip := net.IPv4(127, 0, 0, 1)
+	udpAddr := net.UDPAddr{}
+	udpAddr.IP = ip
+	udpAddr.Port = 4001
+	udpAddr.Zone = "IPv4"
 	// Activate a listener on port 4001.
-	ln, err := net.Listen("udp", ":4001")
+	conn, err := net.ListenUDP("udp4", &udpAddr)
 	fmt.Println("Listening on port: 4001")
 
 	if err != nil {
 		fmt.Println("There was an error:", err)
 	}
-	// Accepts incoming connection.
-	conn, _ := ln.Accept()
 
 	// Infinite loop that listens on port 4001, when it receives a message it prints it out.
 	for {
