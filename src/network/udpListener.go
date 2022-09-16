@@ -33,7 +33,9 @@ func initiateCMD(msg []byte) {
 	switch rpc.Cmd {
 	case "PING":
 		panic("help")
-	case "STORE":
+	case "PONG":
+		panic("help")
+	case "STRE":
 		panic("help")
 	case "FINO":
 		panic("help")
