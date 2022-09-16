@@ -23,5 +23,17 @@ func UDPListener(ip net.IP, port int) {
 		n, addr, _ := connection.ReadFromUDP(buffer)
 		log.INFO("Received \"%s\" from %v", string(buffer[0:n]), addr)
 	}
+}
 
+func initiateCMD(msg []byte) {
+	var rpc RPC
+	RpcUnmarshal(msg, &rpc)
+	switch rpc.Cmd {
+	case "PING":
+	case "STORE":
+	case "FINO":
+	case "FIVA":
+	default:
+		log.ERROR("UNKNOWN CMD")
+	}
 }
