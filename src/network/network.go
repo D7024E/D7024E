@@ -4,27 +4,17 @@ import (
 	"D7024E/node"
 )
 
-type Network struct {
-	Ip   string
-	Port string
+func SendPingMessage(contact *node.Contact) {
 }
 
-func Listen(ip string, port int) {
-	// TODO
-
-}
-
-func (network *Network) SendPingMessage(contact *node.Contact) {
-}
-
-func (network *Network) SendFindContactMessage(contact *node.Contact) {
+func SendFindContactMessage(contact *node.Contact) {
 	// TODO
 }
 
-func (network *Network) SendFindDataMessage(hash string) {
+func SendFindDataMessage(hash string) {
 	// TODO
 }
 
-func (network *Network) SendStoreMessage(data []byte) {
+func SendStoreMessage(data []byte) {
 	// TODO
 }
