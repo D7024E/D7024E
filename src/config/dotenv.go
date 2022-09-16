@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	LogConsole bool  // Debug mode
+	LogConsole bool  // Log Console mode
 	err        error // error given from enviroment
 )
 
