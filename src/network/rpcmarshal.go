@@ -1,12 +1,13 @@
 package network
 
 import (
+	"D7024E/node"
 	"encoding/json"
 )
 
 type RPC struct {
 	Cmd     string
-	Contact []string
+	Contact node.Contact
 	Id      any
 }
 
