@@ -1,4 +1,4 @@
-package node
+package contact
 
 import (
 	"D7024E/id"
@@ -21,18 +21,18 @@ func NewContact(contactId *id.KademliaID, address string) Contact {
 
 // CalcDistance calculates the distance to the target and
 // fills the contacts distance field
-func (contact *Contact) CalcDistance(target *id.KademliaID) {
-	contact.distance = contact.ID.CalcDistance(target)
+func (c *Contact) CalcDistance(target *id.KademliaID) {
+	c.distance = c.ID.CalcDistance(target)
 }
 
 // Less returns true if contact.distance < otherContact.distance
-func (contact *Contact) Less(otherContact *Contact) bool {
-	return contact.distance.Less(otherContact.distance)
+func (c *Contact) Less(otherContact *Contact) bool {
+	return c.distance.Less(otherContact.distance)
 }
 
 // String returns a simple string representation of a Contact
-func (contact *Contact) String() string {
-	return fmt.Sprintf(`contact("%s", "%s")`, contact.ID, contact.Address)
+func (c *Contact) String() string {
+	return fmt.Sprintf(`contact("%s", "%s")`, c.ID, c.Address)
 }
 
 // ContactCandidates definition

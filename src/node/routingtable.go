@@ -1,14 +1,13 @@
 package node
 
 import (
-	err "D7024E/error"
+	"D7024E/contact"
 	"D7024E/id"
-	"D7024E/log"
 	"sync"
 )
 
 type routingTable struct {
-	me      Contact
+	me      contact.Contact
 	buckets [id.IDLength * 8]*bucket
 }
 
@@ -17,40 +16,30 @@ const bucketSize = 20
 var instance *routingTable // Singleton instance of routing table
 var lock = &sync.Mutex{}   // mutex lock for singleton
 
-func CreateInstance(me Contact) {
-	if instance == nil {
-		lock.Lock()
-		defer lock.Unlock()
-
-		instance = &routingTable{}
-		for i := 0; i < id.IDLength*8; i++ {
-			instance.buckets[i] = newBucket()
-		}
-		instance.me = me
-	} else {
-		log.WARN("Attempted creation of already existing instance of routing table")
-	}
-}
-
-func GetInstance() (*routingTable, error) {
+func GetInstance() *routingTable {
 	if instance == nil {
 		lock.Lock()
 		defer lock.Unlock()
 		if instance == nil {
-			return nil, &err.InstanceNotCreated{}
+			instance = &routingTable{}
+			for i := 0; i < id.IDLength*8; i++ {
+				instance.buckets[i] = newBucket()
+			}
 		}
 	}
-	return instance, nil
+	return instance
 }
 
-func (rt *routingTable) AddContact(contact Contact) {
-	bucketIndex := rt.getBucketIndex(contact.ID)
+func (rt *routingTable) AddContact(newContact contact.Contact) {
+	lock.Lock()
+	defer lock.Unlock()
+	bucketIndex := rt.getBucketIndex(newContact.ID)
 	bucket := rt.buckets[bucketIndex]
-	bucket.AddContact(contact)
+	bucket.AddContact(newContact)
 }
 
-func (rt *routingTable) FindClosestContacts(target *id.KademliaID, count int) []Contact {
-	var candidates ContactCandidates
+func (rt *routingTable) FindClosestContacts(target *id.KademliaID, count int) []contact.Contact {
+	var candidates contact.ContactCandidates
 	bucketIndex := rt.getBucketIndex(target)
 	bucket := rt.buckets[bucketIndex]
 

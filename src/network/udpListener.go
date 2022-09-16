@@ -5,11 +5,9 @@ import (
 	"net"
 )
 
-/**
- * Listener of the udp messages.
- * Establish udp4 listner by address reccived from ip and port.
- * Read from udp connection into buffer to reccive whole message.
- */
+// Listener of the udp messages.
+// Establish udp4 listner by address reccived from ip and port.
+// Read from udp connection into buffer to reccive whole message.
 func UDPListener(ip net.IP, port int) {
 	connection, err := net.ListenUDP("udp4", &net.UDPAddr{IP: ip, Port: port})
 	if err != nil {
@@ -27,6 +25,7 @@ func UDPListener(ip net.IP, port int) {
 	}
 }
 
+// Depending on the RPC command initiate go routine.
 func initiateCMD(msg []byte) {
 	var rpc RPC
 	RpcUnmarshal(msg, &rpc)

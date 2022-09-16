@@ -8,7 +8,6 @@ import (
 )
 
 /**
- * Listner of UDP messages.
  * Establish udp4 connection with given address created from ip and port.
  * Send message over connection.
  */

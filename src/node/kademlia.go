@@ -1,5 +1,7 @@
 package node
 
-func LookupContact(target *Contact) {
+import "D7024E/contact"
+
+func LookupContact(target *contact.Contact) {
 	// TODO
 }
