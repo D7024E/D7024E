@@ -10,7 +10,7 @@ import (
 func Sender(ip net.IP, port int, message string) {
 
 	addr := ip.String() + ":" + strconv.Itoa(port)
-
+	log.INFO("addr: ", addr)
 	connection, err := net.Dial("udp4", addr)
 	if err != nil {
 		log.ERROR("Reccived error ", err)
@@ -22,6 +22,6 @@ func Sender(ip net.IP, port int, message string) {
 	if err != nil {
 		log.ERROR("Something went wrong in the sender...")
 	}
-	log.INFO("Message was sent, it was", sentWords, "chars long...")
+	log.INFO("Message was sent, it was %v chars long...", sentWords)
 
 }

@@ -16,8 +16,7 @@ func Receiver(ip net.IP, port int) {
 	buffer := make([]byte, 4096)
 	for {
 		n, addr, _ := connection.ReadFromUDP(buffer)
-		log.INFO("Received ", string(buffer[0:n]), " from ", addr)
-
+		log.INFO("Received \"%s\" from %v", string(buffer[0:n]), addr)
 	}
 
 }
