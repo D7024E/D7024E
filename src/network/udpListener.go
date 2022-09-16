@@ -6,11 +6,11 @@ import (
 )
 
 /**
- * Listner of the udp messages.
+ * Listener of the udp messages.
  * Establish udp4 listner by address reccived from ip and port.
  * Read from udp connection into buffer to reccive whole message.
  */
-func UDPListner(ip net.IP, port int) {
+func UDPListener(ip net.IP, port int) {
 	connection, err := net.ListenUDP("udp4", &net.UDPAddr{IP: ip, Port: port})
 	if err != nil {
 		log.ERROR("There was an error:", err)

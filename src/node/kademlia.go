@@ -1,10 +1,12 @@
 package node
 
-import err "D7024E/error"
+import (
+	err "D7024E/error"
+)
 
 type Kademlia struct {
 	routingTable *RoutingTable
-	objects      Objects
+	values       Values
 }
 
 var KandemliaNode Kademlia
@@ -18,15 +20,15 @@ func (kademlia *Kademlia) LookupContact(target *Contact) {
 	// TODO
 }
 
-func (kademlia *Kademlia) LookupObject(hash string) (Object, error) {
-	for _, item := range kademlia.objects {
-		if item.Hash == hash {
+func (kademlia *Kademlia) LookupValues(ID KademliaID) (Value, error) {
+	for _, item := range kademlia.values {
+		if item.ID == ID {
 			return item, nil
 		}
 	}
-	return Object{}, &err.ObjectNotFound{}
+	return Value{}, &err.ValueNotFound{}
 }
 
-func (kademlia *Kademlia) Store(object Object) {
-	kademlia.objects = append(kademlia.objects, object)
+func (kademlia *Kademlia) Store(value Value) {
+	kademlia.values = append(kademlia.values, value)
 }
