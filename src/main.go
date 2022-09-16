@@ -1,15 +1,19 @@
 package main
 
 import (
+	"D7024E/log"
 	"D7024E/network"
+	"net"
 	"time"
 )
 
 func main() {
-	// network.Start()
-	go network.Receiver()
+	ip := net.IPv4(127, 0, 0, 1)
+	port := 4001
+	go network.Receiver(ip, port)
 	time.Sleep(1 * time.Second)
-	network.Sender("172.0.0.1", "this is udp test")
+	network.Sender(ip, port, "this is the message")
+	log.INFO("HERE")
 	for {
 
 	}

@@ -1,26 +1,27 @@
 package network
 
 import (
+	"D7024E/log"
 	"fmt"
 	"net"
+	"strconv"
 )
 
-func Sender(ip string, message string) {
-	// Define the network.
-	conn, _ := net.Dial("udp4", "127.0.0.1:4001")
+func Sender(ip net.IP, port int, message string) {
 
-	// Send a message to the client.
-	fmt.Println("Sending message...")
-	fmt.Println("Trying to send -", message, "-")
+	addr := ip.String() + ":" + strconv.Itoa(port)
 
-	// This is the actual functionality, the rest is just logging.
-	// Prints "message" to the listener defined by "conn".
-	sentWords, err := fmt.Fprintf(conn, message)
+	connection, err := net.Dial("udp4", addr)
 	if err != nil {
-		fmt.Println("Something went wrong in the sender...")
+		log.ERROR("Reccived error ", err)
+	} else {
+		log.INFO("Setup for sending udp")
 	}
 
-	// Log how long the sent message was and theen sleep before looping over again.
-	fmt.Println("Message was sent, it was", sentWords, "chars long...")
+	sentWords, err := fmt.Fprintf(connection, message)
+	if err != nil {
+		log.ERROR("Something went wrong in the sender...")
+	}
+	log.INFO("Message was sent, it was", sentWords, "chars long...")
 
 }
