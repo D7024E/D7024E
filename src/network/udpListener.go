@@ -18,10 +18,12 @@ func UDPListener(ip net.IP, port int) {
 		log.INFO("Setup for listning to udp over %v:%v", ip, port)
 	}
 	defer connection.Close()
-	buffer := make([]byte, 4096)
 	for {
+		buffer := make([]byte, 4096)
 		n, addr, _ := connection.ReadFromUDP(buffer)
+		go initiateCMD((buffer[0:n]))
 		log.INFO("Received \"%s\" from %v", string(buffer[0:n]), addr)
+
 	}
 }
 
@@ -30,9 +32,13 @@ func initiateCMD(msg []byte) {
 	RpcUnmarshal(msg, &rpc)
 	switch rpc.Cmd {
 	case "PING":
+		panic("help")
 	case "STORE":
+		panic("help")
 	case "FINO":
+		panic("help")
 	case "FIVA":
+		panic("help")
 	default:
 		log.ERROR("UNKNOWN CMD")
 	}
