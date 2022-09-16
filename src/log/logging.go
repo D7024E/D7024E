@@ -26,7 +26,7 @@ func init() {
 		log.Fatal(err)
 	}
 
-	if config.Debug {
+	if config.LogConsole {
 		multiWriter = io.MultiWriter(os.Stdout, file)
 	} else {
 		multiWriter = io.MultiWriter(file)

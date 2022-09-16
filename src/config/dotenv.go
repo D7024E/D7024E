@@ -8,8 +8,8 @@ import (
 )
 
 var (
-	Debug bool  // Debug mode
-	err   error // error given from enviroment
+	LogConsole bool  // Debug mode
+	err        error // error given from enviroment
 )
 
 /**
@@ -18,8 +18,8 @@ var (
 func init() {
 	_ = godotenv.Load("../.env")
 	// err := nil
-	Debug, err = strconv.ParseBool(os.Getenv("DEBUG"))
+	LogConsole, err = strconv.ParseBool(os.Getenv("LOG_CONSOLE"))
 	if err != nil {
-		Debug = false
+		LogConsole = false
 	}
 }
