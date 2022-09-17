@@ -7,21 +7,21 @@ import (
 	"sync"
 )
 
-type routingTable struct {
+type RoutingTable struct {
 	me      contact.Contact
 	buckets [id.IDLength * 8]*bucket
 }
 
-var instance *routingTable // Singleton instance of routing table
+var instance *RoutingTable // Singleton instance of routing table
 var lock = &sync.Mutex{}   // mutex lock for singleton
 
-func GetInstance() *routingTable {
+func GetInstance() *RoutingTable {
 	if instance == nil {
 		lock.Lock()
 		defer lock.Unlock()
 		if instance == nil {
 			log.INFO("New routing table created")
-			instance = &routingTable{}
+			instance = &RoutingTable{}
 			for i := 0; i < id.IDLength*8; i++ {
 				instance.buckets[i] = newBucket()
 			}
@@ -30,15 +30,15 @@ func GetInstance() *routingTable {
 	return instance
 }
 
-func (rt *routingTable) SetMe(me contact.Contact) {
+func (rt *RoutingTable) SetMe(me contact.Contact) {
 	rt.me = me
 }
 
-func (rt *routingTable) GetMe() contact.Contact {
+func (rt *RoutingTable) GetMe() contact.Contact {
 	return rt.me
 }
 
-func (rt *routingTable) AddContact(newContact contact.Contact) {
+func (rt *RoutingTable) AddContact(newContact contact.Contact) {
 	lock.Lock()
 	defer lock.Unlock()
 	bucketIndex := rt.getBucketIndex(newContact.ID)
@@ -46,7 +46,7 @@ func (rt *routingTable) AddContact(newContact contact.Contact) {
 	bucket.AddContact(newContact)
 }
 
-func (rt *routingTable) FindClosestContacts(target *id.KademliaID, count int) []contact.Contact {
+func (rt *RoutingTable) FindClosestContacts(target *id.KademliaID, count int) []contact.Contact {
 	var candidates contact.ContactCandidates
 	bucketIndex := rt.getBucketIndex(target)
 	bucket := rt.buckets[bucketIndex]
@@ -73,7 +73,7 @@ func (rt *routingTable) FindClosestContacts(target *id.KademliaID, count int) []
 	return candidates.GetContacts(count)
 }
 
-func (rt *routingTable) getBucketIndex(contactId *id.KademliaID) int {
+func (rt *RoutingTable) getBucketIndex(contactId *id.KademliaID) int {
 	distance := contactId.CalcDistance(rt.me.ID)
 	for i := 0; i < id.IDLength; i++ {
 		for j := 0; j < 8; j++ {
