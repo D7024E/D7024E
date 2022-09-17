@@ -1,7 +1,5 @@
 package kademlia
 
-package kademlia
-
 import (
 	"D7024E/node/bucket"
 	"D7024E/node/contact"
