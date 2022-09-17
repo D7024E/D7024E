@@ -1,6 +1,39 @@
-package node
+package contact
 
-import "sort"
+import (
+	"D7024E/node/id"
+	"fmt"
+	"sort"
+)
+
+// Contact definition
+// stores the KademliaID, the ip address and the distance
+type Contact struct {
+	ID       *id.KademliaID
+	Address  string
+	distance *id.KademliaID
+}
+
+// NewContact returns a new instance of a Contact
+func NewContact(contactId *id.KademliaID, address string) Contact {
+	return Contact{contactId, address, nil}
+}
+
+// CalcDistance calculates the distance to the target and
+// fills the contacts distance field
+func (c *Contact) CalcDistance(target *id.KademliaID) {
+	c.distance = c.ID.CalcDistance(target)
+}
+
+// Less returns true if contact.distance < otherContact.distance
+func (c *Contact) Less(otherContact *Contact) bool {
+	return c.distance.Less(otherContact.distance)
+}
+
+// String returns a simple string representation of a Contact
+func (c *Contact) String() string {
+	return fmt.Sprintf(`contact("%s", "%s")`, c.ID, c.Address)
+}
 
 // ContactCandidates definition
 // stores an array of Contacts

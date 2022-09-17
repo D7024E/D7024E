@@ -1,13 +1,13 @@
-package network
+package rpcmarshal
 
 import (
-	"D7024E/node"
+	"D7024E/node/contact"
 	"encoding/json"
 )
 
 type RPC struct {
 	Cmd     string
-	Contact node.Contact
+	Contact contact.Contact
 	Id      any
 }
 
