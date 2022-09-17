@@ -1,4 +1,4 @@
-package network
+package kademlia_rpc
 
 import (
 	"D7024E/node/contact"

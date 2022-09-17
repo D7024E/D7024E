@@ -1,4 +1,4 @@
-package network
+package server
 
 import (
 	"D7024E/log"

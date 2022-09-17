@@ -2,14 +2,14 @@ package rest
 
 import (
 	"D7024E/log"
-	"D7024E/network/REST/route"
+	"D7024E/network/serverREST/route"
 	"net/http"
 
 	"github.com/gorilla/mux"
 )
 
 /**
- * Start a server with REST http strucutre.
+ * Start a server with REST http structure.
  */
 func Start() {
 	log.INFO("Initiated on %v", GetAddress())

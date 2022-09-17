@@ -1,6 +1,7 @@
-package network
+package server
 
 import (
+	rpc "D7024E/kademliaRPC"
 	"D7024E/log"
 	"net"
 )
@@ -19,28 +20,8 @@ func UDPListener(ip net.IP, port int) {
 	for {
 		buffer := make([]byte, 4096)
 		n, addr, _ := connection.ReadFromUDP(buffer)
-		go initiateCMD((buffer[0:n]))
+		go rpc.InitiateCMD((buffer[0:n]))
 		log.INFO("Received \"%s\" from %v", string(buffer[0:n]), addr)
 
-	}
-}
-
-// Depending on the RPC command initiate go routine.
-func initiateCMD(msg []byte) {
-	var rpc RPC
-	RpcUnmarshal(msg, &rpc)
-	switch rpc.Cmd {
-	case "PING":
-		panic("help")
-	case "PONG":
-		panic("help")
-	case "STRE":
-		panic("help")
-	case "FINO":
-		panic("help")
-	case "FIVA":
-		panic("help")
-	default:
-		log.ERROR("UNKNOWN CMD")
 	}
 }
