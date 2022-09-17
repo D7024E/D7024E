@@ -20,7 +20,7 @@ func UDPListener(ip net.IP, port int) {
 	for {
 		buffer := make([]byte, 4096)
 		n, addr, _ := connection.ReadFromUDP(buffer)
-		go handler.InitiateCMD((buffer[0:n]))
+		go handler.HandleCMD((buffer[0:n]))
 		log.INFO("Received \"%s\" from %v", string(buffer[0:n]), addr)
 
 	}

@@ -7,7 +7,7 @@ import (
 )
 
 // Depending on the RPC command initiate go routine.
-func InitiateCMD(msg []byte) {
+func HandleCMD(msg []byte) {
 	var rpcMessage rpcmarshal.RPC
 	rpcmarshal.RpcUnmarshal(msg, &rpcMessage)
 	switch rpcMessage.Cmd {
