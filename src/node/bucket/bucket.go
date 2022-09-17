@@ -1,10 +1,12 @@
-package node
+package bucket
 
 import (
-	"D7024E/contact"
-	"D7024E/id"
+	"D7024E/node/contact"
+	"D7024E/node/id"
 	"container/list"
 )
+
+const bucketSize = 20
 
 // bucket definition
 // contains a List
@@ -16,6 +18,7 @@ type bucket struct {
 func newBucket() *bucket {
 	bucket := &bucket{}
 	bucket.list = list.New()
+
 	return bucket
 }
 

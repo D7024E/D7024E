@@ -1,7 +1,7 @@
 package contact
 
 import (
-	"D7024E/id"
+	"D7024E/node/id"
 	"fmt"
 	"sort"
 )

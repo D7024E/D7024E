@@ -1,7 +1,7 @@
 package network
 
 import (
-	"D7024E/contact"
+	"D7024E/node/contact"
 	"encoding/json"
 )
 

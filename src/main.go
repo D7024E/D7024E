@@ -1,10 +1,10 @@
 package main
 
 import (
-	"D7024E/contact"
-	"D7024E/id"
 	"D7024E/log"
-	"D7024E/node"
+	"D7024E/node/bucket"
+	"D7024E/node/contact"
+	"D7024E/node/id"
 	"D7024E/node/stored"
 )
 
@@ -13,7 +13,8 @@ func main() {
 	// port := 4001
 	// go network.UDPListener(ip, port)
 	// network.UDPSender(ip, port, "this is the message")
-	rt := node.GetInstance()
+
+	rt := bucket.GetInstance()
 	rt.SetMe(contact.Contact{ID: id.NewRandomKademliaID(), Address: "this is address"})
 	log.INFO("%v", rt.GetMe())
 	val := stored.GetInstance()

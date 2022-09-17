@@ -2,7 +2,7 @@ package stored
 
 import (
 	err "D7024E/error"
-	"D7024E/id"
+	"D7024E/node/id"
 	"sync"
 	"time"
 )

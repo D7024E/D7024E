@@ -1,9 +1,9 @@
-package node
+package bucket
 
 import (
-	"D7024E/contact"
-	"D7024E/id"
 	"D7024E/log"
+	"D7024E/node/contact"
+	"D7024E/node/id"
 	"sync"
 )
 
@@ -11,8 +11,6 @@ type routingTable struct {
 	me      contact.Contact
 	buckets [id.IDLength * 8]*bucket
 }
-
-const bucketSize = 20
 
 var instance *routingTable // Singleton instance of routing table
 var lock = &sync.Mutex{}   // mutex lock for singleton
