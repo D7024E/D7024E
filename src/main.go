@@ -2,6 +2,7 @@ package main
 
 import (
 	"D7024E/log"
+	"D7024E/network/sender"
 	"D7024E/network/server"
 	"D7024E/node/bucket"
 	"D7024E/node/contact"
@@ -14,7 +15,7 @@ func main() {
 	ip := net.IPv4(127, 0, 0, 1)
 	port := 4001
 	go server.UDPListener(ip, port)
-	server.UDPSender(ip, port, "this is the message")
+	sender.UDPSender(ip, port, "this is the message")
 
 	rt := bucket.GetInstance()
 	rt.SetMe(contact.Contact{ID: id.NewRandomKademliaID(), Address: "this is address"})

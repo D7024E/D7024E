@@ -1,4 +1,4 @@
-package server
+package sender
 
 import (
 	"D7024E/log"
