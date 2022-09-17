@@ -1,11 +1,14 @@
-package kademlia_rpc
+package handler
 
-import "D7024E/log"
+import (
+	"D7024E/kademliaRPC/rpcmarshal"
+	"D7024E/log"
+)
 
 // Depending on the RPC command initiate go routine.
 func InitiateCMD(msg []byte) {
-	var rpc RPC
-	RpcUnmarshal(msg, &rpc)
+	var rpc rpcmarshal.RPC
+	rpcmarshal.RpcUnmarshal(msg, &rpc)
 	switch rpc.Cmd {
 	case "PING":
 		panic("help")

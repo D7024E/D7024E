@@ -1,7 +1,7 @@
 package server
 
 import (
-	rpc "D7024E/kademliaRPC"
+	"D7024E/kademliaRPC/handler"
 	"D7024E/log"
 	"net"
 )
@@ -20,7 +20,7 @@ func UDPListener(ip net.IP, port int) {
 	for {
 		buffer := make([]byte, 4096)
 		n, addr, _ := connection.ReadFromUDP(buffer)
-		go rpc.InitiateCMD((buffer[0:n]))
+		go handler.InitiateCMD((buffer[0:n]))
 		log.INFO("Received \"%s\" from %v", string(buffer[0:n]), addr)
 
 	}

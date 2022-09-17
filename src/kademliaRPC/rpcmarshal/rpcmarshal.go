@@ -1,4 +1,4 @@
-package kademlia_rpc
+package rpcmarshal
 
 import (
 	"D7024E/node/contact"
