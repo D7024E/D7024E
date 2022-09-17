@@ -3,6 +3,7 @@ package node
 import (
 	"D7024E/contact"
 	"D7024E/id"
+	"D7024E/log"
 	"sync"
 )
 
@@ -21,6 +22,7 @@ func GetInstance() *routingTable {
 		lock.Lock()
 		defer lock.Unlock()
 		if instance == nil {
+			log.INFO("New routing table created")
 			instance = &routingTable{}
 			for i := 0; i < id.IDLength*8; i++ {
 				instance.buckets[i] = newBucket()
@@ -28,6 +30,14 @@ func GetInstance() *routingTable {
 		}
 	}
 	return instance
+}
+
+func (rt *routingTable) SetMe(me contact.Contact) {
+	rt.me = me
+}
+
+func (rt *routingTable) GetMe() contact.Contact {
+	return rt.me
 }
 
 func (rt *routingTable) AddContact(newContact contact.Contact) {
