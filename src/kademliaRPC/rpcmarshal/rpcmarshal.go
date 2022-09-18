@@ -8,6 +8,7 @@ import (
 type RPC struct {
 	Cmd     string
 	Sender  contact.Contact
+	ReqID   string
 	Content any
 }
 

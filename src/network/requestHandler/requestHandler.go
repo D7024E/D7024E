@@ -31,6 +31,7 @@ func GetInstance() *requestTable {
 	return instance
 }
 
+// Takes a request id to enter into the request table, if there is a collision throws an error.
 func (rt *requestTable) NewRequest(reqID string) error {
 	lock.Lock()
 	defer lock.Unlock()
