@@ -15,7 +15,7 @@ func main() {
 	ip := net.IPv4(127, 0, 0, 1)
 	port := 4001
 	go server.UDPListener(ip, port)
-	sender.UDPSender(ip, port, "this is the message")
+	sender.UDPSender(ip, port, []byte("this is the message"))
 
 	rt := bucket.GetInstance()
 	rt.SetMe(contact.Contact{ID: id.NewRandomKademliaID(), Address: "this is address"})

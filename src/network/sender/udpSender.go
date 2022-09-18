@@ -11,7 +11,7 @@ import (
  * Establish udp4 connection with given address created from ip and port.
  * Send message over connection.
  */
-func UDPSender(ip net.IP, port int, message string) {
+func UDPSender(ip net.IP, port int, message []byte) {
 	addr := ip.String() + ":" + strconv.Itoa(port)
 	connection, err := net.Dial("udp4", addr)
 	if err != nil {

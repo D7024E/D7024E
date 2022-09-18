@@ -7,8 +7,8 @@ import (
 
 type RPC struct {
 	Cmd     string
-	Contact contact.Contact
-	Id      any
+	Sender  contact.Contact
+	Content any
 }
 
 // A basic test is bellow, move it to main for testing.
