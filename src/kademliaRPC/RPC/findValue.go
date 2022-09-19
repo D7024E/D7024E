@@ -16,7 +16,7 @@ import (
 // have value or that the request timeout, return error. Otherwise return the
 // value ID valueID.
 func FindValueRequest(me contact.Contact, valueID id.KademliaID, target contact.Contact) (stored.Value, error) {
-	// Create request id instance
+	// Get pointer to request id instance.
 	requestInstance := requestHandler.GetInstance()
 
 	// Find valid request id then proceed.
