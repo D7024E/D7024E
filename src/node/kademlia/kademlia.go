@@ -13,6 +13,8 @@ type KademliaNode struct {
 	Values       *stored.Stored
 }
 
+const alpha = 3
+
 var lock = &sync.Mutex{}
 var instance *KademliaNode
 
@@ -25,4 +27,8 @@ func GetInstance() *KademliaNode {
 		}
 	}
 	return instance
+}
+
+func (node *KademliaNode) LookupContact(target contact.Contact) {
+	// TODO
 }
