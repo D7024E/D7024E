@@ -2,6 +2,7 @@ package rpcmarshal
 
 import (
 	"D7024E/node/contact"
+	"D7024E/node/id"
 	"D7024E/node/stored"
 	"encoding/json"
 )
@@ -10,6 +11,7 @@ type RPC struct {
 	Cmd     string
 	Contact contact.Contact
 	ReqID   string
+	ID      id.KademliaID
 	Content stored.Value
 }
 
