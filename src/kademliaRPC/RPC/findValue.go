@@ -50,7 +50,7 @@ func FindValueRequest(me contact.Contact, valueID id.KademliaID, target contact.
 	var rpcMessage rpcmarshal.RPC
 	rpcmarshal.RpcUnmarshal(*message, &rpcMessage)
 	if (stored.Value{} == rpcMessage.Content) {
-		return stored.Value{}, errors.New("node does not have value stored")
+		return stored.Value{}, errors.New("target node does not have value stored")
 	}
 
 	return rpcMessage.Content, nil
