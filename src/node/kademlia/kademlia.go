@@ -3,7 +3,10 @@ package kademlia
 import (
 	"D7024E/node/bucket"
 	"D7024E/node/contact"
+	"D7024E/node/id"
 	"D7024E/node/stored"
+	"net"
+	"strings"
 	"sync"
 )
 
@@ -12,6 +15,8 @@ type KademliaNode struct {
 	RoutingTable *bucket.RoutingTable
 	Values       *stored.Stored
 }
+
+const alpha = 3
 
 var lock = &sync.Mutex{}
 var instance *KademliaNode
@@ -22,12 +27,25 @@ func GetInstance() *KademliaNode {
 		defer lock.Unlock()
 		if instance == nil {
 			instance = &KademliaNode{}
+			instance.Me = contact.NewContact(
+				id.NewRandomKademliaID(),
+				getAddress())
+			instance.RoutingTable = bucket.GetInstance()
+			instance.RoutingTable.Me = instance.Me
+			instance.Values = stored.GetInstance()
 		}
 	}
 	return instance
 }
 
-// instance := kademlia.GetInstance()
-// instance.Me to get Me Contact
-// instance.RoutingTable to get routing table
-// instance.Values to get the stored values
+func (node *KademliaNode) LookupContact(target contact.Contact) {
+	// closestContacts := node.RoutingTable.FindClosestContacts(target.ID, alpha)
+	// TODO
+
+}
+
+func getAddress() string {
+	conn, _ := net.Dial("udp", "8.8.8.8:80")
+	defer conn.Close()
+	return strings.Split(conn.LocalAddr().String(), ":")[0]
+}

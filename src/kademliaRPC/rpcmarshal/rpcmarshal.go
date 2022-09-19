@@ -10,8 +10,9 @@ import (
 type RPC struct {
 	Cmd     string
 	Contact contact.Contact
+	ReqID   string
 	ID      id.KademliaID
-	Value   stored.Value
+	Content stored.Value
 }
 
 // A basic test is bellow, move it to main for testing.
