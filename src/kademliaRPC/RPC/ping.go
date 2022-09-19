@@ -11,10 +11,10 @@ import (
 	"net"
 )
 
-// ping node
+// ping node.
 func ping(me contact.Contact, target contact.Contact) {
 
-	//request new request id
+	//request new request id.
 	var reqID string = id.NewRandomKademliaID().String()
 	reqTable := requestHandler.GetInstance()
 	err := reqTable.NewRequest(reqID)
@@ -25,7 +25,7 @@ func ping(me contact.Contact, target contact.Contact) {
 		ReqID:   reqID,
 	}
 
-	// if reqId already exists
+	// if reqId already exists.
 	if err != nil {
 		log.ERROR("%v", err)
 		var reqID string = id.NewRandomKademliaID().String()
@@ -42,7 +42,7 @@ func ping(me contact.Contact, target contact.Contact) {
 
 }
 
-// pong response responds to the request id from ping
+// pong response responds to the request id from ping.
 func pongResponse(contact contact.Contact, kademliaID id.KademliaID) {
 
 	node := kademlia.GetInstance()
