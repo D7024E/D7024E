@@ -19,9 +19,9 @@ func ping(target contact.Contact) {
 	err := reqTable.NewRequest(reqID)
 
 	rpc := rpcmarshal.RPC{
-		Cmd:    "PING",
-		Sender: node.Me,
-		ReqID:  reqID,
+		Cmd:     "PING",
+		Contact: node.Me,
+		ReqID:   reqID,
 	}
 
 	if err != nil {

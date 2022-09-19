@@ -16,7 +16,7 @@ func HandleCMD(msg []byte) {
 	case "PONG":
 		panic("help")
 	case "STRE":
-		rpc.Store(rpcMessage.Value)
+		rpc.Store(rpcMessage.Content)
 	case "FINO":
 		panic("help")
 	case "FIVA":
