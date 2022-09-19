@@ -2,62 +2,64 @@ package rpc
 
 import (
 	"D7024E/kademliaRPC/rpcmarshal"
-	"D7024E/log"
 	"D7024E/network/requestHandler"
 	"D7024E/network/sender"
 	"D7024E/node/contact"
 	"D7024E/node/id"
-	"D7024E/node/kademlia"
 	"net"
 )
 
-// ping node.
-func ping(me contact.Contact, target contact.Contact) {
+// PING rpc.
+// Ping target node, if there is a response return true, otherwise false.
+func Ping(me contact.Contact, target contact.Contact) bool {
+	// Pointer to request Handler instance.
+	requestInstance := requestHandler.GetInstance()
 
-	//request new request id.
-	var reqID string = id.NewRandomKademliaID().String()
-	reqTable := requestHandler.GetInstance()
-	err := reqTable.NewRequest(reqID)
+	// Request new request id.
+	var reqID string
+	var err error
+	for {
+		reqID = id.NewRandomKademliaID().String()
+		err = requestInstance.NewRequest(reqID)
+		if err != nil {
+			break
+		}
+	}
 
-	rpc := rpcmarshal.RPC{
+	// Create a rpc struct.
+	rpcMessage := rpcmarshal.RPC{
 		Cmd:     "PING",
 		Contact: me,
 		ReqID:   reqID,
 	}
 
-	// if reqId already exists.
-	if err != nil {
-		log.ERROR("%v", err)
-		var reqID string = id.NewRandomKademliaID().String()
-		rpc.ReqID = reqID
-		err = reqTable.NewRequest(reqID)
-	}
-
+	// Marshal rpc and send.
 	var msg *[]byte
-	rpcmarshal.RpcMarshal(rpc, msg)
+	rpcmarshal.RpcMarshal(rpcMessage, msg)
+	sender.UDPSender(net.ParseIP(target.Address), 4001, *msg)
 
-	ip := net.ParseIP(target.Address)
-
-	sender.UDPSender(ip, 4001, *msg)
-
+	// Wait for response.
+	err2 := requestInstance.ReadResponse(reqID, msg)
+	if err2 != nil {
+		return false
+	} else {
+		return true
+	}
 }
 
-// pong response responds to the request id from ping.
-func pongResponse(contact contact.Contact, kademliaID id.KademliaID) {
+// PONG rpc.
+// Ping target node, if there is a response return true, otherwise false.
+func Pong(me contact.Contact, target contact.Contact, reqID string) {
 
-	node := kademlia.GetInstance()
-	var reqID string = kademliaID.String()
-
-	rpc := rpcmarshal.RPC{
+	// Create a rpc struct.
+	rpcMessage := rpcmarshal.RPC{
 		Cmd:     "PONG",
-		Contact: node.Me,
+		Contact: me,
 		ReqID:   reqID,
 	}
 
+	// Marshal rpc and send.
 	var msg *[]byte
-	rpcmarshal.RpcMarshal(rpc, msg)
-
-	ip := net.ParseIP(contact.Address)
-
-	sender.UDPSender(ip, 4001, *msg)
+	rpcmarshal.RpcMarshal(rpcMessage, msg)
+	sender.UDPSender(net.ParseIP(target.Address), 4001, *msg)
 }
