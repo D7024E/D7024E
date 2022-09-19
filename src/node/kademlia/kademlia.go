@@ -26,8 +26,3 @@ func GetInstance() *KademliaNode {
 	}
 	return instance
 }
-
-// instance := kademlia.GetInstance()
-// instance.Me to get Me Contact
-// instance.RoutingTable to get routing table
-// instance.Values to get the stored values

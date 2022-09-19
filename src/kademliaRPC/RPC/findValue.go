@@ -6,76 +6,77 @@ import (
 	"D7024E/network/sender"
 	"D7024E/node/contact"
 	"D7024E/node/id"
-	"D7024E/node/kademlia"
 	"D7024E/node/stored"
 	"errors"
 	"net"
 )
 
-func FindValueRequest(valueID id.KademliaID, node contact.Contact) (stored.Value, error) {
-	kademliaInstance := kademlia.GetInstance()
+// FIND_VALUE RPC
+// Attempt to find valueID in values in given target. If the given target does not
+// have value or that the request timeout, return error. Otherwise return the
+// value ID valueID.
+func FindValueRequest(me contact.Contact, valueID id.KademliaID, target contact.Contact) (stored.Value, error) {
+	// Create request id instance
 	requestInstance := requestHandler.GetInstance()
 
-	value, err := kademliaInstance.Values.FindValue(valueID)
-
-	if err != nil {
-		var reqID string
-		var err2 error
-		for {
-			reqID = id.NewRandomKademliaID().String()
-			err2 = requestInstance.NewRequest(reqID)
-			if err2 == nil {
-				break
-			}
+	// Find valid request id then proceed.
+	var reqID string
+	var err error
+	for {
+		reqID = id.NewRandomKademliaID().String()
+		err = requestInstance.NewRequest(reqID)
+		if err == nil {
+			break
 		}
-
-		var message *[]byte
-		rpcmarshal.RpcMarshal(rpcmarshal.RPC{
-			Cmd:     "FIVA",
-			Contact: kademliaInstance.Me,
-			ReqID:   reqID,
-			ID:      valueID,
-		}, message)
-
-		var rpcMessage *[]byte
-		sender.UDPSender(net.ParseIP(node.Address), 4001, *message)
-
-		err3 := requestInstance.ReadResponse(reqID, rpcMessage)
-		if err3 != nil {
-			return stored.Value{}, errors.New("timeout of request")
-		}
-
-		var rpc rpcmarshal.RPC
-		rpcmarshal.RpcUnmarshal(*rpcMessage, &rpc)
-
-		return rpc.Content, nil
-	} else {
-		return value, nil
 	}
+
+	// Marshal message then send it to node.
+	var message *[]byte
+	rpcmarshal.RpcMarshal(rpcmarshal.RPC{
+		Cmd:     "FIVA",
+		Contact: me,
+		ReqID:   reqID,
+		ID:      valueID,
+	}, message)
+	sender.UDPSender(net.ParseIP(target.Address), 4001, *message)
+
+	// Attempt read the response, otherwise throw timeout error.
+	err2 := requestInstance.ReadResponse(reqID, message)
+	if err2 != nil {
+		return stored.Value{}, errors.New("timeout of request")
+	}
+
+	// Unmarshal rpc from message and throw error if content is nil.
+	var rpcMessage rpcmarshal.RPC
+	rpcmarshal.RpcUnmarshal(*message, &rpcMessage)
+	if (stored.Value{} == rpcMessage.Content) {
+		return stored.Value{}, errors.New("node does not have value stored")
+	}
+
+	return rpcMessage.Content, nil
+
 }
 
-func FindValueResponse(reqID string, kademliaID id.KademliaID) {
-	kademliaInstance := kademlia.GetInstance()
-	requestInstance := requestHandler.GetInstance()
-
-	value, err := kademliaInstance.Values.FindValue(kademliaID)
-
-	var message *[]byte
-
-	if err != nil {
-		rpcmarshal.RpcMarshal(rpcmarshal.RPC{
-			Cmd:     "AVIF",
-			Contact: kademliaInstance.Me,
-			ReqID:   reqID,
-		}, message)
-	} else {
-		rpcmarshal.RpcMarshal(rpcmarshal.RPC{
-			Cmd:     "AVIF",
-			Contact: kademliaInstance.Me,
-			ReqID:   reqID,
-			Content: value,
-		}, message)
+// FIND_VALUE RPC Response
+// Checks own stored values for Value with ID valueID, if found add value to
+// rpc response message, otherwise send message without a value
+// (thereby Content will be nil).
+func FindValueResponse(me contact.Contact, target contact.Contact, reqID string, valueID id.KademliaID) {
+	// Create rpc which will be sent.
+	rpcMessage := rpcmarshal.RPC{
+		Cmd:     "AVIF",
+		Contact: me,
+		ReqID:   reqID,
 	}
 
-	requestInstance.WriteRespone(reqID, *message)
+	// Check if value is stored within node, if so add it to the rpcMessage.
+	value, err := stored.GetInstance().FindValue(valueID)
+	if err == nil {
+		rpcMessage.Content = value
+	}
+
+	// Marshal rpc and send it to target.
+	var message *[]byte
+	rpcmarshal.RpcMarshal(rpcMessage, message)
+	sender.UDPSender(net.ParseIP(target.Address), 4001, *message)
 }
