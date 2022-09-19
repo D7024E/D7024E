@@ -11,7 +11,7 @@ import (
 	"net"
 )
 
-func ping(target contact.Contact) {
+func ping(contact contact.Contact) {
 
 	node := kademlia.GetInstance()
 	var reqID string = id.NewRandomKademliaID().String()
@@ -34,10 +34,27 @@ func ping(target contact.Contact) {
 	var msg *[]byte
 	rpcmarshal.RpcMarshal(rpc, msg)
 
-	str := target.Address
-
-	ip := net.ParseIP(str)
+	ip := net.ParseIP(contact.Address)
 
 	sender.UDPSender(ip, 4001, *msg)
 
+}
+
+func pongResponse(contact contact.Contact, kademliaID id.KademliaID) {
+
+	node := kademlia.GetInstance()
+	var reqID string = kademliaID.String()
+
+	rpc := rpcmarshal.RPC{
+		Cmd:     "PONG",
+		Contact: node.Me,
+		ReqID:   reqID,
+	}
+
+	var msg *[]byte
+	rpcmarshal.RpcMarshal(rpc, msg)
+
+	ip := net.ParseIP(contact.Address)
+
+	sender.UDPSender(ip, 4001, *msg)
 }
