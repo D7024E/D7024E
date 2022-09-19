@@ -2,7 +2,6 @@ package rpcmarshal
 
 import (
 	"D7024E/node/contact"
-	"D7024E/node/id"
 	"D7024E/node/stored"
 	"encoding/json"
 )
@@ -10,8 +9,8 @@ import (
 type RPC struct {
 	Cmd     string
 	Contact contact.Contact
-	ID      id.KademliaID
-	Value   stored.Value
+	ReqID   string
+	Content stored.Value
 }
 
 // A basic test is bellow, move it to main for testing.
