@@ -8,10 +8,11 @@ import (
 )
 
 type RPC struct {
-	Cmd     string
-	Contact contact.Contact
-	ID      id.KademliaID
-	Value   stored.Value
+	Cmd    string
+	Sender contact.Contact
+	ID     id.KademliaID
+	Value  stored.Value
+	ReqID  string
 }
 
 // A basic test is bellow, move it to main for testing.
