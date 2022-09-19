@@ -39,7 +39,9 @@ func GetInstance() *KademliaNode {
 }
 
 func (node *KademliaNode) LookupContact(target contact.Contact) {
+	// closestContacts := node.RoutingTable.FindClosestContacts(target.ID, alpha)
 	// TODO
+
 }
 
 func getAddress() string {
