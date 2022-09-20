@@ -63,3 +63,38 @@ func Pong(me contact.Contact, target contact.Contact, reqID string) {
 	rpcmarshal.RpcMarshal(rpcMessage, msg)
 	sender.UDPSender(net.ParseIP(target.Address), 4001, *msg)
 }
+
+func testPing(me contact.Contact) bool {
+
+	// Pointer to request Handler instance.
+	requestInstance := requestHandler.GetInstance()
+
+	// Request new request id.
+	var reqID string
+	var err error
+	for {
+		reqID = id.NewRandomKademliaID().String()
+		err = requestInstance.NewRequest(reqID)
+		if err != nil {
+			break
+		}
+	}
+
+	// Create a rpc struct.
+	rpcMessage := rpcmarshal.RPC{
+		Cmd:     "PING",
+		Contact: me,
+		ReqID:   reqID,
+	}
+
+	// Marshal rpc and send.
+	var msg *[]byte
+	rpcmarshal.RpcMarshal(rpcMessage, msg)
+
+	err2 := requestInstance.ReadResponse(reqID, msg)
+	if err2 != nil {
+		return false
+	} else {
+		return true
+	}
+}
