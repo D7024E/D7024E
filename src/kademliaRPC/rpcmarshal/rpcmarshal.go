@@ -9,12 +9,12 @@ import (
 )
 
 type RPC struct {
-	Cmd     string
-	Contact contact.Contact
-	ReqID   string
-	ID      id.KademliaID
-	Content stored.Value
-	KNodes  []contact.Contact
+	Cmd     string            `json:"cmd"`
+	Contact contact.Contact   `json:"contact"`
+	ReqID   string            `json:"reqid"`
+	ID      id.KademliaID     `json:"id"`
+	Content stored.Value      `json:"content"`
+	KNodes  []contact.Contact `json:"knodes"`
 }
 
 // Check if two RPC are equal, return true if they are otherwise false.
