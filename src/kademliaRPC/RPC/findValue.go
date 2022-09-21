@@ -16,45 +16,39 @@ import (
 // have value or that the request timeout, return error. Otherwise return the
 // value ID valueID.
 func FindValueRequest(me contact.Contact, valueID id.KademliaID, target contact.Contact) (stored.Value, error) {
-	// Get pointer to request id instance.
-	requestInstance := requestHandler.GetInstance()
+	reqID := newValidRequestID()
+	message := findValueRequestMessage(me, reqID, valueID)
+	ip := parseIP(target.Address)
+	sender.UDPSender(ip, 4001, message)
+	err := requestHandler.GetInstance().ReadResponse(reqID, &message)
+	return findValueRequestReturn(message, err)
+}
 
-	// Find valid request id then proceed.
-	var reqID string
-	var err error
-	for {
-		reqID = id.NewRandomKademliaID().String()
-		err = requestInstance.NewRequest(reqID)
-		if err == nil {
-			break
-		}
-	}
-
-	// Marshal message then send it to node.
-	var message *[]byte
+// Create FindValue message by marshaling RPC.
+func findValueRequestMessage(me contact.Contact, reqID string, valueID id.KademliaID) []byte {
+	var message []byte
 	rpcmarshal.RpcMarshal(rpcmarshal.RPC{
 		Cmd:     "FIVA",
 		Contact: me,
 		ReqID:   reqID,
 		ID:      valueID,
-	}, message)
-	sender.UDPSender(net.ParseIP(target.Address), 4001, *message)
+	}, &message)
+	return message
+}
 
-	// Attempt read the response, otherwise throw timeout error.
-	err2 := requestInstance.ReadResponse(reqID, message)
-	if err2 != nil {
+// Handle the request response, by throwing errors and or unmarshaling.
+func findValueRequestReturn(message []byte, err error) (stored.Value, error) {
+	if isError(err) {
 		return stored.Value{}, errors.New("timeout of request")
+	} else {
+		var rpcMessage rpcmarshal.RPC
+		rpcmarshal.RpcUnmarshal(message, &rpcMessage)
+		if (stored.Value{} == rpcMessage.Content) {
+			return stored.Value{}, errors.New("target node does not have value stored")
+		} else {
+			return rpcMessage.Content, nil
+		}
 	}
-
-	// Unmarshal rpc from message and throw error if content is nil.
-	var rpcMessage rpcmarshal.RPC
-	rpcmarshal.RpcUnmarshal(*message, &rpcMessage)
-	if (stored.Value{} == rpcMessage.Content) {
-		return stored.Value{}, errors.New("target node does not have value stored")
-	}
-
-	return rpcMessage.Content, nil
-
 }
 
 // FIND_VALUE RPC Response
@@ -62,6 +56,12 @@ func FindValueRequest(me contact.Contact, valueID id.KademliaID, target contact.
 // rpc response message, otherwise send message without a value
 // (thereby Content will be nil).
 func FindValueResponse(me contact.Contact, target contact.Contact, reqID string, valueID id.KademliaID) {
+	message := findValueResponseMessage(me, reqID, valueID)
+	sender.UDPSender(net.ParseIP(target.Address), 4001, message)
+}
+
+// Create a find value response message and store the value.
+func findValueResponseMessage(me contact.Contact, reqID string, valueID id.KademliaID) []byte {
 	// Create rpc which will be sent.
 	rpcMessage := rpcmarshal.RPC{
 		Cmd:     "AVIF",
@@ -75,8 +75,8 @@ func FindValueResponse(me contact.Contact, target contact.Contact, reqID string,
 		rpcMessage.Content = value
 	}
 
-	// Marshal rpc and send it to target.
-	var message *[]byte
-	rpcmarshal.RpcMarshal(rpcMessage, message)
-	sender.UDPSender(net.ParseIP(target.Address), 4001, *message)
+	// Marshal rpc message.
+	var message []byte
+	rpcmarshal.RpcMarshal(rpcMessage, &message)
+	return message
 }
