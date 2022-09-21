@@ -2,14 +2,18 @@ package rpcmarshal
 
 import (
 	"D7024E/node/contact"
+	"D7024E/node/id"
 	"encoding/json"
 )
 
 type RPC struct {
-	Cmd     string
-	Sender  contact.Contact
-	ReqID   string
-	Content any
+	Cmd    string
+	Sender contact.Contact
+	ReqID  string
+
+	// Optional fields.
+	Destination id.KademliaID
+	KNodes      []contact.Contact
 }
 
 // A basic test is bellow, move it to main for testing.
