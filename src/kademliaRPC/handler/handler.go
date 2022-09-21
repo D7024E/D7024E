@@ -1,6 +1,7 @@
 package handler
 
 import (
+	rpc "D7024E/kademliaRPC/RPC"
 	"D7024E/kademliaRPC/rpcmarshal"
 	"D7024E/log"
 )
@@ -17,7 +18,7 @@ func HandleCMD(msg []byte) {
 	case "STRE":
 		panic("help")
 	case "FINO":
-		panic("help")
+		go rpc.RespondFindNode(rpcMessage)
 	case "FIVA":
 		panic("help")
 	default:
