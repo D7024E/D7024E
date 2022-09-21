@@ -19,21 +19,48 @@ type RPC struct {
 
 func (r1 *RPC) Equals(r2 *RPC) bool {
 	var res bool
+	// Cmd
 	if !(reflect.ValueOf(*r1).FieldByName("Cmd").IsZero()) {
 		res = r1.Cmd == r2.Cmd
+	} else if reflect.ValueOf(*r2).FieldByName("Cmd").IsZero() {
+		return false
 	}
+
+	// Contact
 	if !(reflect.ValueOf(*r1).FieldByName("Contact").IsZero()) {
 		res = res && r1.Contact.Equals(&r2.Contact)
+	} else if reflect.ValueOf(*r2).FieldByName("Contact").IsZero() {
+		return false
 	}
+
+	// ReqID
 	if !(reflect.ValueOf(*r1).FieldByName("ReqID").IsZero()) {
 		res = res && (r2.ReqID == r1.ReqID)
+	} else if reflect.ValueOf(*r2).FieldByName("ReqID").IsZero() {
+		return false
 	}
+
+	// ID
 	if !(reflect.ValueOf(*r1).FieldByName("ID").IsZero()) {
 		res = res && r1.ID.Equals(&r2.ID)
+	} else if reflect.ValueOf(*r2).FieldByName("ID").IsZero() {
+		return false
 	}
+
+	// Content
 	if !(reflect.ValueOf(*r1).FieldByName("Content").IsZero()) {
 		res = res && r1.Content.Equals(&r2.Content)
+	} else if reflect.ValueOf(*r2).FieldByName("Content").IsZero() {
+		return false
 	}
+
+	// KNodes
+	if !(reflect.ValueOf(*r1).FieldByName("KNodes").IsZero()) {
+		// TODO CHANGE TYPE OF KNODES
+	} else if reflect.ValueOf(*r2).FieldByName("KNodes").IsZero() {
+		return false
+	}
+
 	return res
 }
 

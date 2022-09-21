@@ -42,6 +42,22 @@ type ContactCandidates struct {
 	contacts []Contact
 }
 
+func (c1 *ContactCandidates) Equals(c2 *ContactCandidates) bool {
+	if c1.Len() != c2.Len() {
+		return false
+	}
+	for i, c := range c1.contacts {
+		if c != c2.GetContact(i) {
+			return false
+		}
+	}
+	return true
+}
+
+func (candidates *ContactCandidates) GetContact(index int) Contact {
+	return candidates.contacts[index]
+}
+
 // Append an array of Contacts to the ContactCandidates
 func (candidates *ContactCandidates) Append(contacts []Contact) {
 	candidates.contacts = append(candidates.contacts, contacts...)
