@@ -24,7 +24,7 @@ func FindNode(target contact.Contact, destNode id.KademliaID) (kNodes []contact.
 
 	rpc := rpcmarshal.RPC{
 		Cmd:         "FINO",
-		Sender:      node.Me,
+		Contact:     node.Me,
 		ReqID:       reqID,
 		Destination: destNode,
 	}
@@ -54,13 +54,13 @@ func FindNode(target contact.Contact, destNode id.KademliaID) (kNodes []contact.
 func RespondFindNode(rpc rpcmarshal.RPC) {
 	node := kademlia.GetInstance()
 	response := rpcmarshal.RPC{
-		Cmd:    "RESP",
-		Sender: node.Me,
-		ReqID:  rpc.ReqID,
+		Cmd:     "RESP",
+		Contact: node.Me,
+		ReqID:   rpc.ReqID,
 	}
 	var marshaledResponse []byte
 	target := &rpc.Destination
 	response.KNodes = bucket.GetInstance().FindClosestContacts(target, 20)
 	rpcmarshal.RpcMarshal(response, &marshaledResponse)
-	sender.UDPSender(net.IP(rpc.Sender.Address), config.Port, marshaledResponse)
+	sender.UDPSender(net.IP(rpc.Contact.Address), config.Port, marshaledResponse)
 }

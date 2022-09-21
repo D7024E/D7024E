@@ -8,7 +8,7 @@ import (
 )
 
 type RoutingTable struct {
-	me      contact.Contact
+	Me      contact.Contact
 	buckets [id.IDLength * 8]*bucket
 }
 
@@ -28,14 +28,6 @@ func GetInstance() *RoutingTable {
 		}
 	}
 	return instance
-}
-
-func (rt *RoutingTable) SetMe(me contact.Contact) {
-	rt.me = me
-}
-
-func (rt *RoutingTable) GetMe() contact.Contact {
-	return rt.me
 }
 
 func (rt *RoutingTable) AddContact(newContact contact.Contact) {
@@ -74,7 +66,7 @@ func (rt *RoutingTable) FindClosestContacts(target *id.KademliaID, count int) []
 }
 
 func (rt *RoutingTable) getBucketIndex(contactId *id.KademliaID) int {
-	distance := contactId.CalcDistance(rt.me.ID)
+	distance := contactId.CalcDistance(rt.Me.ID)
 	for i := 0; i < id.IDLength; i++ {
 		for j := 0; j < 8; j++ {
 			if (distance[i]>>uint8(7-j))&0x1 != 0 {
