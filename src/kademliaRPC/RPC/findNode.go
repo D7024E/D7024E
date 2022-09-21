@@ -1,6 +1,7 @@
 package rpc
 
 import (
+	"errors"
 	"net"
 
 	"D7024E/config"
@@ -14,7 +15,7 @@ import (
 	"D7024E/node/kademlia"
 )
 
-func FindNode(target contact.Contact, destNode id.KademliaID) (kNodes []contact.Contact) {
+func FindNode(target contact.Contact, destNode id.KademliaID) (kNodes []contact.Contact, newErr error) {
 	node := kademlia.GetInstance()
 	reqHandler := requestHandler.GetInstance()
 
@@ -28,6 +29,7 @@ func FindNode(target contact.Contact, destNode id.KademliaID) (kNodes []contact.
 		ReqID:       reqID,
 		Destination: destNode,
 	}
+	log.INFO("Creating find node RPC")
 
 	// Attempt to lock th request id in the reqTable.
 	err := reqHandler.NewRequest(reqID)
@@ -41,12 +43,21 @@ func FindNode(target contact.Contact, destNode id.KademliaID) (kNodes []contact.
 
 	// Marshal the rpc struct and send it to the target.
 	rpcmarshal.RpcMarshal(rpc, &fino)
+	log.INFO("Marshalling find node RPC")
 	sender.UDPSender(net.IP(target.Address), config.Port, fino)
+	log.INFO("Sending find node RPC")
 
 	// Await and return the response.
-	reqHandler.ReadResponse(reqID, &fino)
+	log.INFO("Waiting for find node response")
+	err = reqHandler.ReadResponse(reqID, &fino)
+	if err != nil {
+		log.ERROR("%v", err)
+		newErr := errors.New("No response")
+		return nil, newErr
+	}
+	log.INFO("Received find node response")
 	rpcmarshal.RpcUnmarshal(fino, &response)
-	return response.KNodes
+	return response.KNodes, nil
 }
 
 // Creates a response RPC struct and populates it with the K, (K = 20), closest nodes to the destination node.
@@ -58,9 +69,13 @@ func RespondFindNode(rpc rpcmarshal.RPC) {
 		Contact: node.Me,
 		ReqID:   rpc.ReqID,
 	}
+	log.INFO("Creating new RPC-struct for find node")
 	var marshaledResponse []byte
 	target := &rpc.Destination
 	response.KNodes = bucket.GetInstance().FindClosestContacts(target, 20)
+	log.INFO("Finding closest nodes to the find node target")
 	rpcmarshal.RpcMarshal(response, &marshaledResponse)
+	log.INFO("Marshalling find node RPC-response")
 	sender.UDPSender(net.IP(rpc.Contact.Address), config.Port, marshaledResponse)
+	log.INFO("Sending find node response")
 }
