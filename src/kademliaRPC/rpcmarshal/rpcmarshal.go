@@ -13,6 +13,7 @@ type RPC struct {
 	ReqID   string
 	ID      id.KademliaID
 	Content stored.Value
+	KNodes  []contact.Contact
 }
 
 // A basic test is bellow, move it to main for testing.
