@@ -14,6 +14,7 @@ type RPC struct {
 	ReqID   string
 	ID      id.KademliaID
 	Content stored.Value
+	KNodes  []contact.Contact
 }
 
 func (r1 *RPC) Equals(r2 *RPC) bool {

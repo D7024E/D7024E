@@ -11,6 +11,7 @@ import (
 )
 
 type KademliaNode struct {
+	Alpha        int
 	Me           contact.Contact
 	RoutingTable *bucket.RoutingTable
 	Values       *stored.Stored

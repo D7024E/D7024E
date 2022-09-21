@@ -8,6 +8,8 @@ import (
 )
 
 var (
+	K          int
+	Port       int
 	LogConsole bool  // Log Console mode
 	err        error // error given from enviroment
 )
@@ -16,6 +18,7 @@ var (
  * Load enviroment variables
  */
 func init() {
+	Port = 4001
 	_ = godotenv.Load("../.env")
 	// err := nil
 	LogConsole, err = strconv.ParseBool(os.Getenv("LOG_CONSOLE"))
