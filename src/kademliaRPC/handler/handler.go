@@ -18,7 +18,7 @@ func HandleCMD(msg []byte) {
 	case "STRE":
 		panic("help")
 	case "FINO":
-		go rpc.RespondFindNode(rpcMessage)
+		rpc.RespondFindNode(rpcMessage)
 	case "FIVA":
 		panic("help")
 	default:

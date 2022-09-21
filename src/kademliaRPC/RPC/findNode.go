@@ -24,10 +24,10 @@ func FindNode(target contact.Contact, destNode id.KademliaID) (kNodes []contact.
 	var response rpcmarshal.RPC
 
 	rpc := rpcmarshal.RPC{
-		Cmd:         "FINO",
-		Contact:     node.Me,
-		ReqID:       reqID,
-		Destination: destNode,
+		Cmd:     "FINO",
+		Contact: node.Me,
+		ReqID:   reqID,
+		ID:      destNode,
 	}
 	log.INFO("Creating find node RPC")
 
@@ -71,7 +71,7 @@ func RespondFindNode(rpc rpcmarshal.RPC) {
 	}
 	log.INFO("Creating new RPC-struct for find node")
 	var marshaledResponse []byte
-	target := &rpc.Destination
+	target := &rpc.ID
 	response.KNodes = bucket.GetInstance().FindClosestContacts(target, 20)
 	log.INFO("Finding closest nodes to the find node target")
 	rpcmarshal.RpcMarshal(response, &marshaledResponse)

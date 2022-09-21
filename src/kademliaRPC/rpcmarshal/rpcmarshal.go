@@ -8,13 +8,12 @@ import (
 )
 
 type RPC struct {
-	Cmd         string
-	Contact     contact.Contact
-	ReqID       string
-	Destination id.KademliaID
-	ID          id.KademliaID
-	Content     stored.Value
-	KNodes      []contact.Contact
+	Cmd     string
+	Contact contact.Contact
+	ReqID   string
+	ID      id.KademliaID
+	Content stored.Value
+	KNodes  []contact.Contact
 }
 
 // A basic test is bellow, move it to main for testing.
