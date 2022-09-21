@@ -14,9 +14,10 @@ type Contact struct {
 	distance *id.KademliaID
 }
 
-// NewContact returns a new instance of a Contact
-func NewContact(contactId *id.KademliaID, address string) Contact {
-	return Contact{contactId, address, nil}
+func (c1 *Contact) Equals(c2 *Contact) bool {
+	res := c1.ID.Equals(c2.ID)
+	res = res && (c1.Address == c2.Address)
+	return res
 }
 
 // CalcDistance calculates the distance to the target and

@@ -27,9 +27,9 @@ func GetInstance() *KademliaNode {
 		defer lock.Unlock()
 		if instance == nil {
 			instance = &KademliaNode{}
-			instance.Me = contact.NewContact(
-				id.NewRandomKademliaID(),
-				getAddress())
+			instance.Me = contact.Contact{
+				ID:      id.NewRandomKademliaID(),
+				Address: getAddress()}
 			instance.RoutingTable = bucket.GetInstance()
 			instance.RoutingTable.Me = instance.Me
 			instance.Values = stored.GetInstance()
