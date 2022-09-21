@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestPingRequestMessageSucces(t *testing.T) {
+func TestPingRequestMessageSuccess(t *testing.T) {
 	rpc1 := rpcmarshal.RPC{
 		Cmd: "PING",
 		Contact: contact.Contact{
@@ -38,7 +38,7 @@ func TestPingRequestMessageFail(t *testing.T) {
 	}
 }
 
-func TestPongRequestMessageSucces(t *testing.T) {
+func TestPongRequestMessageSuccess(t *testing.T) {
 	rpc1 := rpcmarshal.RPC{
 		Cmd: "PONG",
 		Contact: contact.Contact{
