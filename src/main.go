@@ -1,21 +1,7 @@
 package main
 
-func main() {
-	// ip := net.IPv4(127, 0, 0, 1)
-	// port := 4001
-	// go server.UDPListener(ip, port)
-	// sender.UDPSender(ip, port, "this is the message")
+import kademlia "D7024E/node/kademlia/algorithms"
 
-	// rt := bucket.GetInstance()
-	// rt.SetMe(contact.Contact{ID: id.NewRandomKademliaID(), Address: "this is address"})
-	// log.INFO("%v", rt.GetMe())
-	// val := stored.GetInstance()
-	// i := *id.NewRandomKademliaID()
-	// val.Store([]stored.Value{{Data: "this is the data", ID: i}})
-	// res, err := val.FindValue(i)
-	// if err != nil {
-	// 	log.ERROR("%v", err)
-	// } else {
-	// 	log.INFO("%v", res)
-	// }
+func main() {
+	kademlia.TestMergeBatch(10)
 }
