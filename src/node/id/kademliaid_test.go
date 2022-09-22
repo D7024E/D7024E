@@ -1,10 +1,11 @@
 package id
 
 import (
+	"fmt"
 	"testing"
 )
 
-func TestCalcDistanceEqualsSucces(t *testing.T) {
+func TestCalcDistanceSucces(t *testing.T) {
 	idMe := NewRandomKademliaID()
 	idTarget := NewRandomKademliaID()
 
@@ -20,7 +21,7 @@ func TestCalcDistanceEqualsSucces(t *testing.T) {
 	}
 }
 
-func TestCalcDistanceEqualsFail(t *testing.T) {
+func TestCalcDistanceFail(t *testing.T) {
 	idMe := NewRandomKademliaID()
 	idTarget := NewRandomKademliaID()
 
@@ -38,36 +39,46 @@ func TestCalcDistanceEqualsFail(t *testing.T) {
 	}
 }
 
-func TestCalcDistanceLessSucces(t *testing.T) {
+func TestEqualsSucces(t *testing.T) {
 	idMe := NewRandomKademliaID()
-	idTarget := NewRandomKademliaID()
 
-	result1 := idMe.CalcDistance(idTarget)
-
-	result2 := KademliaID{}
-	for i := 0; i < IDLength; i++ {
-		result2[i] = idMe[i] ^ idTarget[i]
-	}
-
-	if result1.Less(&result2) {
+	if !idMe.Equals(idMe) {
 		t.FailNow()
 	}
 }
 
-func TestCalcDistanceLessFail(t *testing.T) {
+func TestEqualsFail(t *testing.T) {
 	idMe := NewRandomKademliaID()
 	idTarget := NewRandomKademliaID()
 
-	idTarget2 := NewRandomKademliaID()
-
-	result1 := idMe.CalcDistance(idTarget)
-
-	result2 := KademliaID{}
-	for i := 0; i < IDLength; i++ {
-		result2[i] = idMe[i] ^ idTarget2[i]
+	if idMe.Equals(idTarget) {
+		t.FailNow()
 	}
+}
 
-	if !result1.Less(&result2) {
+func TestLessSucces(t *testing.T) {
+	idMe := NewRandomKademliaID()
+	idTarget := NewRandomKademliaID()
+
+	fmt.Println("idTarget is " + idTarget.String())
+	fmt.Println("idMe is     " + idMe.String())
+
+	fmt.Println(idTarget.Less(idMe))
+	fmt.Println(idMe.Less(idTarget))
+
+	if idTarget.Less(idMe) {
+		t.FailNow()
+	}
+}
+
+func TestLessFail(t *testing.T) {
+	idMe := NewRandomKademliaID()
+
+	fmt.Println("idMe is     " + idMe.String())
+
+	fmt.Println(idMe.Less(idMe))
+
+	if idMe.Less(idMe) {
 		t.FailNow()
 	}
 }
