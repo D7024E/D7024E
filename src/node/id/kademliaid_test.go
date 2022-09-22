@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestCalcDistanceEqualsSucces(t *testing.T) {
+func TestCalcDistanceEqualsSuccess(t *testing.T) {
 	idMe := NewRandomKademliaID()
 	idTarget := NewRandomKademliaID()
 
@@ -38,7 +38,7 @@ func TestCalcDistanceEqualsFail(t *testing.T) {
 	}
 }
 
-func TestCalcDistanceLessSucces(t *testing.T) {
+func TestCalcDistanceLessSuccess(t *testing.T) {
 	idMe := NewRandomKademliaID()
 	idTarget := NewRandomKademliaID()
 
