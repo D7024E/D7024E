@@ -39,7 +39,7 @@ func findValueRequestMessage(me contact.Contact, reqID string, valueID id.Kademl
 // Handle the request response, by throwing errors and or unmarshaling.
 func findValueRequestReturn(message []byte, err error) (stored.Value, error) {
 	if isError(err) {
-		return stored.Value{}, errors.New("timeout of request")
+		return stored.Value{}, err
 	} else {
 		var rpcMessage rpcmarshal.RPC
 		rpcmarshal.RpcUnmarshal(message, &rpcMessage)
