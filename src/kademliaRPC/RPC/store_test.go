@@ -57,7 +57,7 @@ func TestStoreRequestMessageFail(t *testing.T) {
 // Test if storeRespondMessage outputs correct message.
 func TestStoreRespondMessageSuccess(t *testing.T) {
 	rpc1 := rpcmarshal.RPC{
-		Cmd: "ERTS",
+		Cmd: "RESP",
 		Contact: contact.Contact{
 			ID:      id.NewRandomKademliaID(),
 			Address: "THIS IS ADDRESS"},
@@ -74,7 +74,7 @@ func TestStoreRespondMessageSuccess(t *testing.T) {
 // Test if storeRespondMessage outputs correct message.
 func TestStoreRespondMessageFail(t *testing.T) {
 	rpc1 := rpcmarshal.RPC{
-		Cmd: "ERTS",
+		Cmd: "RESP",
 		Contact: contact.Contact{
 			ID:      id.NewRandomKademliaID(),
 			Address: "THIS IS ADDRESS"},

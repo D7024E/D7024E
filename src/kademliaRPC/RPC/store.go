@@ -47,7 +47,7 @@ func StoreRespond(me contact.Contact, target contact.Contact, reqID string, valu
 func storeRespondMessage(me contact.Contact, reqID string) []byte {
 	var message []byte
 	rpcmarshal.RpcMarshal(rpcmarshal.RPC{
-		Cmd:     "ERTS",
+		Cmd:     "RESP",
 		Contact: me,
 		ReqID:   reqID,
 	}, &message)
