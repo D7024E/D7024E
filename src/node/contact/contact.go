@@ -14,11 +14,11 @@ type Contact struct {
 	distance *id.KademliaID
 }
 
-func (contact Contact) GetDistance() *id.KademliaID {
+func (contact *Contact) GetDistance() *id.KademliaID {
 	return contact.distance
 }
 
-func (contact Contact) SetDistance(dist *id.KademliaID) {
+func (contact *Contact) SetDistance(dist *id.KademliaID) {
 	contact.distance = dist
 }
 
