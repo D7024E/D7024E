@@ -44,7 +44,7 @@ func PongMessage(me contact.Contact, reqID string) []byte {
 	var msg []byte
 	rpcmarshal.RpcMarshal(
 		rpcmarshal.RPC{
-			Cmd:     "PONG",
+			Cmd:     "RESP",
 			Contact: me,
 			ReqID:   reqID,
 		}, &msg)

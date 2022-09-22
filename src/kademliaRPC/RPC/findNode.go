@@ -55,7 +55,7 @@ func FindNodeResponse(me contact.Contact, reqID string, kademliaID id.KademliaID
 // Create the response message.
 func findNodeResponseMessage(me contact.Contact, reqID string, kademliaID id.KademliaID) []byte {
 	rpcMessage := rpcmarshal.RPC{
-		Cmd:     "ONIF",
+		Cmd:     "RESP",
 		Contact: me,
 		ReqID:   reqID,
 	}
