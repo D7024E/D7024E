@@ -9,9 +9,9 @@ import (
 	"D7024E/node/id"
 )
 
-func NodeLookup(destNode id.KademliaID, batch []contact.Contact) (closest contact.Contact) {
+func NodeLookup(destNode id.KademliaID, batch []contact.Contact) (closest []contact.Contact) {
 	rt := bucket.GetInstance()
-	node := rt.Me
+	//node := rt.Me
 
 	if len(batch) == 0 {
 		batch = rt.FindClosestContacts(&destNode, config.Alpha)
@@ -28,4 +28,19 @@ func NodeLookup(destNode id.KademliaID, batch []contact.Contact) (closest contac
 		}
 	}
 
+	// Convert the contact batch into a single slice.
+	batch = mergeBatch(newBatch)
+
+	//
+
+	return
+}
+
+// Note that this merge do not take duplicates into account.
+func mergeBatch(batch [][]contact.Contact) []contact.Contact {
+	var mergedBatch []contact.Contact
+	for i := 0; i < len(batch); i++ {
+		mergedBatch = append(mergedBatch, batch[i]...)
+	}
+	return mergedBatch
 }
