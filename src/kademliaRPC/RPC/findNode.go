@@ -1,81 +1,66 @@
 package rpc
 
 import (
-	"errors"
-	"net"
-
 	"D7024E/config"
 	"D7024E/kademliaRPC/rpcmarshal"
-	"D7024E/log"
 	"D7024E/network/requestHandler"
 	"D7024E/network/sender"
 	"D7024E/node/bucket"
 	"D7024E/node/contact"
 	"D7024E/node/id"
-	"D7024E/node/kademlia"
 )
 
-func FindNode(target contact.Contact, destNode id.KademliaID) (kNodes []contact.Contact, newErr error) {
-	node := kademlia.GetInstance()
-	reqHandler := requestHandler.GetInstance()
+// FindNode RPC request
+// Retrieve k contacts from target node, return error if request timeout.
+func FindNodeRequest(me contact.Contact, target contact.Contact, kademliaID id.KademliaID) ([]contact.Contact, error) {
+	requestInstance := requestHandler.GetInstance()
+	reqID := newValidRequestID()
+	message := findNodeRequestMessage(me, reqID, kademliaID)
+	ip := parseIP(target.Address)
+	sender.UDPSender(ip, config.Port, message)
+	err := requestInstance.ReadResponse(reqID, &message)
+	return findNodeRequestReturn(message, err)
+}
 
-	var reqID string = id.NewRandomKademliaID().String()
-	var fino []byte
-	var response rpcmarshal.RPC
-
-	rpc := rpcmarshal.RPC{
+// Create FindNodeRequest message by marshaling.
+func findNodeRequestMessage(me contact.Contact, reqID string, kademliaID id.KademliaID) []byte {
+	var message []byte
+	rpcmarshal.RpcMarshal(rpcmarshal.RPC{
 		Cmd:     "FINO",
-		Contact: node.Me,
+		Contact: me,
 		ReqID:   reqID,
-		ID:      destNode,
-	}
-	log.INFO("Creating find node RPC")
+		ID:      kademliaID,
+	}, &message)
+	return message
+}
 
-	// Attempt to lock th request id in the reqTable.
-	err := reqHandler.NewRequest(reqID)
-	// If there is a request id collision, generate a new request id and try again.
-	for err != nil {
-		log.ERROR("%v", err)
-		var reqID string = id.NewRandomKademliaID().String()
-		rpc.ReqID = reqID
-		err = reqHandler.NewRequest(reqID)
+// The return response from the request.
+func findNodeRequestReturn(message []byte, err error) ([]contact.Contact, error) {
+	if isError(err) {
+		return nil, err
 	}
-
-	// Marshal the rpc struct and send it to the target.
-	rpcmarshal.RpcMarshal(rpc, &fino)
-	log.INFO("Marshalling find node RPC")
-	sender.UDPSender(net.IP(target.Address), config.Port, fino)
-	log.INFO("Sending find node RPC")
-
-	// Await and return the response.
-	log.INFO("Waiting for find node response")
-	err = reqHandler.ReadResponse(reqID, &fino)
-	if err != nil {
-		log.ERROR("%v", err)
-		newErr := errors.New("No response")
-		return nil, newErr
-	}
-	log.INFO("Received find node response")
-	rpcmarshal.RpcUnmarshal(fino, &response)
-	return response.KNodes, nil
+	var rpcMessage rpcmarshal.RPC
+	rpcmarshal.RpcUnmarshal(message, &rpcMessage)
+	return rpcMessage.KNodes, nil
 }
 
 // Creates a response RPC struct and populates it with the K, (K = 20), closest nodes to the destination node.
 // Which is then sent back to the sender.
-func RespondFindNode(rpc rpcmarshal.RPC) {
-	node := kademlia.GetInstance()
-	response := rpcmarshal.RPC{
-		Cmd:     "RESP",
-		Contact: node.Me,
-		ReqID:   rpc.ReqID,
+func FindNodeResponse(me contact.Contact, reqID string, kademliaID id.KademliaID, target contact.Contact) {
+	message := findNodeResponseMessage(me, reqID, kademliaID)
+	ip := parseIP(target.Address)
+	sender.UDPSender(ip, config.Port, message)
+}
+
+// Create the response message.
+func findNodeResponseMessage(me contact.Contact, reqID string, kademliaID id.KademliaID) []byte {
+	rpcMessage := rpcmarshal.RPC{
+		Cmd:     "ONIF",
+		Contact: me,
+		ReqID:   reqID,
 	}
-	log.INFO("Creating new RPC-struct for find node")
-	var marshaledResponse []byte
-	target := &rpc.ID
-	response.KNodes = bucket.GetInstance().FindClosestContacts(target, 20)
-	log.INFO("Finding closest nodes to the find node target")
-	rpcmarshal.RpcMarshal(response, &marshaledResponse)
-	log.INFO("Marshalling find node RPC-response")
-	sender.UDPSender(net.IP(rpc.Contact.Address), config.Port, marshaledResponse)
-	log.INFO("Sending find node response")
+	rpcMessage.KNodes = bucket.GetInstance().FindClosestContacts(&kademliaID, 20)
+	var message []byte
+	rpcmarshal.RpcMarshal(rpcMessage, &message)
+	return message
 }
