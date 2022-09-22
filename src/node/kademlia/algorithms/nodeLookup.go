@@ -49,3 +49,15 @@ func mergeBatch(batch [][]contact.Contact) []contact.Contact {
 func getDistance(nodeA id.KademliaID, nodeB id.KademliaID) *id.KademliaID {
 	return nodeA.CalcDistance(&nodeB)
 }
+
+// Updates the distances in "batch" to be the distances to the current node then returns the new batch.
+func getAllDistances(destNode id.KademliaID, batch []contact.Contact) []contact.Contact {
+	rt := bucket.GetInstance()
+	me := rt.Me
+
+	for i := 0; i < len(batch); i++ {
+		relativeDistance := getDistance(*batch[i].ID, *me.ID)
+		batch[i].SetDistance(relativeDistance)
+	}
+	return batch
+}
