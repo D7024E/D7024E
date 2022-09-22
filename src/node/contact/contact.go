@@ -14,6 +14,14 @@ type Contact struct {
 	distance *id.KademliaID
 }
 
+func (contact Contact) GetDistance() *id.KademliaID {
+	return contact.distance
+}
+
+func (contact Contact) SetDistance(dist *id.KademliaID) {
+	contact.distance = dist
+}
+
 // NewContact returns a new instance of a Contact
 func NewContact(contactId *id.KademliaID, address string) Contact {
 	return Contact{contactId, address, nil}
