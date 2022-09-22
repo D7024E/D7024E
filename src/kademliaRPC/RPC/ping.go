@@ -20,7 +20,6 @@ func Ping(me contact.Contact, target contact.Contact) bool {
 }
 
 func PingMessage(me contact.Contact, reqID string) []byte {
-
 	var msg []byte
 	rpcmarshal.RpcMarshal(
 		rpcmarshal.RPC{
@@ -34,13 +33,11 @@ func PingMessage(me contact.Contact, reqID string) []byte {
 // PONG rpc.
 // Ping target node, if there is a response return true, otherwise false.
 func Pong(me contact.Contact, target contact.Contact, reqID string) {
-
 	msg := PongMessage(me, reqID)
 	sender.UDPSender(net.ParseIP(target.Address), 4001, msg)
 }
 
 func PongMessage(me contact.Contact, reqID string) []byte {
-
 	var msg []byte
 	rpcmarshal.RpcMarshal(
 		rpcmarshal.RPC{
