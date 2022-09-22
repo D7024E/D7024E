@@ -72,7 +72,7 @@ func TestCalcDistanceLessFail(t *testing.T) {
 	}
 }
 
-func TestNewKademliaIDSuccess(t *testing.T) {
+func TestNewKademliaID(t *testing.T) {
 	id := NewRandomKademliaID()
 	idString := id.String()
 	id2 := NewKademliaID(idString)
