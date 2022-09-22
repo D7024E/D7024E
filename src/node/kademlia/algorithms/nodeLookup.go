@@ -44,3 +44,8 @@ func mergeBatch(batch [][]contact.Contact) []contact.Contact {
 	}
 	return mergedBatch
 }
+
+// Given two kademlia ids' returns the distance between them
+func getDistance(nodeA id.KademliaID, nodeB id.KademliaID) *id.KademliaID {
+	return nodeA.CalcDistance(&nodeB)
+}
