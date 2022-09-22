@@ -11,7 +11,7 @@ import (
 
 func NodeLookup(destNode id.KademliaID, batch []contact.Contact) (closest []contact.Contact) {
 	rt := bucket.GetInstance()
-	//node := rt.Me
+	me := rt.Me
 
 	if len(batch) == 0 {
 		batch = rt.FindClosestContacts(&destNode, config.Alpha)
@@ -31,7 +31,8 @@ func NodeLookup(destNode id.KademliaID, batch []contact.Contact) (closest []cont
 	// Convert the contact batch into a single slice.
 	batch = mergeBatch(newBatch)
 
-	//
+	// Calculate the distance to each node in the batch.
+	distBatch := getAllDistances(*me.ID, batch)
 
 	return
 }
@@ -52,11 +53,30 @@ func getDistance(nodeA id.KademliaID, nodeB id.KademliaID) *id.KademliaID {
 
 // Updates the distances in "batch" to be the distances to the current node then returns the new batch.
 func getAllDistances(me id.KademliaID, batch []contact.Contact) []contact.Contact {
-	rt := bucket.GetInstance()
-
 	for i := 0; i < len(batch); i++ {
 		relativeDistance := getDistance(*batch[i].ID, me)
 		batch[i].SetDistance(relativeDistance)
 	}
 	return batch
+}
+
+func removeDuplicates(batch []contact.Contact) []contact.Contact {
+	var cleanedBatch []contact.Contact
+	// For each element in batch, check if the distance already exists in cleanedBatch.
+	for i := 0; i < len(batch); i++ {
+		var dupe bool = false
+		currentDist := *batch[i].GetDistance()
+		for j := 0; j < len(cleanedBatch); j++ {
+			if currentDist == *cleanedBatch[j].GetDistance() {
+				dupe = true
+				// If one duplicate is found there is no reason to look for more.
+				break
+			}
+		}
+		// If no match is found, we add the i:th contact from batch to cleanedBatch.
+		if dupe == false {
+			cleanedBatch = append(cleanedBatch, batch[i])
+		}
+	}
+	return cleanedBatch
 }
