@@ -1,7 +1,6 @@
 package handler
 
 import (
-	rpc "D7024E/kademliaRPC/RPC"
 	"D7024E/kademliaRPC/rpcmarshal"
 	"D7024E/log"
 )
@@ -11,14 +10,14 @@ func HandleCMD(msg []byte) {
 	var rpcMessage rpcmarshal.RPC
 	rpcmarshal.RpcUnmarshal(msg, &rpcMessage)
 	switch rpcMessage.Cmd {
-	case "PING":
+	case "RESP":
 		panic("help")
-	case "PONG":
+	case "PING":
 		panic("help")
 	case "STRE":
 		panic("help")
 	case "FINO":
-		rpc.RespondFindNode(rpcMessage)
+		panic("help")
 	case "FIVA":
 		panic("help")
 	default:
