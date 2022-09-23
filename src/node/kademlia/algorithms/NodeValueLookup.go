@@ -31,5 +31,5 @@ func NodeValueLookup(valueID id.KademliaID) (stored.Value, error) {
 			return v, nil
 		}
 	}
-	return stored.Value{}, errors.New("Value not found")
+	return stored.Value{}, errors.New("value not found")
 }

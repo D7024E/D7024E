@@ -84,8 +84,7 @@ func TestMergeBatch(n int) {
 	testSet = append(testSet, testSetA)
 	testSet = append(testSet, testSetB)
 
-	var mergedTest []contact.Contact
-	mergedTest = mergeBatch(testSet)
+	mergedTest := mergeBatch(testSet)
 
 	fmt.Println("")
 	fmt.Println("The test set is:")
@@ -158,7 +157,7 @@ func removeDuplicates(batch []contact.Contact) []contact.Contact {
 			}
 		}
 		// If no match is found, we add the i:th contact from batch to cleanedBatch.
-		if dupe == false {
+		if !dupe {
 			cleanedBatch = append(cleanedBatch, batch[i])
 		}
 	}
