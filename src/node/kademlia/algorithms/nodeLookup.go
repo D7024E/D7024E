@@ -17,6 +17,7 @@ import (
 func NodeLookup(destNode id.KademliaID, batch []contact.Contact) (closest []contact.Contact) {
 	rt := bucket.GetInstance()
 	me := rt.Me
+	alpha := config.Alpha
 
 	if len(batch) == 0 {
 		batch = rt.FindClosestContacts(&destNode, config.Alpha)
@@ -43,7 +44,7 @@ func NodeLookup(destNode id.KademliaID, batch []contact.Contact) (closest []cont
 
 	// Sort the cleaned batch and extract the alpha closest nodes.
 	sortedBatch := kademliaSort.SortContacts(cleanedBatch)
-	alphaNodes := removeDeadNodes(sortedBatch)[:3]
+	alphaNodes := removeDeadNodes(sortedBatch)[:alpha]
 
 	return alphaNodes
 }
