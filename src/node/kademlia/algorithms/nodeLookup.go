@@ -7,7 +7,11 @@ import (
 	"D7024E/node/bucket"
 	"D7024E/node/contact"
 	"D7024E/node/id"
+	"D7024E/node/kademlia/kademliaSort"
+
 	"fmt"
+	"sort"
+	"sync"
 )
 
 func NodeLookup(destNode id.KademliaID, batch []contact.Contact) (closest []contact.Contact) {
@@ -38,8 +42,10 @@ func NodeLookup(destNode id.KademliaID, batch []contact.Contact) (closest []cont
 	fmt.Print(cleanedBatch)
 
 	// Sort the cleaned batch and extract the alpha closest nodes.
+	sortedBatch := kademliaSort.SortContacts(cleanedBatch)
+	alphaNodes := removeDeadNodes(sortedBatch)[:3]
 
-	return
+	return alphaNodes
 }
 
 // Note that this merge do not take duplicates into account.
@@ -191,4 +197,34 @@ func TestDupe(n int, dupes int) {
 		fmt.Println(testSet[i])
 	}
 	fmt.Println("There are", len(testSet), "elements in the list")
+}
+
+func removeDeadNodes(batch []contact.Contact) []contact.Contact {
+	rt := bucket.GetInstance()
+	me := rt.Me
+
+	var deadNodes []int
+	var wg sync.WaitGroup
+
+	for i := 0; i < len(batch); i++ {
+		wg.Add(1)
+		n := i
+		go func() {
+			alive := rpc.Ping(me, batch[n])
+			if !alive {
+				deadNodes = append(deadNodes, n)
+			}
+			wg.Done()
+		}()
+	}
+
+	wg.Wait()
+
+	sort.Ints(deadNodes)
+
+	for i := len(deadNodes); i > 0; i-- {
+		batch = append(batch[:i], batch[i+1:]...)
+	}
+
+	return batch
 }
