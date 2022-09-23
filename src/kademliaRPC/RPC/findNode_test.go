@@ -72,7 +72,7 @@ func TestFindNodeResponseMessageSuccess(t *testing.T) {
 	bucket.GetInstance().AddContact(contact.Contact{ID: id.NewRandomKademliaID()})
 	bucket.GetInstance().AddContact(contact.Contact{ID: id.NewRandomKademliaID()})
 	rpc1 := rpcmarshal.RPC{
-		Cmd: "ONIF",
+		Cmd: "RESP",
 		Contact: contact.Contact{
 			ID:      id.NewRandomKademliaID(),
 			Address: "THIS IS ADDRESS"},
@@ -96,7 +96,7 @@ func TestFindNodeResponseMessageFail(t *testing.T) {
 	bucket.GetInstance().AddContact(contact.Contact{ID: id.NewRandomKademliaID()})
 	bucket.GetInstance().AddContact(contact.Contact{ID: id.NewRandomKademliaID()})
 	rpc1 := rpcmarshal.RPC{
-		Cmd: "ONIF",
+		Cmd: "RESP",
 		Contact: contact.Contact{
 			ID:      id.NewRandomKademliaID(),
 			Address: "THIS IS ADDRESS"},
