@@ -22,9 +22,10 @@ func (contact *Contact) SetDistance(dist *id.KademliaID) {
 	contact.distance = dist
 }
 
-// NewContact returns a new instance of a Contact
-func NewContact(contactId *id.KademliaID, address string) Contact {
-	return Contact{contactId, address, nil}
+func (c1 *Contact) Equals(c2 *Contact) bool {
+	res := c1.ID.Equals(c2.ID)
+	res = res && (c1.Address == c2.Address)
+	return res
 }
 
 // CalcDistance calculates the distance to the target and
@@ -67,15 +68,38 @@ func (candidates *ContactCandidates) Sort() {
 // Len returns the length of the ContactCandidates
 func (candidates *ContactCandidates) Len() int {
 	return len(candidates.contacts)
+}ucket.GetInstance()
+me := rt.Me
+
+if len(batch) == 0 {
+	batch = rt.FindClosestContacts(&destNode, config.Alpha)
+}
+var newBatch [][]contact.Contact
+// For each of the alpha nodes in "batch", send a findNode RPC and append the result to "newBatch"
+for i := 0; i < len(batch); i++ {
+	var kN []contact.Contact
+	kN, err := rpc.FindNode(batch[i], destNode)
+	if err != nil {
+		log.ERROR("%v", err)
+	} else {
+		newBatch = append(newBatch, kN)
+	}
 }
 
-// Swap the position of the Contacts at i and j
-// WARNING does not check if either i or j is within range
-func (candidates *ContactCandidates) Swap(i, j int) {
-	candidates.contacts[i], candidates.contacts[j] = candidates.contacts[j], candidates.contacts[i]
-}
+// Convert the contact batch into a single slice.
+batch = mergeBatch(newBatch)
 
-// Less returns true if the Contact at index i is smaller than
+// Calculate the distance to each node in the batch and remove duplicates.
+distBatch := getAllDistances(*me.ID, batch)
+cleanedBatch := removeDuplicates(distBatch)
+fmt.Print(cleanedBatch)
+
+// Sort the cleaned batch and extract the alpha closest nodes.
+sortedBatch := kademliaSort.SortContacts(cleanedBatch)
+alphaNodes := removeDeadNodes(sortedBatch)[:3]
+
+return alphaNodes
+} smaller than
 // the Contact at index j
 func (candidates *ContactCandidates) Less(i, j int) bool {
 	return candidates.contacts[i].Less(&candidates.contacts[j])

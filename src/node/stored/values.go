@@ -14,6 +14,15 @@ type Value struct {
 	DeadAt time.Time     `json:"deadAt"` // json time where value is dead.
 }
 
+// Equals for two Value, true if equal otherwise false.
+func (v1 *Value) Equals(v2 *Value) bool {
+	res := v1.Data == v2.Data
+	res = res && v1.ID.Equals(&v2.ID)
+	res = res && (v1.Ttl.String() == v2.Ttl.String())
+	res = res && v1.DeadAt.Equal(v2.DeadAt)
+	return res
+}
+
 type Stored struct {
 	values []Value
 }

@@ -5,61 +5,48 @@ import (
 	"D7024E/network/requestHandler"
 	"D7024E/network/sender"
 	"D7024E/node/contact"
-	"D7024E/node/id"
 	"net"
 )
 
 // PING rpc.
 // Ping target node, if there is a response return true, otherwise false.
 func Ping(me contact.Contact, target contact.Contact) bool {
-	// Pointer to request Handler instance.
-	requestInstance := requestHandler.GetInstance()
+	reqID := newValidRequestID()
+	msg := PingMessage(me, reqID)
+	ip := net.ParseIP(target.Address)
+	sender.UDPSender(ip, 4001, msg)
+	err := requestHandler.GetInstance().ReadResponse(reqID, &msg)
+	return !isError(err)
+}
 
-	// Request new request id.
-	var reqID string
-	var err error
-	for {
-		reqID = id.NewRandomKademliaID().String()
-		err = requestInstance.NewRequest(reqID)
-		if err != nil {
-			break
-		}
-	}
+func PingMessage(me contact.Contact, reqID string) []byte {
 
-	// Create a rpc struct.
-	rpcMessage := rpcmarshal.RPC{
-		Cmd:     "PING",
-		Contact: me,
-		ReqID:   reqID,
-	}
-
-	// Marshal rpc and send.
-	var msg *[]byte
-	rpcmarshal.RpcMarshal(rpcMessage, msg)
-	sender.UDPSender(net.ParseIP(target.Address), 4001, *msg)
-
-	// Wait for response.
-	err2 := requestInstance.ReadResponse(reqID, msg)
-	if err2 != nil {
-		return false
-	} else {
-		return true
-	}
+	var msg []byte
+	rpcmarshal.RpcMarshal(
+		rpcmarshal.RPC{
+			Cmd:     "PING",
+			Contact: me,
+			ReqID:   reqID,
+		}, &msg)
+	return msg
 }
 
 // PONG rpc.
 // Ping target node, if there is a response return true, otherwise false.
 func Pong(me contact.Contact, target contact.Contact, reqID string) {
 
-	// Create a rpc struct.
-	rpcMessage := rpcmarshal.RPC{
-		Cmd:     "PONG",
-		Contact: me,
-		ReqID:   reqID,
-	}
+	msg := PongMessage(me, reqID)
+	sender.UDPSender(net.ParseIP(target.Address), 4001, msg)
+}
 
-	// Marshal rpc and send.
-	var msg *[]byte
-	rpcmarshal.RpcMarshal(rpcMessage, msg)
-	sender.UDPSender(net.ParseIP(target.Address), 4001, *msg)
+func PongMessage(me contact.Contact, reqID string) []byte {
+
+	var msg []byte
+	rpcmarshal.RpcMarshal(
+		rpcmarshal.RPC{
+			Cmd:     "PONG",
+			Contact: me,
+			ReqID:   reqID,
+		}, &msg)
+	return msg
 }

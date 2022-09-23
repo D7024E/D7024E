@@ -6,3 +6,6 @@ logs.txt
 
 #ignore environment
 .env
+
+#ignore test coverage 
+cover.out
