@@ -24,7 +24,8 @@ func HandleCMD(msg []byte) {
 	case "FINO":
 		panic("help")
 	case "FIVA":
-		panic("help")
+		log.INFO("FIVA DONE")
+		rpc.FindValueResponse(kademlia.GetInstance().Me, rpcMessage.Contact, rpcMessage.ReqID, rpcMessage.ID)
 	default:
 		log.ERROR("UNKNOWN CMD")
 	}
