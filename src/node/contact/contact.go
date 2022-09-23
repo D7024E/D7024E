@@ -14,6 +14,14 @@ type Contact struct {
 	distance *id.KademliaID
 }
 
+func (contact *Contact) GetDistance() *id.KademliaID {
+	return contact.distance
+}
+
+func (contact *Contact) SetDistance(dist *id.KademliaID) {
+	contact.distance = dist
+}
+
 func (c1 *Contact) Equals(c2 *Contact) bool {
 	res := c1.ID.Equals(c2.ID)
 	res = res && (c1.Address == c2.Address)
