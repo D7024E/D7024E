@@ -64,7 +64,7 @@ func FindValueResponse(me contact.Contact, target contact.Contact, reqID string,
 func findValueResponseMessage(me contact.Contact, reqID string, valueID id.KademliaID) []byte {
 	// Create rpc which will be sent.
 	rpcMessage := rpcmarshal.RPC{
-		Cmd:     "AVIF",
+		Cmd:     "RESP",
 		Contact: me,
 		ReqID:   reqID,
 	}

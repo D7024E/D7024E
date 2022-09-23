@@ -40,7 +40,7 @@ func TestPingRequestMessageFail(t *testing.T) {
 
 func TestPongRequestMessageSuccess(t *testing.T) {
 	rpc1 := rpcmarshal.RPC{
-		Cmd: "PONG",
+		Cmd: "RESP",
 		Contact: contact.Contact{
 			ID:      id.NewRandomKademliaID(),
 			Address: "THIS IS ADDRESS"},
@@ -56,7 +56,7 @@ func TestPongRequestMessageSuccess(t *testing.T) {
 
 func TestPongRequestMessageFail(t *testing.T) {
 	rpc1 := rpcmarshal.RPC{
-		Cmd: "PONG",
+		Cmd: "RESP",
 		Contact: contact.Contact{
 			ID:      id.NewRandomKademliaID(),
 			Address: "THIS IS ADDRESS"},

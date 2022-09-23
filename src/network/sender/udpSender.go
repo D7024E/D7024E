@@ -2,7 +2,6 @@ package sender
 
 import (
 	"D7024E/log"
-	"fmt"
 	"net"
 	"strconv"
 )
@@ -21,10 +20,11 @@ func UDPSender(ip net.IP, port int, message []byte) {
 	}
 	defer connection.Close()
 
-	sentWords, err := fmt.Fprint(connection, message)
+	_, err = connection.Write(message)
+	// sentWords, err := fmt.Fprint(connection, message)
 	if err != nil {
 		log.ERROR("Something went wrong in the sender...")
-	} else {
-		log.INFO("Message was sent, it was %v chars long...", sentWords)
-	}
+	} // else {
+	// 	log.INFO("Message was sent, it was %v chars long...", sentWords)
+	// }
 }

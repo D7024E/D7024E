@@ -77,7 +77,7 @@ func TestFindValueResponseMessageSuccess(t *testing.T) {
 	value := stored.Value{ID: *id.NewRandomKademliaID()}
 	stored.GetInstance().Store([]stored.Value{value})
 	rpc1 := rpcmarshal.RPC{
-		Cmd: "AVIF",
+		Cmd: "RESP",
 		Contact: contact.Contact{
 			ID:      id.NewRandomKademliaID(),
 			Address: "THIS IS ADDRESS"},
@@ -97,7 +97,7 @@ func TestFindValueResponseMessageNotFound(t *testing.T) {
 	value := stored.Value{ID: *id.NewRandomKademliaID()}
 	stored.GetInstance().Store([]stored.Value{value})
 	rpc1 := rpcmarshal.RPC{
-		Cmd: "AVIF",
+		Cmd: "RESP",
 		Contact: contact.Contact{
 			ID:      id.NewRandomKademliaID(),
 			Address: "THIS IS ADDRESS"},
