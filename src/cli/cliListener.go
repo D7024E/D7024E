@@ -10,6 +10,6 @@ func CliListener() {
 	scanner := bufio.NewScanner(os.Stdin)
 	for {
 		scanner.Scan()
-		log.INFO("%v", (scanner.Text()))
+		log.INFO("%v", Handle(scanner.Text()))
 	}
 }

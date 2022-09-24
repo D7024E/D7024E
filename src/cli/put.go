@@ -8,7 +8,7 @@ import (
 
 func Put(input []string) string {
 	if len(input) != 2 {
-		return "Invalid amount of inputs"
+		return "invalid amount of arguments"
 	}
 	id := *id.NewKademliaID(input[1])
 	value := stored.Value{

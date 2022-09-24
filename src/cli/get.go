@@ -7,7 +7,7 @@ import (
 
 func Get(input []string) string {
 	if len(input) != 2 {
-		return "Invalid amount of inputs"
+		return "invalid amount of arguments"
 	}
 
 	valueID, err := id.String2KademliaID(input[1])

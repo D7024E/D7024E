@@ -15,7 +15,7 @@ func Handle(text string) string {
 	case "exit":
 		result = Exit(split)
 	default:
-		result = "Invalid command"
+		result = "invalid command"
 	}
 	return result
 }

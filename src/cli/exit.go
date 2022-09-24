@@ -4,7 +4,7 @@ import "os"
 
 func Exit(inputs []string) string {
 	if len(inputs) != 1 {
-		return "Invalid amount of inputs"
+		return "invalid amount of arguments"
 	}
 	os.Exit(1)
 	return ""
