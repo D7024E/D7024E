@@ -30,12 +30,22 @@ func GetInstance() *RoutingTable {
 	return instance
 }
 
-func (rt *RoutingTable) AddContact(newContact contact.Contact) {
+// Attempt to add a contact to its bucket.
+func (rt *RoutingTable) AddContact(newContact contact.Contact) (head contact.Contact, res bool) {
 	lock.Lock()
 	defer lock.Unlock()
 	bucketIndex := rt.getBucketIndex(newContact.ID)
 	bucket := rt.buckets[bucketIndex]
-	bucket.AddContact(newContact)
+	head, res = bucket.AddContact(newContact)
+	return head, res
+}
+
+func (rt *RoutingTable) RemoveContact(oldContact contact.Contact) {
+	lock.Lock()
+	defer lock.Unlock()
+	bucketIndex := rt.getBucketIndex(oldContact.ID)
+	bucket := rt.buckets[bucketIndex]
+	bucket.RemoveContact(oldContact)
 }
 
 func (rt *RoutingTable) FindClosestContacts(target *id.KademliaID, count int) []contact.Contact {
