@@ -45,3 +45,44 @@ func TestFindValueFail(t *testing.T) {
 		t.FailNow()
 	}
 }
+
+func TestFindValueEqualsTrue(t *testing.T) {
+
+	list := GetInstance()
+	value := Value{
+		Data: "Erik",
+		ID:   *id.NewRandomKademliaID(),
+	}
+
+	list.Store(append(list.values, value))
+
+	fmt.Println(value.Equals(&value))
+
+	if !(value.Equals(&value) == true) {
+		t.FailNow()
+	}
+
+}
+
+func TestFindValueEqualsFalse(t *testing.T) {
+
+	list := GetInstance()
+	value1 := Value{
+		Data: "Erik",
+		ID:   *id.NewRandomKademliaID(),
+	}
+
+	value2 := Value{
+		Data: "Dennis",
+		ID:   *id.NewRandomKademliaID(),
+	}
+	list.Store(append(list.values, value1))
+	list.Store(append(list.values, value2))
+
+	fmt.Println(value1.Equals(&value2))
+
+	if !(value1.Equals(&value2) == false) {
+		t.FailNow()
+	}
+
+}
