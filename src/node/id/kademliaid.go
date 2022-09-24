@@ -3,6 +3,7 @@ package id
 import (
 	"crypto/sha1"
 	"encoding/hex"
+	"errors"
 	"math/rand"
 )
 
@@ -56,4 +57,17 @@ func (kademliaID KademliaID) CalcDistance(target *KademliaID) *KademliaID {
 
 func (kademliaID *KademliaID) String() string {
 	return hex.EncodeToString(kademliaID[0:IDLength])
+}
+
+func String2KademliaID(str string) (*KademliaID, error) {
+	kademliaID := KademliaID{}
+	bytes := []byte(str)
+	if len(bytes) != IDLength {
+		return &kademliaID, errors.New("invalid length str 2 kademlia")
+	}
+
+	for i := 0; i < IDLength; i++ {
+		kademliaID[i] = bytes[i]
+	}
+	return &kademliaID, nil
 }
