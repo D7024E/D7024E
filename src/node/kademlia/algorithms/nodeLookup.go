@@ -15,13 +15,13 @@ import (
 	"sync"
 )
 
-func NodeLookup(destNode id.KademliaID, batch []contact.Contact) (closest []contact.Contact) {
+func NodeLookup(destNode id.KademliaID, batch []contact.Contact) []contact.Contact {
 	rt := bucket.GetInstance()
 	me := rt.Me
 	alpha := config.Alpha
 
 	if len(batch) == 0 {
-		batch = rt.FindClosestContacts(&destNode, config.Alpha)
+		batch = rt.FindClosestContacts(&destNode, alpha)
 	}
 	var newBatch [][]contact.Contact
 	// For each of the alpha nodes in "batch", send a findNode RPC and append the result to "newBatch"
@@ -36,18 +36,35 @@ func NodeLookup(destNode id.KademliaID, batch []contact.Contact) (closest []cont
 	}
 
 	// Convert the contact batch into a single slice.
-	batch = mergeBatch(newBatch)
+	updatedBatch := mergeBatch(newBatch)
 
 	// Calculate the distance to each node in the batch and remove duplicates.
-	distBatch := getAllDistances(*me.ID, batch)
-	cleanedBatch := removeDuplicates(distBatch)
-	fmt.Print(cleanedBatch)
+	updatedBatch = getAllDistances(*me.ID, updatedBatch)
+	updatedBatch = removeDuplicates(updatedBatch)
 
 	// Sort the cleaned batch and extract the alpha closest nodes.
-	sortedBatch := kademliaSort.SortContacts(cleanedBatch)
-	alphaNodes := removeDeadNodes(sortedBatch)[:alpha]
+	updatedBatch = kademliaSort.SortContacts(updatedBatch)
+	updatedBatch = removeDeadNodes(updatedBatch)[:alpha]
 
-	return alphaNodes
+	var sameBatch bool = true
+	for i := 0; i < min(len(batch), len(updatedBatch)); i++ {
+		if batch[i].GetDistance() != updatedBatch[i].GetDistance() {
+			sameBatch = false
+		}
+	}
+	if sameBatch {
+		return updatedBatch
+	} else {
+		return NodeLookup(destNode, updatedBatch)
+	}
+}
+
+func min(a, b int) int {
+	if a <= b {
+		return b
+	} else {
+		return a
+	}
 }
 
 // Note that this merge do not take duplicates into account.
@@ -84,8 +101,7 @@ func TestMergeBatch(n int) {
 	testSet = append(testSet, testSetA)
 	testSet = append(testSet, testSetB)
 
-	var mergedTest []contact.Contact
-	mergedTest = mergeBatch(testSet)
+	mergedTest := mergeBatch(testSet)
 
 	fmt.Println("")
 	fmt.Println("The test set is:")
@@ -158,7 +174,7 @@ func removeDuplicates(batch []contact.Contact) []contact.Contact {
 			}
 		}
 		// If no match is found, we add the i:th contact from batch to cleanedBatch.
-		if dupe == false {
+		if !dupe {
 			cleanedBatch = append(cleanedBatch, batch[i])
 		}
 	}
