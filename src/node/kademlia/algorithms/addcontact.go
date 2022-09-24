@@ -13,5 +13,6 @@ func AddContact(newContact contact.Contact) {
 		return
 	} else {
 		rt.RemoveContact(head)
+		AddContact(newContact)
 	}
 }
