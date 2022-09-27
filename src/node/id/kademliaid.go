@@ -69,11 +69,12 @@ func (kademliaID *KademliaID) String() string {
 
 func String2KademliaID(str string) (*KademliaID, error) {
 	kademliaID := KademliaID{}
-	bytes := []byte(str)
+	bytes, err := hex.DecodeString(str)
 	if len(bytes) != IDLength {
 		return &kademliaID, errors.New("invalid length str 2 kademlia")
+	} else if err != nil {
+		return &kademliaID, err
 	}
-
 	for i := 0; i < IDLength; i++ {
 		kademliaID[i] = bytes[i]
 	}
