@@ -245,7 +245,7 @@ func removeDeadNodes(batch []contact.Contact, fn func(contact.Contact, contact.C
 			if !alive {
 				deadNodes = append(deadNodes, n)
 			} else {
-				//AddContact(batch[n])
+				AddContact(batch[n])
 			}
 			wg.Done()
 		}()
@@ -277,6 +277,10 @@ func TestRemoveDeadNodes(n int) {
 		testSet = append(testSet, randomContact)
 	}
 
+	fmt.Println("")
+	fmt.Println("The test set is", len(testSet), "randomly generated contacts.")
+	fmt.Println("")
+
 	for i := 0; i < len(testSet); i++ {
 		fmt.Println(testSet[i])
 	}
@@ -285,6 +289,10 @@ func TestRemoveDeadNodes(n int) {
 	fmt.Println("")
 
 	var resSet []contact.Contact = removeDeadNodes(testSet, FakePing)
+
+	fmt.Println("")
+	fmt.Println("After using remove nodes on them with a fake ping function, which has 50% chance to return a fail.")
+	fmt.Println("")
 
 	for i := 0; i < len(resSet); i++ {
 		fmt.Println(resSet[i])
