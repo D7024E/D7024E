@@ -10,10 +10,12 @@ import (
 
 type storeRPC func(contact.Contact, contact.Contact, stored.Value) bool
 
+// NodeStore value initiate.
 func NodeStore(value stored.Value) bool {
 	return AlphaNodeStoreRec(value, rpc.StoreRequest)
 }
 
+// Store value in alpha nodes using fn.
 func AlphaNodeStoreRec(value stored.Value, fn storeRPC) bool {
 	alphaClosest := []contact.Contact{{Address: "172.21.0.2"}, {Address: "172.21.0.3"}, {Address: "172.21.0.4"}} // TODO NodeLookup(valueID)
 	var wg sync.WaitGroup
