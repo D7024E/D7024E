@@ -90,7 +90,7 @@ func TestFindNodeResponseMessageSuccess(t *testing.T) {
 // Test Find Node response fail case.
 func TestFindNodeResponseMessageFail(t *testing.T) {
 	kademliaID := *id.NewRandomKademliaID()
-	contact.GetInstance()
+	bucket.GetInstance().Me = contact.Contact{ID: id.NewRandomKademliaID()}
 	bucket.GetInstance().AddContact(contact.Contact{ID: id.NewRandomKademliaID()})
 	bucket.GetInstance().AddContact(contact.Contact{ID: id.NewRandomKademliaID()})
 	bucket.GetInstance().AddContact(contact.Contact{ID: id.NewRandomKademliaID()})
