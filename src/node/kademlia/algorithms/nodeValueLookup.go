@@ -14,10 +14,10 @@ type findValueRPC func(contact.Contact, id.KademliaID, contact.Contact) (stored.
 
 func NodeValueLookup(valueID id.KademliaID) (stored.Value, error) {
 	alphaClosest := []contact.Contact{{Address: "172.21.0.2"}, {Address: "172.21.0.3"}, {Address: "172.21.0.4"}} // TODO NodeLookup(valueID)
-	return AlphaNodeValueLookup(valueID, alphaClosest, rpc.FindValueRequest)
+	return alphaNodeValueLookup(valueID, alphaClosest, rpc.FindValueRequest)
 }
 
-func AlphaNodeValueLookup(valueID id.KademliaID, alphaClosest []contact.Contact, fn findValueRPC) (stored.Value, error) {
+func alphaNodeValueLookup(valueID id.KademliaID, alphaClosest []contact.Contact, fn findValueRPC) (stored.Value, error) {
 	var wg sync.WaitGroup
 	var result []stored.Value
 	for _, c := range alphaClosest {
