@@ -12,10 +12,12 @@ const IDLength = 20
 
 type KademliaID [IDLength]byte
 
+// Initiates seed using time now.
 func init() {
 	rand.Seed(time.Now().UTC().UnixNano())
 }
 
+// Creates new kademlia id by hashing data.
 func NewKademliaID(data string) *KademliaID {
 	sha := sha1.New()
 	hash := sha.Sum([]byte(data))
@@ -26,6 +28,7 @@ func NewKademliaID(data string) *KademliaID {
 	return &newKademliaID
 }
 
+// Creates new random kademlia id.
 func NewRandomKademliaID() *KademliaID {
 	newKademliaID := KademliaID{}
 	for i := 0; i < IDLength; i++ {
