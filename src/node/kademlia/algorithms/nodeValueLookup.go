@@ -10,16 +10,22 @@ import (
 	"sync"
 )
 
+type findValueRPC func(contact.Contact, id.KademliaID, contact.Contact) (stored.Value, error)
+
 func NodeValueLookup(valueID id.KademliaID) (stored.Value, error) {
-	closest := []contact.Contact{{Address: "172.21.0.2"}, {Address: "172.21.0.3"}, {Address: "172.21.0.4"}} // TODO NodeLookup(valueID)
+	alphaClosest := []contact.Contact{{Address: "172.21.0.2"}, {Address: "172.21.0.3"}, {Address: "172.21.0.4"}} // TODO NodeLookup(valueID)
+	return AlphaNodeValueLookup(valueID, alphaClosest, rpc.FindValueRequest)
+}
+
+func AlphaNodeValueLookup(valueID id.KademliaID, alphaClosest []contact.Contact, fn findValueRPC) (stored.Value, error) {
 	var wg sync.WaitGroup
 	var result []stored.Value
-	for _, c := range closest {
+	for _, c := range alphaClosest {
 		wg.Add(1)
 		target := c
 		go func() {
 			defer wg.Done()
-			val, err := rpc.FindValueRequest(kademlia.GetInstance().Me, valueID, target)
+			val, err := fn(kademlia.GetInstance().Me, valueID, target)
 			if err == nil {
 				result = append(result, val)
 			}
