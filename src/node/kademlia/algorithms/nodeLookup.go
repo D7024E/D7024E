@@ -11,11 +11,18 @@ import (
 	"D7024E/node/kademlia/kademliaSort"
 
 	"fmt"
+	"math/rand"
 	"sort"
 	"sync"
 )
 
-func NodeLookup(destNode id.KademliaID, batch []contact.Contact) []contact.Contact {
+func NodeLookup(destNode id.KademliaID) []contact.Contact {
+	batch := kademlia.GetInstance().RoutingTable.FindClosestContacts(&destNode, config.Alpha)
+	// batch = append(batch, kademlia.GetInstance().Me)
+	return NodeLookupRec(destNode, batch)
+}
+
+func NodeLookupRec(destNode id.KademliaID, batch []contact.Contact) []contact.Contact {
 	rt := bucket.GetInstance()
 	me := rt.Me
 	alpha := config.Alpha
@@ -23,11 +30,12 @@ func NodeLookup(destNode id.KademliaID, batch []contact.Contact) []contact.Conta
 	if len(batch) == 0 {
 		batch = rt.FindClosestContacts(&destNode, alpha)
 	}
+
 	var newBatch [][]contact.Contact
 	// For each of the alpha nodes in "batch", send a findNode RPC and append the result to "newBatch"
 	for i := 0; i < len(batch); i++ {
 		var kN []contact.Contact
-		kN, err := rpc.FindNodeRequest(kademlia.GetInstance().Me, batch[i], destNode)
+		kN, err := rpc.FindNodeRequest(me, batch[i], destNode)
 		if err != nil {
 			log.ERROR("%v", err)
 		} else {
@@ -44,26 +52,30 @@ func NodeLookup(destNode id.KademliaID, batch []contact.Contact) []contact.Conta
 
 	// Sort the cleaned batch and extract the alpha closest nodes.
 	updatedBatch = kademliaSort.SortContacts(updatedBatch)
-	updatedBatch = removeDeadNodes(updatedBatch)[:alpha]
+	updatedBatch = removeDeadNodes(updatedBatch, rpc.Ping)
+
+	if len(updatedBatch) >= alpha {
+		updatedBatch = updatedBatch[:alpha]
+	}
 
 	var sameBatch bool = true
 	for i := 0; i < min(len(batch), len(updatedBatch)); i++ {
-		if batch[i].GetDistance() != updatedBatch[i].GetDistance() {
+		if !batch[i].GetDistance().Equals(updatedBatch[i].GetDistance()) {
 			sameBatch = false
 		}
 	}
 	if sameBatch {
 		return updatedBatch
 	} else {
-		return NodeLookup(destNode, updatedBatch)
+		return NodeLookupRec(destNode, updatedBatch)
 	}
 }
 
 func min(a, b int) int {
 	if a <= b {
-		return b
-	} else {
 		return a
+	} else {
+		return b
 	}
 }
 
@@ -167,9 +179,9 @@ func removeDuplicates(batch []contact.Contact) []contact.Contact {
 	// For each element in batch, check if the distance already exists in cleanedBatch.
 	for i := 0; i < len(batch); i++ {
 		var dupe bool = false
-		currentDist := batch[i].GetDistance()
+		currentID := batch[i].ID
 		for j := 0; j < len(cleanedBatch); j++ {
-			if currentDist == cleanedBatch[j].GetDistance() {
+			if currentID == cleanedBatch[j].ID {
 				dupe = true
 			}
 		}
@@ -200,24 +212,25 @@ func TestDupe(n int, dupes int) {
 		randomContact.SetDistance(id.NewRandomKademliaID())
 		testSet = append(testSet, randomContact)
 	}
-	fmt.Println("")
-	fmt.Println("")
-	fmt.Println("The test set is:")
+	// fmt.Println("")
+	// fmt.Println("")
+	// fmt.Println("The test set is:")
 	for i := 0; i < len(testSet); i++ {
 		fmt.Println(testSet[i])
 	}
-	fmt.Println("There are", len(testSet), "elements in the list")
-	fmt.Println("")
-	fmt.Println("")
+	// fmt.Println("There are", len(testSet), "elements in the list")
+	// fmt.Println("")
+	// fmt.Println("")
 	testSet = removeDuplicates(testSet)
 	fmt.Println("The test set after running removeDuplicates is:")
 	for i := 0; i < len(testSet); i++ {
 		fmt.Println(testSet[i])
 	}
-	fmt.Println("There are", len(testSet), "elements in the list")
+	// fmt.Println("There are", len(testSet), "elements in the list")
 }
 
-func removeDeadNodes(batch []contact.Contact) []contact.Contact {
+// Takes a list of contacts, and a function as arguments. The function should be Ping() or a test function.
+func removeDeadNodes(batch []contact.Contact, fn func(contact.Contact, contact.Contact) bool) []contact.Contact {
 	rt := bucket.GetInstance()
 	me := rt.Me
 
@@ -228,9 +241,11 @@ func removeDeadNodes(batch []contact.Contact) []contact.Contact {
 		wg.Add(1)
 		n := i
 		go func() {
-			alive := rpc.Ping(me, batch[n])
+			alive := fn(me, batch[n])
 			if !alive {
 				deadNodes = append(deadNodes, n)
+			} else {
+				AddContact(batch[n])
 			}
 			wg.Done()
 		}()
@@ -240,9 +255,55 @@ func removeDeadNodes(batch []contact.Contact) []contact.Contact {
 
 	sort.Ints(deadNodes)
 
-	for i := len(deadNodes); i > 0; i-- {
-		batch = append(batch[:i], batch[i+1:]...)
+	for i := 0; i < len(deadNodes); i++ {
+		idx := deadNodes[i] - i
+		if idx != len(batch)-1 {
+			batch = append(batch[:idx], batch[idx+1:]...)
+		} else {
+			batch = batch[:idx]
+		}
 	}
 
 	return batch
+}
+
+func TestRemoveDeadNodes(n int) {
+	var testSet []contact.Contact
+	for i := 0; i < n; i++ {
+		randomContact := contact.Contact{
+			ID:      id.NewRandomKademliaID(),
+			Address: id.NewRandomKademliaID().String(),
+		}
+		testSet = append(testSet, randomContact)
+	}
+
+	fmt.Println("")
+	fmt.Println("The test set is", len(testSet), "randomly generated contacts.")
+	fmt.Println("")
+
+	for i := 0; i < len(testSet); i++ {
+		fmt.Println(testSet[i])
+	}
+
+	fmt.Println("")
+	fmt.Println("")
+
+	var resSet []contact.Contact = removeDeadNodes(testSet, FakePing)
+
+	fmt.Println("")
+	fmt.Println("After using remove nodes on them with a fake ping function, which has 50% chance to return a fail.")
+	fmt.Println("")
+
+	for i := 0; i < len(resSet); i++ {
+		fmt.Println(resSet[i])
+	}
+
+}
+
+func FakePing(nodeA contact.Contact, nodeB contact.Contact) bool {
+	if rand.Float32() < float32(0.5) {
+		return true
+	} else {
+		return false
+	}
 }
