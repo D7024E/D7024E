@@ -5,11 +5,16 @@ import (
 	"encoding/hex"
 	"errors"
 	"math/rand"
+	"time"
 )
 
 const IDLength = 20
 
 type KademliaID [IDLength]byte
+
+func init() {
+	rand.Seed(time.Now().UTC().UnixNano())
+}
 
 func NewKademliaID(data string) *KademliaID {
 	sha := sha1.New()
