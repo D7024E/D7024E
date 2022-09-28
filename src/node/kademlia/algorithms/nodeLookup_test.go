@@ -124,7 +124,7 @@ func TestFindNodesFail(t *testing.T) {
 	}
 }
 
-// Validate successful merge batch.
+// Validate the merge batch input with output.
 func TestMergeBatch(t *testing.T) {
 	contacts1 := []contact.Contact{
 		{ID: id.NewRandomKademliaID(), Address: "127.21.0.2"},
