@@ -1,7 +1,7 @@
 package algorithms
 
 import (
-	"D7024E/config"
+	"D7024E/environment"
 	rpc "D7024E/kademliaRPC/RPC"
 	"D7024E/node/bucket"
 	"D7024E/node/contact"
@@ -18,7 +18,7 @@ type FindNodeRPC func(contact.Contact, contact.Contact, id.KademliaID) ([]contac
 
 // Node lookup initiator.
 func NodeLookup(targetID id.KademliaID) []contact.Contact {
-	batch := kademlia.GetInstance().RoutingTable.FindClosestContacts(&targetID, config.Alpha)
+	batch := kademlia.GetInstance().RoutingTable.FindClosestContacts(&targetID, environment.Alpha)
 	return NodeLookupRec(targetID, batch, rpc.FindNodeRequest, rpc.Ping)
 }
 
@@ -61,9 +61,9 @@ func min(a, b int) int {
 // Find all nodes from the know contacts in batch.
 func findNodes(targetID id.KademliaID, batch []contact.Contact, findNode FindNodeRPC) [][]contact.Contact {
 	newBatch := [][]contact.Contact{batch}
-	for i := 0; i < len(batch); i += config.Alpha {
+	for i := 0; i < len(batch); i += environment.Alpha {
 		var wg sync.WaitGroup
-		for j := i; j < min((i+config.Alpha), len(batch)); j++ {
+		for j := i; j < min((i+environment.Alpha), len(batch)); j++ {
 			wg.Add(1)
 			n := j
 			go func() {

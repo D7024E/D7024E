@@ -1,7 +1,7 @@
 package rpc
 
 import (
-	"D7024E/config"
+	"D7024E/environment"
 	"D7024E/kademliaRPC/rpcmarshal"
 	"D7024E/network/requestHandler"
 	"D7024E/network/sender"
@@ -17,7 +17,7 @@ func FindNodeRequest(me contact.Contact, target contact.Contact, kademliaID id.K
 	reqID := newValidRequestID()
 	message := findNodeRequestMessage(me, reqID, kademliaID)
 	ip := parseIP(target.Address)
-	sender.UDPSender(ip, config.Port, message)
+	sender.UDPSender(ip, environment.Port, message)
 	err := requestInstance.ReadResponse(reqID, &message)
 	return findNodeRequestReturn(message, err)
 }
@@ -49,7 +49,7 @@ func findNodeRequestReturn(message []byte, err error) ([]contact.Contact, error)
 func FindNodeResponse(me contact.Contact, reqID string, kademliaID id.KademliaID, target contact.Contact) {
 	message := findNodeResponseMessage(me, reqID, kademliaID)
 	ip := parseIP(target.Address)
-	sender.UDPSender(ip, config.Port, message)
+	sender.UDPSender(ip, environment.Port, message)
 }
 
 // Create the response message.
