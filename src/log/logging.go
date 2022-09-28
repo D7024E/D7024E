@@ -3,7 +3,7 @@ package log
 // https://www.youtube.com/watch?v=p45_9nOpD4k
 
 import (
-	"D7024E/config"
+	"D7024E/environment"
 	"io"
 	"log"
 	"os"
@@ -26,7 +26,7 @@ func init() {
 		log.Fatal(err)
 	}
 
-	if config.LogConsole {
+	if environment.LogConsole {
 		multiWriter = io.MultiWriter(os.Stdout, file)
 	} else {
 		multiWriter = io.MultiWriter(file)
