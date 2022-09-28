@@ -3,7 +3,6 @@ package algorithms
 import (
 	"D7024E/config"
 	rpc "D7024E/kademliaRPC/RPC"
-	"D7024E/log"
 	"D7024E/node/bucket"
 	"D7024E/node/contact"
 	"D7024E/node/id"
@@ -14,73 +13,34 @@ import (
 	"sync"
 )
 
-func NodeLookup(destNode id.KademliaID) []contact.Contact {
-	batch := kademlia.GetInstance().RoutingTable.FindClosestContacts(&destNode, config.Alpha)
-	// batch = append(batch, kademlia.GetInstance().Me)
-	return NodeLookupRec(destNode, batch)
+type PingRpc func(contact.Contact, contact.Contact) bool
+type FindNodeRPC func(contact.Contact, contact.Contact, id.KademliaID) ([]contact.Contact, error)
+
+// Node lookup initiator.
+func NodeLookup(targetID id.KademliaID) []contact.Contact {
+	batch := kademlia.GetInstance().RoutingTable.FindClosestContacts(&targetID, config.Alpha)
+	return NodeLookupRec(targetID, batch, rpc.FindNodeRequest, rpc.Ping)
 }
 
-func NodeLookupRec(destNode id.KademliaID, batch []contact.Contact) []contact.Contact {
-	rt := bucket.GetInstance()
-	me := rt.Me
-	alpha := config.Alpha
-
-	if len(batch) == 0 {
-		batch = rt.FindClosestContacts(&destNode, alpha)
-	}
-
-	var newBatch [][]contact.Contact
-	for i := 0; i < len(batch); i++ {
-		var kN []contact.Contact
-		kN, err := rpc.FindNodeRequest(me, batch[i], destNode)
-		if err != nil {
-			log.ERROR("%v", err)
-		} else {
-			newBatch = append(newBatch, kN)
-		}
-	}
-
+// Algorithm for Node lookup.
+func NodeLookupRec(targetID id.KademliaID, batch []contact.Contact, findNode FindNodeRPC, ping PingRpc) []contact.Contact {
+	batch = getAllDistances(batch)
+	newBatch := findNodes(targetID, batch, findNode)
 	updatedBatch := mergeBatch(newBatch)
 	updatedBatch = removeDuplicates(updatedBatch)
-	updatedBatch = removeDeadNodes(updatedBatch, rpc.Ping)
+	updatedBatch = removeDeadNodes(updatedBatch, ping)
 	updatedBatch = getAllDistances(updatedBatch)
 	updatedBatch = kademliaSort.SortContacts(updatedBatch)
-
-	if len(updatedBatch) >= alpha {
-		updatedBatch = updatedBatch[:alpha]
-	}
-
-	var sameBatch bool = true
-	for i := 0; i < min(len(batch), len(updatedBatch)); i++ {
-		if !batch[i].GetDistance().Equals(updatedBatch[i].GetDistance()) {
-			sameBatch = false
-		}
-	}
-	if sameBatch {
+	updatedBatch = resize(updatedBatch)
+	if isSame(batch, updatedBatch) {
 		return updatedBatch
 	} else {
-		return NodeLookupRec(destNode, updatedBatch)
+		return NodeLookupRec(targetID, updatedBatch, findNode, ping)
 	}
 }
 
-func min(a, b int) int {
-	if a <= b {
-		return a
-	} else {
-		return b
-	}
-}
-
-// Note that this merge do not take duplicates into account.
-func mergeBatch(batch [][]contact.Contact) []contact.Contact {
-	var mergedBatch []contact.Contact
-	for i := 0; i < len(batch); i++ {
-		mergedBatch = append(mergedBatch, batch[i]...)
-	}
-	return mergedBatch
-}
-
-// Updates the distances in "batch" to be the distances to the current node then returns the new batch.
+// Updates the distances in "batch" to be the distances to the current node
+// then returns the new batch.
 func getAllDistances(batch []contact.Contact) []contact.Contact {
 	for i := 0; i < len(batch); i++ {
 		relativeDistance := *batch[i].ID.CalcDistance(contact.GetInstance().ID)
@@ -89,6 +49,47 @@ func getAllDistances(batch []contact.Contact) []contact.Contact {
 	return batch
 }
 
+// min value of a and b.
+func min(a, b int) int {
+	if a <= b {
+		return a
+	} else {
+		return b
+	}
+}
+
+// Find all nodes from the know contacts in batch.
+func findNodes(targetID id.KademliaID, batch []contact.Contact, findNode FindNodeRPC) [][]contact.Contact {
+	newBatch := [][]contact.Contact{batch}
+	for i := 0; i < len(batch); i += config.Alpha {
+		var wg sync.WaitGroup
+		for j := i; j < min((i+config.Alpha), len(batch)); j++ {
+			wg.Add(1)
+			n := j
+			go func() {
+				defer wg.Done()
+				kN, err := findNode(*contact.GetInstance(), batch[n], targetID)
+				if err == nil {
+					AddContact(batch[n])
+					newBatch = append(newBatch, kN)
+				}
+			}()
+		}
+		wg.Wait()
+	}
+	return newBatch
+}
+
+// Merge a 2D slice to a 1D slice.
+func mergeBatch(batch [][]contact.Contact) []contact.Contact {
+	var mergedBatch []contact.Contact
+	for i := 0; i < len(batch); i++ {
+		mergedBatch = append(mergedBatch, batch[i]...)
+	}
+	return mergedBatch
+}
+
+// Remove duplicate Contacts, contacts with the same id, from batch.
 func removeDuplicates(batch []contact.Contact) []contact.Contact {
 	var cleanedBatch []contact.Contact
 	for i := 0; i < len(batch); i++ {
@@ -106,25 +107,21 @@ func removeDuplicates(batch []contact.Contact) []contact.Contact {
 	return cleanedBatch
 }
 
-// Takes a list of contacts, and a function as arguments. The function should be Ping() or a test function.
-func removeDeadNodes(batch []contact.Contact, fn func(contact.Contact, contact.Contact) bool) []contact.Contact {
-	rt := bucket.GetInstance()
-	me := rt.Me
-
-	var deadNodes []int
+// Removes dead contacts by pinging and verifying if they are alive.
+func removeDeadNodes(batch []contact.Contact, ping PingRpc) []contact.Contact {
 	var wg sync.WaitGroup
-
+	var deadNodes []int
 	for i := 0; i < len(batch); i++ {
 		wg.Add(1)
 		n := i
 		go func() {
-			alive := fn(me, batch[n])
-			if !alive {
-				deadNodes = append(deadNodes, n)
-			} else {
+			defer wg.Done()
+			alive := ping(*contact.GetInstance(), batch[n])
+			if alive {
 				AddContact(batch[n])
+			} else {
+				deadNodes = append(deadNodes, n)
 			}
-			wg.Done()
 		}()
 	}
 
@@ -142,4 +139,25 @@ func removeDeadNodes(batch []contact.Contact, fn func(contact.Contact, contact.C
 	}
 
 	return batch
+}
+
+// Resize batch to at most BucketSize in length.
+func resize(batch []contact.Contact) []contact.Contact {
+	if len(batch) > bucket.BucketSize {
+		batch = batch[bucket.BucketSize:]
+	}
+	return batch
+}
+
+// Check if two slices of contacts are the same.
+func isSame(batch []contact.Contact, newBatch []contact.Contact) bool {
+	if len(batch) != len(newBatch) {
+		return false
+	}
+	for i, c := range batch {
+		if !c.ID.Equals(newBatch[i].ID) {
+			return false
+		}
+	}
+	return true
 }
