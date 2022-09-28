@@ -107,68 +107,17 @@ func removeDuplicates(batch []contact.Contact) []contact.Contact {
 	return cleanedBatch
 }
 
-<<<<<<< HEAD
 // Removes dead contacts by pinging and verifying if they are alive.
 func removeDeadNodes(batch []contact.Contact, ping PingRpc) []contact.Contact {
-=======
-func TestDupe(n int, dupes int) {
-	var testSet []contact.Contact
-	for i := 0; i < dupes; i++ {
-		randomContact := contact.Contact{
-			ID:      id.NewRandomKademliaID(),
-			Address: id.NewRandomKademliaID().String(),
-		}
-		randomContact.SetDistance(id.NewRandomKademliaID())
-		testSet = append(testSet, randomContact)
-		testSet = append(testSet, randomContact)
-	}
-	for i := 0; i < n; i++ {
-		randomContact := contact.Contact{
-			ID:      id.NewRandomKademliaID(),
-			Address: id.NewRandomKademliaID().String(),
-		}
-		randomContact.SetDistance(id.NewRandomKademliaID())
-		testSet = append(testSet, randomContact)
-	}
-	// fmt.Println("")
-	// fmt.Println("")
-	// fmt.Println("The test set is:")
-	for i := 0; i < len(testSet); i++ {
-		fmt.Println(testSet[i])
-	}
-	// fmt.Println("There are", len(testSet), "elements in the list")
-	// fmt.Println("")
-	// fmt.Println("")
-	testSet = removeDuplicates(testSet)
-	fmt.Println("The test set after running removeDuplicates is:")
-	for i := 0; i < len(testSet); i++ {
-		fmt.Println(testSet[i])
-	}
-	// fmt.Println("There are", len(testSet), "elements in the list")
-}
-
-// Takes a list of contacts, and a function as arguments. The function should be Ping() or a test function.
-func removeDeadNodes(batch []contact.Contact, fn func(contact.Contact, contact.Contact) bool) []contact.Contact {
-	me := contact.GetInstance()
-
-	var deadNodes []int
->>>>>>> master
 	var wg sync.WaitGroup
 	var deadNodes []int
 	for i := 0; i < len(batch); i++ {
 		wg.Add(1)
 		n := i
 		go func() {
-<<<<<<< HEAD
 			defer wg.Done()
 			alive := ping(*contact.GetInstance(), batch[n])
 			if alive {
-=======
-			alive := fn(*me, batch[n])
-			if !alive {
-				deadNodes = append(deadNodes, n)
-			} else {
->>>>>>> master
 				AddContact(batch[n])
 			} else {
 				deadNodes = append(deadNodes, n)
