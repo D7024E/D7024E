@@ -6,6 +6,7 @@ import (
 	"testing"
 )
 
+// Tests to generate a new Bucket.
 func TestNewBucket(t *testing.T) {
 	bucket := newBucket()
 	if bucket == nil {
@@ -23,7 +24,7 @@ func TestAddContact(t *testing.T) {
 	}
 }
 
-// Tries to add a new contact to an already full bucket which will return bool=false
+// Tries to add a new contact to an already full bucket which will return bool=false.
 func TestAddContactBucketFullNewContactNotAdded(t *testing.T) {
 	bucket := newBucket()
 	for i := 0; i < 20; i++ {
@@ -40,7 +41,7 @@ func TestAddContactBucketFullNewContactNotAdded(t *testing.T) {
 	}
 }
 
-// Test to add the same contact with the same id twice which will give length == 1 and isAdded == false
+// Test to add the same contact with the same id twice which will give length == 1 and isAdded == false.
 func TestAddSameContactTwice(t *testing.T) {
 	bucket := newBucket()
 	contact := generateContact()
@@ -62,6 +63,7 @@ func TestAddContactFail(t *testing.T) {
 	}
 }
 
+// Adds a contact and removes it afterwards and checks if the length is 0.
 func TestRemoveContact(t *testing.T) {
 	bucket := newBucket()
 	contact := generateContact()
@@ -72,7 +74,7 @@ func TestRemoveContact(t *testing.T) {
 	}
 }
 
-// List of contacts with calculated lists is equal to the length of the bucket
+// List of contacts with calculated lists is equal to the length of the bucket.
 func TestCalcDistance(t *testing.T) {
 	bucket := newBucket()
 	contact1 := generateContact()
@@ -87,7 +89,8 @@ func TestCalcDistance(t *testing.T) {
 
 }
 
-func TestBucketLen(t *testing.T) {
+// Tests that the length of a contact is 0 and calculated correctly.
+func TestBucketLenZero(t *testing.T) {
 	bucket := newBucket()
 	len := bucket.Len()
 	if len != 0 {
@@ -95,6 +98,18 @@ func TestBucketLen(t *testing.T) {
 	}
 }
 
+// Tests that the length of a contact is 1 and calculated correctly.
+func TestBucketLenOne(t *testing.T) {
+	bucket := newBucket()
+	contact := generateContact()
+	bucket.AddContact(contact)
+	len := bucket.Len()
+	if len != 1 {
+		t.FailNow()
+	}
+}
+
+// Used to generate a contact for testing.
 func generateContact() contact.Contact {
 	newContact := contact.Contact{
 		ID:      id.NewRandomKademliaID(),
