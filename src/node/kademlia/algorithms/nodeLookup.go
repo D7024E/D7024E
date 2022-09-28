@@ -24,7 +24,7 @@ func NodeLookup(destNode id.KademliaID) []contact.Contact {
 
 func NodeLookupRec(destNode id.KademliaID, batch []contact.Contact) []contact.Contact {
 	rt := bucket.GetInstance()
-	me := rt.Me
+	me := contact.GetInstance()
 	alpha := config.Alpha
 
 	if len(batch) == 0 {
@@ -35,7 +35,7 @@ func NodeLookupRec(destNode id.KademliaID, batch []contact.Contact) []contact.Co
 	// For each of the alpha nodes in "batch", send a findNode RPC and append the result to "newBatch"
 	for i := 0; i < len(batch); i++ {
 		var kN []contact.Contact
-		kN, err := rpc.FindNodeRequest(me, batch[i], destNode)
+		kN, err := rpc.FindNodeRequest(*me, batch[i], destNode)
 		if err != nil {
 			log.ERROR("%v", err)
 		} else {
@@ -231,8 +231,7 @@ func TestDupe(n int, dupes int) {
 
 // Takes a list of contacts, and a function as arguments. The function should be Ping() or a test function.
 func removeDeadNodes(batch []contact.Contact, fn func(contact.Contact, contact.Contact) bool) []contact.Contact {
-	rt := bucket.GetInstance()
-	me := rt.Me
+	me := contact.GetInstance()
 
 	var deadNodes []int
 	var wg sync.WaitGroup
@@ -241,7 +240,7 @@ func removeDeadNodes(batch []contact.Contact, fn func(contact.Contact, contact.C
 		wg.Add(1)
 		n := i
 		go func() {
-			alive := fn(me, batch[n])
+			alive := fn(*me, batch[n])
 			if !alive {
 				deadNodes = append(deadNodes, n)
 			} else {
