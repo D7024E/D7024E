@@ -6,7 +6,7 @@ import (
 	"container/list"
 )
 
-const bucketSize = 20
+const BucketSize = 20
 
 // bucket definition
 // contains a List
@@ -35,14 +35,14 @@ func (bucket *bucket) AddContact(newContact contact.Contact) (oldContact contact
 	}
 
 	var head contact.Contact
-	if bucket.list.Len() == bucketSize {
+	if bucket.list.Len() == BucketSize {
 		head = contact.Contact(bucket.list.Front().Value.(contact.Contact))
 	} else {
 		head = contact.Contact{}
 	}
 
 	if element == nil {
-		if bucket.list.Len() < bucketSize {
+		if bucket.list.Len() < BucketSize {
 			bucket.list.PushFront(newContact)
 			return head, true
 		} else {

@@ -6,14 +6,6 @@ import (
 	"testing"
 )
 
-func GenreateAContact() contact.Contact {
-	contact := contact.Contact{
-		ID:      id.NewRandomKademliaID(),
-		Address: "THIS IS ADDRESS",
-	}
-	return contact
-}
-
 func TestNewBucket(t *testing.T) {
 	bucket := newBucket()
 	if bucket == nil {
@@ -21,13 +13,12 @@ func TestNewBucket(t *testing.T) {
 	}
 }
 
-// Adds a single Contact
+// Validate contact to be added is in fact added.
 func TestAddContact(t *testing.T) {
 	bucket := newBucket()
-	contact := GenreateAContact()
-	bucket.AddContact(contact)
-
-	if bucket.Len() == 0 {
+	newContact := generateContact()
+	bucket.AddContact(newContact)
+	if bucket.list.Front().Value.(contact.Contact) != newContact {
 		t.FailNow()
 	}
 }
@@ -36,24 +27,23 @@ func TestAddContact(t *testing.T) {
 func TestAddContactBucketFullNewContactNotAdded(t *testing.T) {
 	bucket := newBucket()
 	for i := 0; i < 20; i++ {
-		contact := GenreateAContact()
+		contact := generateContact()
 		bucket.AddContact(contact)
 	}
 
-	contact := GenreateAContact()
+	contact := generateContact()
 
 	_, isAdded := bucket.AddContact(contact)
 
 	if isAdded == true {
 		t.FailNow()
 	}
-
 }
 
 // Test to add the same contact with the same id twice which will give length == 1 and isAdded == false
 func TestAddSameContactTwice(t *testing.T) {
 	bucket := newBucket()
-	contact := GenreateAContact()
+	contact := generateContact()
 	bucket.AddContact(contact)
 	_, isAdded := bucket.AddContact(contact)
 
@@ -62,9 +52,19 @@ func TestAddSameContactTwice(t *testing.T) {
 	}
 }
 
+// Validate that the test does not give false positives.
+func TestAddContactFail(t *testing.T) {
+	bucket := newBucket()
+	newContact := generateContact()
+	bucket.AddContact(newContact)
+	if bucket.list.Front().Value.(contact.Contact) == generateContact() {
+		t.FailNow()
+	}
+}
+
 func TestRemoveContact(t *testing.T) {
 	bucket := newBucket()
-	contact := GenreateAContact()
+	contact := generateContact()
 	bucket.AddContact(contact)
 	bucket.RemoveContact(contact)
 	if bucket.Len() != 0 {
@@ -75,8 +75,8 @@ func TestRemoveContact(t *testing.T) {
 // List of contacts with calculated lists is equal to the length of the bucket
 func TestCalcDistance(t *testing.T) {
 	bucket := newBucket()
-	contact1 := GenreateAContact()
-	contact2 := GenreateAContact()
+	contact1 := generateContact()
+	contact2 := generateContact()
 	bucket.AddContact(contact1)
 	bucket.AddContact(contact2)
 	contacts := bucket.GetContactAndCalcDistance(contact1.ID)
@@ -93,4 +93,12 @@ func TestBucketLen(t *testing.T) {
 	if len != 0 {
 		t.FailNow()
 	}
+}
+
+func generateContact() contact.Contact {
+	newContact := contact.Contact{
+		ID:      id.NewRandomKademliaID(),
+		Address: id.NewRandomKademliaID().String(),
+	}
+	return newContact
 }

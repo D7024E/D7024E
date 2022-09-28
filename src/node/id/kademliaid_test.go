@@ -1,7 +1,6 @@
 package id
 
 import (
-	"fmt"
 	"math/rand"
 	"testing"
 )
@@ -179,9 +178,6 @@ func TestString(t *testing.T) {
 	kademliaID1 := NewKademliaID("id")
 	str := kademliaID1.String()
 	kademliaID2, err := String2KademliaID(str)
-	fmt.Println(kademliaID1)
-	fmt.Println(kademliaID2)
-	fmt.Println(err)
 	if err != nil {
 		t.FailNow()
 	} else if !kademliaID1.Equals(kademliaID2) {
