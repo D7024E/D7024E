@@ -2,7 +2,7 @@ package algorithms
 
 import (
 	"D7024E/config"
-	"D7024E/kademliaRPC/rpc"
+	rpc "D7024E/kademliaRPC/RPC"
 	"D7024E/log"
 	"D7024E/node/bucket"
 	"D7024E/node/contact"
