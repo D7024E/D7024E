@@ -1,6 +1,7 @@
 package algorithms
 
 import (
+	"D7024E/environment"
 	rpc "D7024E/kademliaRPC/RPC"
 	"D7024E/node/contact"
 	"D7024E/node/kademlia"
@@ -12,12 +13,15 @@ type storeRPC func(contact.Contact, contact.Contact, stored.Value) bool
 
 // NodeStore value initiate.
 func NodeStore(value stored.Value) bool {
-	return AlphaNodeStoreRec(value, rpc.StoreRequest)
+	return KNodeStoreRec(value, rpc.StoreRequest)
 }
 
 // Store value in alpha nodes using fn.
-func AlphaNodeStoreRec(value stored.Value, fn storeRPC) bool {
+func KNodeStoreRec(value stored.Value, fn storeRPC) bool {
 	alphaClosest := NodeLookup(value.ID)
+	if len(alphaClosest) > environment.Alpha {
+		alphaClosest = alphaClosest[environment.Alpha:]
+	}
 	var wg sync.WaitGroup
 	completed := true
 	for _, c := range alphaClosest {
@@ -33,7 +37,7 @@ func AlphaNodeStoreRec(value stored.Value, fn storeRPC) bool {
 	}
 	wg.Wait()
 	if !completed {
-		return AlphaNodeStoreRec(value, fn)
+		return KNodeStoreRec(value, fn)
 	} else {
 		return true
 	}

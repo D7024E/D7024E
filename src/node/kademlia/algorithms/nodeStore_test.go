@@ -23,29 +23,29 @@ func store50RandomSuccess(_ contact.Contact, _ contact.Contact, _ stored.Value) 
 	}
 }
 
-// Test AlphaNodeStoreRec if rpc always succeed.
-func TestAlphaNodeStoreRecSuccess(t *testing.T) {
+// Test KNodeStoreRec if rpc always succeed.
+func TestKNodeStoreRecSuccess(t *testing.T) {
 	value := stored.Value{
 		Data:   "DATA",
 		ID:     *id.NewKademliaID("DATA"),
 		Ttl:    time.Hour,
 		DeadAt: time.Now().Add(time.Hour),
 	}
-	success := AlphaNodeStoreRec(value, storeSuccess)
+	success := KNodeStoreRec(value, storeSuccess)
 	if !success {
 		t.FailNow()
 	}
 }
 
-// Test AlphaNodeStoreRec if it will eventually succeed if rpc return true 50% of the time.
-func TestAlphaNodeStoreRecRandomSuccess(t *testing.T) {
+// Test KNodeStoreRec if it will eventually succeed if rpc return true 50% of the time.
+func TestKNodeStoreRecRandomSuccess(t *testing.T) {
 	value := stored.Value{
 		Data:   "DATA",
 		ID:     *id.NewKademliaID("DATA"),
 		Ttl:    time.Hour,
 		DeadAt: time.Now().Add(time.Hour),
 	}
-	success := AlphaNodeStoreRec(value, store50RandomSuccess)
+	success := KNodeStoreRec(value, store50RandomSuccess)
 	if !success {
 		t.FailNow()
 	}
