@@ -3,7 +3,6 @@ package algorithms
 import (
 	"D7024E/environment"
 	rpc "D7024E/kademliaRPC/RPC"
-	"D7024E/log"
 	"D7024E/node/bucket"
 	"D7024E/node/contact"
 	"D7024E/node/id"
@@ -28,20 +27,12 @@ func NodeLookupRec(targetID id.KademliaID, batch []contact.Contact, findNode Fin
 	batch = getAllDistances(batch)
 	batch = removeDeadNodes(batch, ping)
 	newBatch := findNodes(targetID, batch, findNode)
-	log.INFO("NEW : %v", newBatch)
 	updatedBatch := mergeBatch(newBatch)
-	log.INFO("MERG: %v", updatedBatch)
 	updatedBatch = removeDuplicates(updatedBatch)
-	log.INFO("DUPL: %v", updatedBatch)
 	updatedBatch = removeDeadNodes(updatedBatch, ping)
-	log.INFO("DEAD: %v", updatedBatch)
 	updatedBatch = getAllDistances(updatedBatch)
-	log.INFO("DIST: %v", updatedBatch)
 	updatedBatch = kademliaSort.SortContacts(updatedBatch)
-	log.INFO("SORT: %v", updatedBatch)
 	updatedBatch = resize(updatedBatch)
-	log.INFO("RESI: %v", updatedBatch)
-	log.INFO("\n\n")
 	if isSame(batch, updatedBatch) {
 		return updatedBatch
 	} else {
