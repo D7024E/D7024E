@@ -4,8 +4,6 @@ import (
 	"D7024E/node/bucket"
 	"D7024E/node/contact"
 	"D7024E/node/stored"
-	"net"
-	"strings"
 	"sync"
 )
 
@@ -33,16 +31,4 @@ func GetInstance() *KademliaNode {
 		}
 	}
 	return instance
-}
-
-func (node *KademliaNode) LookupContact(target contact.Contact) {
-	// closestContacts := node.RoutingTable.FindClosestContacts(target.ID, alpha)
-	// TODO
-
-}
-
-func getAddress() string {
-	conn, _ := net.Dial("udp", "8.8.8.8:80")
-	defer conn.Close()
-	return strings.Split(conn.LocalAddr().String(), ":")[0]
 }
