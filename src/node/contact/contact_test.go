@@ -118,11 +118,12 @@ func TestCandidatesLen(t *testing.T) {
 
 func TestCandidatesLess(t *testing.T) {
 	candidates := GenerateACandidateList()
-	dist := emptyKademliaID()
-	candidates.contacts[0].SetDistance(dist)
-	dist[id.IDLength-1] += 1
-	candidates.contacts[1].SetDistance(dist)
-	if candidates.Less(0, 1) {
+	dist1 := emptyKademliaID()
+	candidates.contacts[0].SetDistance(dist1)
+	dist2 := emptyKademliaID()
+	dist2[id.IDLength-1] += 1
+	candidates.contacts[1].SetDistance(dist2)
+	if !candidates.Less(0, 1) {
 		t.FailNow()
 	}
 }
