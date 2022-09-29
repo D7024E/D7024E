@@ -17,7 +17,7 @@ func NodeStore(value stored.Value) bool {
 		target := c
 		go func() {
 			defer wg.Done()
-			val := rpc.StoreRequest(kademlia.GetInstance().Me, target, value)
+			val := rpc.StoreRequest(*kademlia.GetInstance().Me, target, value)
 			if !val {
 				completed = val
 			}

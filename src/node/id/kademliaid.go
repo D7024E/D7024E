@@ -5,12 +5,19 @@ import (
 	"encoding/hex"
 	"errors"
 	"math/rand"
+	"time"
 )
 
 const IDLength = 20
 
 type KademliaID [IDLength]byte
 
+// Initiates seed using time now.
+func init() {
+	rand.Seed(time.Now().UTC().UnixNano())
+}
+
+// Creates new kademlia id by hashing data.
 func NewKademliaID(data string) *KademliaID {
 	sha := sha1.New()
 	hash := sha.Sum([]byte(data))
@@ -21,6 +28,7 @@ func NewKademliaID(data string) *KademliaID {
 	return &newKademliaID
 }
 
+// Creates new random kademlia id.
 func NewRandomKademliaID() *KademliaID {
 	newKademliaID := KademliaID{}
 	for i := 0; i < IDLength; i++ {
@@ -29,6 +37,7 @@ func NewRandomKademliaID() *KademliaID {
 	return &newKademliaID
 }
 
+// Checks if otherKademliaID is smaller then kademliaID.
 func (kademliaID KademliaID) Less(otherKademliaID *KademliaID) bool {
 	for i := 0; i < IDLength; i++ {
 		if kademliaID[i] != otherKademliaID[i] {
@@ -38,6 +47,7 @@ func (kademliaID KademliaID) Less(otherKademliaID *KademliaID) bool {
 	return false
 }
 
+// Checks if kademliaID is equal to otherKademliaID.
 func (kademliaID KademliaID) Equals(otherKademliaID *KademliaID) bool {
 	for i := 0; i < IDLength; i++ {
 		if kademliaID[i] != otherKademliaID[i] {
@@ -47,6 +57,7 @@ func (kademliaID KademliaID) Equals(otherKademliaID *KademliaID) bool {
 	return true
 }
 
+// Calculate distance between two nodes.
 func (kademliaID KademliaID) CalcDistance(target *KademliaID) *KademliaID {
 	result := KademliaID{}
 	for i := 0; i < IDLength; i++ {
@@ -55,17 +66,20 @@ func (kademliaID KademliaID) CalcDistance(target *KademliaID) *KademliaID {
 	return &result
 }
 
+// Convert kademlia id to string.
 func (kademliaID *KademliaID) String() string {
 	return hex.EncodeToString(kademliaID[0:IDLength])
 }
 
+// Convert string to kademlia id.
 func String2KademliaID(str string) (*KademliaID, error) {
 	kademliaID := KademliaID{}
-	bytes := []byte(str)
+	bytes, err := hex.DecodeString(str)
 	if len(bytes) != IDLength {
 		return &kademliaID, errors.New("invalid length str 2 kademlia")
+	} else if err != nil {
+		return &kademliaID, err
 	}
-
 	for i := 0; i < IDLength; i++ {
 		kademliaID[i] = bytes[i]
 	}

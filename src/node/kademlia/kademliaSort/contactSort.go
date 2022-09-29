@@ -12,7 +12,7 @@ type ContactList struct {
 
 func SortContacts(batch []contact.Contact) []contact.Contact {
 	var toSort ContactList
-	toSort.Contacts = append(toSort.Contacts, batch...)
+	toSort.Contacts = batch
 	sort.Sort(&toSort)
 	return toSort.Contacts
 }

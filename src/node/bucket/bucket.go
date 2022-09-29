@@ -6,7 +6,7 @@ import (
 	"container/list"
 )
 
-const bucketSize = 20
+const BucketSize = 20
 
 // bucket definition
 // contains a List
@@ -26,10 +26,6 @@ func newBucket() *bucket {
 // or moves it to the front of the bucket if it already existed
 func (bucket *bucket) AddContact(newContact contact.Contact) (oldContact contact.Contact, res bool) {
 	var element *list.Element
-	var i interface{} = bucket.list.Front().Value
-	head := i.(contact.Contact)
-
-	// Loops through the bucket
 	for e := bucket.list.Front(); e != nil; e = e.Next() {
 		nodeID := e.Value.(contact.Contact).ID
 
@@ -37,21 +33,23 @@ func (bucket *bucket) AddContact(newContact contact.Contact) (oldContact contact
 			element = e
 		}
 	}
-	// The new contact was not found in the bucket.
+
+	var head contact.Contact
+	if bucket.list.Len() == BucketSize {
+		head = contact.Contact(bucket.list.Front().Value.(contact.Contact))
+	} else {
+		head = contact.Contact{}
+	}
+
 	if element == nil {
-		// If the bucket is not full we can just add the new contact as the most recently seen.
-		if bucket.list.Len() < bucketSize {
+		if bucket.list.Len() < BucketSize {
 			bucket.list.PushFront(newContact)
-			// Return dummy head and res = true since the operation went through.
 			return head, true
 		} else {
-			// If the bucket is full, return the head and res = false as the operation failed.
 			return head, false
 		}
 	} else {
-		// New contact was found in the bucket, move the contact to be the most recently seen.
 		bucket.list.MoveToFront(element)
-		// Return dummy head and res = true since the operation went through.
 		return head, true
 	}
 }

@@ -4,7 +4,6 @@ import (
 	rpc "D7024E/kademliaRPC/RPC"
 	"D7024E/node/contact"
 	"D7024E/node/id"
-	"D7024E/node/kademlia"
 	"D7024E/node/stored"
 	"errors"
 	"sync"
@@ -27,7 +26,7 @@ func alphaNodeValueLookup(valueID id.KademliaID, alphaClosest []contact.Contact,
 		target := c
 		go func() {
 			defer wg.Done()
-			val, err := fn(kademlia.GetInstance().Me, valueID, target)
+			val, err := fn(*contact.GetInstance(), valueID, target)
 			if err == nil {
 				result = append(result, val)
 			}
