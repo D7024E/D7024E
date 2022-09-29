@@ -116,7 +116,7 @@ func TestCandidatesLen(t *testing.T) {
 	}
 }
 
-func TestCandidatesLessFail(t *testing.T) {
+func TestCandidatesLess(t *testing.T) {
 	candidates := GenerateACandidateList()
 	dist := emptyKademliaID()
 	candidates.contacts[0].SetDistance(dist)
