@@ -11,7 +11,7 @@ import (
 
 type KademliaNode struct {
 	Alpha        int
-	Me           contact.Contact
+	Me           *contact.Contact
 	RoutingTable *bucket.RoutingTable
 	Values       *stored.Stored
 }
@@ -27,7 +27,7 @@ func GetInstance() *KademliaNode {
 		defer lock.Unlock()
 		if instance == nil {
 			instance = &KademliaNode{}
-			instance.Me = *contact.GetInstance()
+			instance.Me = contact.GetInstance()
 			instance.RoutingTable = bucket.GetInstance()
 			instance.Values = stored.GetInstance()
 		}
