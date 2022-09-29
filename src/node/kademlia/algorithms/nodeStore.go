@@ -25,7 +25,7 @@ func AlphaNodeStoreRec(value stored.Value, fn storeRPC) bool {
 		target := c
 		go func() {
 			defer wg.Done()
-			val := fn(kademlia.GetInstance().Me, target, value)
+			val := fn(*kademlia.GetInstance().Me, target, value)
 			if !val {
 				completed = val
 			}

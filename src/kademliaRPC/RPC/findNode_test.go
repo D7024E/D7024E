@@ -66,7 +66,6 @@ func TestFindNodeRequestReturnTimeout(t *testing.T) {
 // Test Find Node response success case.
 func TestFindNodeResponseMessageSuccess(t *testing.T) {
 	kademliaID := *id.NewRandomKademliaID()
-	bucket.GetInstance().Me = contact.Contact{ID: id.NewRandomKademliaID()}
 	bucket.GetInstance().AddContact(contact.Contact{ID: id.NewRandomKademliaID()})
 	bucket.GetInstance().AddContact(contact.Contact{ID: id.NewRandomKademliaID()})
 	bucket.GetInstance().AddContact(contact.Contact{ID: id.NewRandomKademliaID()})
@@ -90,7 +89,6 @@ func TestFindNodeResponseMessageSuccess(t *testing.T) {
 // Test Find Node response fail case.
 func TestFindNodeResponseMessageFail(t *testing.T) {
 	kademliaID := *id.NewRandomKademliaID()
-	bucket.GetInstance().Me = contact.Contact{ID: id.NewRandomKademliaID()}
 	bucket.GetInstance().AddContact(contact.Contact{ID: id.NewRandomKademliaID()})
 	bucket.GetInstance().AddContact(contact.Contact{ID: id.NewRandomKademliaID()})
 	bucket.GetInstance().AddContact(contact.Contact{ID: id.NewRandomKademliaID()})
