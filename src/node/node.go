@@ -13,7 +13,6 @@ func StartKademliaNode() {
 	time.Sleep(5 * time.Second)
 	if contact.GetInstance().Address == "172.21.0.2" {
 		contact.GetInstance().ID = id.NewKademliaID("172.21.0.2")
-		time.Sleep(10 * time.Second)
 	} else {
 		algorithms.NodeLookup(*id.NewKademliaID("172.21.0.2"))
 	}
