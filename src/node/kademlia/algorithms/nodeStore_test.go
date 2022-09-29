@@ -9,6 +9,17 @@ import (
 	"time"
 )
 
+// NodeLookup mockup
+func nodeLookupMock(_ id.KademliaID) []contact.Contact {
+	return []contact.Contact{
+		{ID: id.NewKademliaID("DATA"), Address: "172.21.0.3"},
+		{ID: id.NewKademliaID("DATA1"), Address: "172.21.0.4"},
+		{ID: id.NewKademliaID("DATA2"), Address: "172.21.0.5"},
+		{ID: id.NewKademliaID("DATA3"), Address: "172.21.0.6"},
+		{ID: id.NewKademliaID("DATA4"), Address: "172.21.0.7"},
+	}
+}
+
 // Store rpc mockup, will always succeed.
 func storeSuccess(_ contact.Contact, _ contact.Contact, _ stored.Value) bool {
 	return true
@@ -31,7 +42,7 @@ func TestKNodeStoreRecSuccess(t *testing.T) {
 		Ttl:    time.Hour,
 		DeadAt: time.Now().Add(time.Hour),
 	}
-	success := KNodeStoreRec(value, storeSuccess)
+	success := KNodeStoreRec(value, storeSuccess, nodeLookupMock)
 	if !success {
 		t.FailNow()
 	}
@@ -45,7 +56,7 @@ func TestKNodeStoreRecRandomSuccess(t *testing.T) {
 		Ttl:    time.Hour,
 		DeadAt: time.Now().Add(time.Hour),
 	}
-	success := KNodeStoreRec(value, store50RandomSuccess)
+	success := KNodeStoreRec(value, store50RandomSuccess, nodeLookupMock)
 	if !success {
 		t.FailNow()
 	}
