@@ -1,23 +1,36 @@
 package algorithms
 
 import (
+	"D7024E/environment"
 	rpc "D7024E/kademliaRPC/RPC"
 	"D7024E/node/contact"
-	"D7024E/node/kademlia"
+	"D7024E/node/id"
 	"D7024E/node/stored"
 	"sync"
 )
 
+type lookupAlgorithm func(id.KademliaID) []contact.Contact
+type storeRPC func(contact.Contact, contact.Contact, stored.Value) bool
+
+// NodeStore value initiate.
 func NodeStore(value stored.Value) bool {
-	closest := []contact.Contact{{Address: "172.21.0.2"}, {Address: "172.21.0.3"}, {Address: "172.21.0.4"}} // TODO NodeLookup(valueID)
+	return AlphaNodeStoreRec(value, rpc.StoreRequest, NodeLookup)
+}
+
+// Store value in alpha nodes using fn.
+func AlphaNodeStoreRec(value stored.Value, store storeRPC, lookup lookupAlgorithm) bool {
+	alphaClosest := lookup(value.ID)
+	if len(alphaClosest) > environment.Alpha {
+		alphaClosest = alphaClosest[:environment.Alpha]
+	}
 	var wg sync.WaitGroup
 	completed := true
-	for _, c := range closest {
+	for _, c := range alphaClosest {
 		wg.Add(1)
 		target := c
 		go func() {
 			defer wg.Done()
-			val := rpc.StoreRequest(*kademlia.GetInstance().Me, target, value)
+			val := store(*contact.GetInstance(), target, value)
 			if !val {
 				completed = val
 			}
@@ -25,7 +38,7 @@ func NodeStore(value stored.Value) bool {
 	}
 	wg.Wait()
 	if !completed {
-		return NodeStore(value)
+		return AlphaNodeStoreRec(value, store, lookup)
 	} else {
 		return true
 	}
