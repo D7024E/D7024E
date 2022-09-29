@@ -17,7 +17,7 @@ func NodeStore(value stored.Value) bool {
 
 // Store value in alpha nodes using fn.
 func AlphaNodeStoreRec(value stored.Value, fn storeRPC) bool {
-	alphaClosest := []contact.Contact{{Address: "172.21.0.2"}, {Address: "172.21.0.3"}, {Address: "172.21.0.4"}} // TODO NodeLookup(valueID)
+	alphaClosest := NodeLookup(value.ID)
 	var wg sync.WaitGroup
 	completed := true
 	for _, c := range alphaClosest {
