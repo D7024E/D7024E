@@ -25,6 +25,7 @@ func NodeLookup(targetID id.KademliaID) []contact.Contact {
 // Algorithm for Node lookup.
 func NodeLookupRec(targetID id.KademliaID, batch []contact.Contact, findNode FindNodeRPC, ping PingRpc) []contact.Contact {
 	batch = getAllDistances(batch)
+	batch = removeDeadNodes(batch, ping)
 	newBatch := findNodes(targetID, batch, findNode)
 	updatedBatch := mergeBatch(newBatch)
 	updatedBatch = removeDuplicates(updatedBatch)

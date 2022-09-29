@@ -19,7 +19,7 @@ func NodeValueLookup(valueID id.KademliaID) (stored.Value, error) {
 		target := c
 		go func() {
 			defer wg.Done()
-			val, err := rpc.FindValueRequest(kademlia.GetInstance().Me, valueID, target)
+			val, err := rpc.FindValueRequest(*kademlia.GetInstance().Me, valueID, target)
 			if err == nil {
 				result = append(result, val)
 			}
