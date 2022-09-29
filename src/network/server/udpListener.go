@@ -19,9 +19,9 @@ func UDPListener(ip net.IP, port int) {
 	defer connection.Close()
 	for {
 		buffer := make([]byte, 4096)
-		n, addr, _ := connection.ReadFromUDP(buffer)
+		n, _, _ := connection.ReadFromUDP(buffer)
 		go handler.HandleCMD((buffer[0:n]))
-		log.INFO("Received \"%s\" from %v", string(buffer[0:n]), addr)
+		// log.INFO("Received \"%s\" from %v", string(buffer[0:n]), addr)
 
 	}
 }
