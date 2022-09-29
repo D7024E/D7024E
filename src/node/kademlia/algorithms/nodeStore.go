@@ -14,11 +14,11 @@ type storeRPC func(contact.Contact, contact.Contact, stored.Value) bool
 
 // NodeStore value initiate.
 func NodeStore(value stored.Value) bool {
-	return KNodeStoreRec(value, rpc.StoreRequest, NodeLookup)
+	return AlphaNodeStoreRec(value, rpc.StoreRequest, NodeLookup)
 }
 
 // Store value in alpha nodes using fn.
-func KNodeStoreRec(value stored.Value, store storeRPC, lookup lookupAlgorithm) bool {
+func AlphaNodeStoreRec(value stored.Value, store storeRPC, lookup lookupAlgorithm) bool {
 	alphaClosest := lookup(value.ID)
 	if len(alphaClosest) > environment.Alpha {
 		alphaClosest = alphaClosest[:environment.Alpha]
@@ -38,7 +38,7 @@ func KNodeStoreRec(value stored.Value, store storeRPC, lookup lookupAlgorithm) b
 	}
 	wg.Wait()
 	if !completed {
-		return KNodeStoreRec(value, store, lookup)
+		return AlphaNodeStoreRec(value, store, lookup)
 	} else {
 		return true
 	}
