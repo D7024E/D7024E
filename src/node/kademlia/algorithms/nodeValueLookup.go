@@ -1,6 +1,7 @@
 package algorithms
 
 import (
+	"D7024E/environment"
 	rpc "D7024E/kademliaRPC/RPC"
 	"D7024E/node/contact"
 	"D7024E/node/id"
@@ -13,7 +14,10 @@ type findValueRPC func(contact.Contact, id.KademliaID, contact.Contact) (stored.
 
 // Initiates NodeValueLookup with alpha nodes.
 func NodeValueLookup(valueID id.KademliaID) (stored.Value, error) {
-	alphaClosest := []contact.Contact{{Address: "172.21.0.2"}, {Address: "172.21.0.3"}, {Address: "172.21.0.4"}} // TODO NodeLookup(valueID)
+	alphaClosest := NodeLookup(valueID)
+	if len(alphaClosest) > environment.Alpha {
+		alphaClosest = alphaClosest[environment.Alpha:]
+	}
 	return alphaNodeValueLookup(valueID, alphaClosest, rpc.FindValueRequest)
 }
 
