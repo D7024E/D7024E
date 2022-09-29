@@ -12,20 +12,23 @@ import (
 func HandleCMD(msg []byte) {
 	var rpcMessage rpcmarshal.RPC
 	rpcmarshal.RpcUnmarshal(msg, &rpcMessage)
+	go kademlia.GetInstance().RoutingTable.AddContact(rpcMessage.Contact)
 	switch rpcMessage.Cmd {
 	case "RESP":
-		log.INFO("GOT RESPONSE")
+		// log.INFO("GOT RESPONSE")
 		requestHandler.GetInstance().WriteRespone(rpcMessage.ReqID, msg)
 	case "PING":
-		rpc.Pong(kademlia.GetInstance().Me, rpcMessage.Contact, rpcMessage.ReqID)
-		log.INFO("PONG DONE")
+		rpc.Pong(*kademlia.GetInstance().Me, rpcMessage.Contact, rpcMessage.ReqID)
+		// log.INFO("PONG DONE")
 	case "STRE":
-		panic("help")
+		rpc.StoreRequest(*kademlia.GetInstance().Me, rpcMessage.Contact, rpcMessage.Content)
+		// log.INFO("STRE DONE")
 	case "FINO":
-		panic("help")
+		rpc.FindNodeRequest(*kademlia.GetInstance().Me, rpcMessage.Contact, rpcMessage.ID)
+		// log.INFO("FINO DONE")
 	case "FIVA":
-		log.INFO("FIVA DONE")
-		rpc.FindValueResponse(kademlia.GetInstance().Me, rpcMessage.Contact, rpcMessage.ReqID, rpcMessage.ID)
+		rpc.FindValueResponse(*kademlia.GetInstance().Me, rpcMessage.Contact, rpcMessage.ReqID, rpcMessage.ID)
+		// log.INFO("FIVA DONE")
 	default:
 		log.ERROR("UNKNOWN CMD")
 	}
