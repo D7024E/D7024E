@@ -15,6 +15,15 @@ func GenreateAContact() Contact {
 	return contact
 }
 
+// Returns empty kademlia id.
+func emptyKademliaID() *id.KademliaID {
+	result := id.KademliaID{}
+	for i := 0; i < id.IDLength; i++ {
+		result[i] = 0
+	}
+	return &result
+}
+
 // Generates a Candiates instance with two Contacts in it.
 func GenerateACandidateList() ContactCandidates {
 
@@ -107,11 +116,14 @@ func TestCandidatesLen(t *testing.T) {
 	}
 }
 
-func TestCandidatesLessFail(t *testing.T) {
+func TestCandidatesLess(t *testing.T) {
 	candidates := GenerateACandidateList()
-
-	//fmt.Println(candidates.Less(0, 1))
-	if candidates.Less(0, 1) {
+	dist1 := emptyKademliaID()
+	candidates.contacts[0].SetDistance(dist1)
+	dist2 := emptyKademliaID()
+	dist2[id.IDLength-1] += 1
+	candidates.contacts[1].SetDistance(dist2)
+	if !candidates.Less(0, 1) {
 		t.FailNow()
 	}
 }
