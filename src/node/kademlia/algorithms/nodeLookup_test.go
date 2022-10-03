@@ -185,7 +185,6 @@ func TestRemoveDeadNodesAllAlive(t *testing.T) {
 
 // Verify that dead nodes are deleted.
 func TestRemoveDeadNodesAllDead(t *testing.T) {
-	kademlia.GetInstance()
 	batch := []contact.Contact{
 		{ID: id.NewRandomKademliaID(), Address: "127.21.0.2"},
 		{ID: id.NewRandomKademliaID(), Address: "127.21.0.3"},
