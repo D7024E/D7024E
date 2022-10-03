@@ -74,6 +74,50 @@ func TestRemoveContact(t *testing.T) {
 	}
 }
 
+// Generates two contacts (contact 1 and 2).
+// Adds contact1 to the bucket and then tries to remove contact2 which is not in the bucket.
+func TestRemoveContactNotExist(t *testing.T) {
+	bucket := newBucket()
+	contact1 := generateContact()
+	contact2 := generateContact()
+
+	bucket.AddContact(contact1)
+	bucket.RemoveContact(contact2)
+
+	if bucket.Len() != 1 {
+		t.FailNow()
+	}
+
+}
+
+// Test if the correct contact is being removed.
+// 3 contacts is added to the bucket.
+// GetContactAndCalcDistance is stored to contactsBefore, contact1 is removed and the GetContactAndCalcDistance is stored again to contactsAfter
+// Then contactsBefore and contactsAfter is compared
+func TestRemoveCorrectContact(t *testing.T) {
+	bucket := newBucket()
+	contact1 := generateContact()
+	contact2 := generateContact()
+	contact3 := generateContact()
+
+	bucket.AddContact(contact1)
+	bucket.AddContact(contact2)
+	bucket.AddContact(contact3)
+
+	contactsBefore := bucket.GetContactAndCalcDistance(contact2.ID)
+
+	bucket.RemoveContact(contact1)
+
+	if bucket.Len() != 2 {
+		t.FailNow()
+	}
+
+	contactsAfter := bucket.GetContactAndCalcDistance(contact2.ID)
+	if len(contactsBefore) == len(contactsAfter) {
+		t.FailNow()
+	}
+}
+
 // List of contacts with calculated lists is equal to the length of the bucket.
 func TestCalcDistance(t *testing.T) {
 	bucket := newBucket()
