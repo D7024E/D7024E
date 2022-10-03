@@ -36,7 +36,8 @@ func (bucket *bucket) AddContact(newContact contact.Contact) (oldContact contact
 
 	var head contact.Contact
 	if bucket.list.Len() == BucketSize {
-		head = contact.Contact(bucket.list.Front().Value.(contact.Contact))
+		head = contact.Contact(bucket.list.Back().Value.(contact.Contact))
+		bucket.list.Remove(bucket.list.Back())
 	} else {
 		head = contact.Contact{}
 	}
@@ -59,6 +60,7 @@ func (bucket *bucket) RemoveContact(target contact.Contact) {
 		nodeID := e.Value.(contact.Contact).ID
 		if target.ID.Equals(nodeID) {
 			bucket.list.Remove(e)
+			break
 		}
 	}
 }
