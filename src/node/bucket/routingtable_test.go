@@ -84,6 +84,7 @@ func TestFindClosestContactsFewerContacts(t *testing.T) {
 	}
 }
 
+// Verify that FindClosestContacts doesn't break on a empty routing table.
 func TestFindClosestContactsEmpty(t *testing.T) {
 	rt := GetInstance()
 	keyContact := generateContact()
