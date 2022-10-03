@@ -39,12 +39,12 @@ func (rt *RoutingTable) AddContact(newContact contact.Contact) (head contact.Con
 	return head, res
 }
 
-func (rt *RoutingTable) RemoveContact(oldContact contact.Contact) {
+func (rt *RoutingTable) RemoveContact(target contact.Contact) {
 	lock.Lock()
 	defer lock.Unlock()
-	bucketIndex := rt.getBucketIndex(oldContact.ID)
+	bucketIndex := rt.getBucketIndex(target.ID)
 	bucket := rt.buckets[bucketIndex]
-	bucket.RemoveContact(oldContact)
+	bucket.RemoveContact(target)
 }
 
 func (rt *RoutingTable) FindClosestContacts(target *id.KademliaID, count int) []contact.Contact {
