@@ -13,7 +13,7 @@ import (
 func HandleCMD(msg []byte) {
 	var rpcMessage rpcmarshal.RPC
 	rpcmarshal.RpcUnmarshal(msg, &rpcMessage)
-	go algorithms.AddContact(rpcMessage.Contact)
+	go algorithms.AddContact(rpcMessage.Contact, rpc.Ping)
 	switch rpcMessage.Cmd {
 	case "RESP":
 		requestHandler.GetInstance().WriteRespone(rpcMessage.ReqID, msg)
