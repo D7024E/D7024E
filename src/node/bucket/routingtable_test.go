@@ -2,6 +2,7 @@ package bucket
 
 import (
 	"D7024E/node/contact"
+	"D7024E/node/id"
 	"testing"
 )
 
@@ -55,7 +56,7 @@ func TestRemoveContactRouting(t *testing.T) {
 }
 
 // Verify that the closest returned contact is correct.
-func TestFindClosestContacts(t *testing.T) {
+func TestFindClosestContactsKnownTarget(t *testing.T) {
 	rt := GetInstance()
 	keyContact := generateContact()
 	rt.AddContact(keyContact)
@@ -69,8 +70,38 @@ func TestFindClosestContacts(t *testing.T) {
 	}
 }
 
+// Verify that FindClosestContacts does not return more contacts than exist the routing table
+func TestFindClosestContactsFewerContacts(t *testing.T) {
+	rt := GetInstance()
+	keyContact := generateContact()
+	rt.AddContact(keyContact)
+	for i := 0; i < 4; i++ {
+		rt.AddContact(generateContact())
+	}
+	res := rt.FindClosestContacts(keyContact.ID, 10)
+	if len(res) != 5 {
+		t.FailNow()
+	}
+}
+
+func TestFindClosestContactsEmpty(t *testing.T) {
+	rt := GetInstance()
+	keyContact := generateContact()
+	res := rt.FindClosestContacts(keyContact.ID, 10)
+	if len(res) > 0 {
+		t.FailNow()
+	}
+}
+
 // Verify that the returned bucket index is consistent.
 func TestGetBucketIndex(t *testing.T) {
 	rt := GetInstance()
-
+	keyContact := id.NewRandomKademliaID()
+	bucketIndex := rt.getBucketIndex(keyContact)
+	for i := 0; i < 100; i++ {
+		newBucketIndex := rt.getBucketIndex(keyContact)
+		if bucketIndex != newBucketIndex {
+			t.FailNow()
+		}
+	}
 }
