@@ -19,11 +19,7 @@ func GetInstance() *RoutingTable {
 		lock.Lock()
 		defer lock.Unlock()
 		if instance == nil {
-			log.INFO("New routing table created")
-			instance = &RoutingTable{}
-			for i := 0; i < id.IDLength*8; i++ {
-				instance.buckets[i] = newBucket()
-			}
+			instance = newRoutingTable()
 		}
 	}
 	return instance
@@ -72,6 +68,15 @@ func (rt *RoutingTable) FindClosestContacts(target *id.KademliaID, count int) []
 	}
 
 	return candidates.GetContacts(count)
+}
+
+func newRoutingTable() *RoutingTable {
+	log.INFO("New routing table created")
+	rt := &RoutingTable{}
+	for i := 0; i < id.IDLength*8; i++ {
+		rt.buckets[i] = newBucket()
+	}
+	return rt
 }
 
 func (rt *RoutingTable) getBucketIndex(contactId *id.KademliaID) int {

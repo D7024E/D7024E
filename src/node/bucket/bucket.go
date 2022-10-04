@@ -25,6 +25,15 @@ func newBucket() *bucket {
 // AddContact adds the Contact to the front of the bucket
 // or moves it to the front of the bucket if it already existed
 func (bucket *bucket) AddContact(newContact contact.Contact) (oldContact contact.Contact, res bool) {
+	var head contact.Contact
+	if bucket.list.Len() == BucketSize {
+		head = contact.Contact(bucket.list.Back().Value.(contact.Contact))
+		bucket.list.Remove(bucket.list.Back())
+		return head, false
+	} else {
+		head = contact.Contact{}
+	}
+
 	var element *list.Element
 	for e := bucket.list.Front(); e != nil; e = e.Next() {
 		nodeID := e.Value.(contact.Contact).ID
@@ -34,20 +43,9 @@ func (bucket *bucket) AddContact(newContact contact.Contact) (oldContact contact
 		}
 	}
 
-	var head contact.Contact
-	if bucket.list.Len() == BucketSize {
-		head = contact.Contact(bucket.list.Front().Value.(contact.Contact))
-	} else {
-		head = contact.Contact{}
-	}
-
 	if element == nil {
-		if bucket.list.Len() < BucketSize {
-			bucket.list.PushFront(newContact)
-			return head, true
-		} else {
-			return head, false
-		}
+		bucket.list.PushFront(newContact)
+		return head, true
 	} else {
 		bucket.list.MoveToFront(element)
 		return head, true
@@ -59,6 +57,7 @@ func (bucket *bucket) RemoveContact(target contact.Contact) {
 		nodeID := e.Value.(contact.Contact).ID
 		if target.ID.Equals(nodeID) {
 			bucket.list.Remove(e)
+			break
 		}
 	}
 }

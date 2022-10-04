@@ -5,14 +5,16 @@ import (
 	"D7024E/node/contact"
 )
 
-// // Attempt to add a contact to its bucket.
-func AddContact(newContact contact.Contact) {
+// Attempt to add a contact to its buckets.
+func AddContact(newContact contact.Contact, ping pingRPC) {
 	rt := bucket.GetInstance()
 	head, res := rt.AddContact(newContact)
 	if res {
 		return
 	} else {
-		rt.RemoveContact(head)
-		AddContact(newContact)
+		resp := ping(*contact.GetInstance(), head)
+		if !resp {
+			AddContact(newContact, ping)
+		}
 	}
 }

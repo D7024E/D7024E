@@ -13,8 +13,8 @@ import (
 	"sync"
 )
 
-type PingRpc func(contact.Contact, contact.Contact) bool
-type FindNodeRPC func(contact.Contact, contact.Contact, id.KademliaID) ([]contact.Contact, error)
+type pingRPC func(contact.Contact, contact.Contact) bool
+type findNodeRPC func(contact.Contact, contact.Contact, id.KademliaID) ([]contact.Contact, error)
 
 // Node lookup initiator.
 func NodeLookup(targetID id.KademliaID) []contact.Contact {
@@ -23,7 +23,7 @@ func NodeLookup(targetID id.KademliaID) []contact.Contact {
 }
 
 // Algorithm for Node lookup.
-func NodeLookupRec(targetID id.KademliaID, batch []contact.Contact, findNode FindNodeRPC, ping PingRpc) []contact.Contact {
+func NodeLookupRec(targetID id.KademliaID, batch []contact.Contact, findNode findNodeRPC, ping pingRPC) []contact.Contact {
 	batch = getAllDistances(batch)
 	batch = removeDeadNodes(batch, ping)
 	newBatch := findNodes(targetID, batch, findNode)
@@ -60,7 +60,7 @@ func min(a, b int) int {
 }
 
 // Find all nodes from the know contacts in batch.
-func findNodes(targetID id.KademliaID, batch []contact.Contact, findNode FindNodeRPC) [][]contact.Contact {
+func findNodes(targetID id.KademliaID, batch []contact.Contact, findNode findNodeRPC) [][]contact.Contact {
 	newBatch := [][]contact.Contact{batch}
 	for i := 0; i < len(batch); i += environment.Alpha {
 		var wg sync.WaitGroup
@@ -70,8 +70,9 @@ func findNodes(targetID id.KademliaID, batch []contact.Contact, findNode FindNod
 			go func() {
 				defer wg.Done()
 				kN, err := findNode(*contact.GetInstance(), batch[n], targetID)
-				if err == nil {
-					AddContact(batch[n])
+				if err != nil {
+					bucket.GetInstance().RemoveContact(batch[n])
+				} else {
 					newBatch = append(newBatch, kN)
 				}
 			}()
@@ -109,7 +110,7 @@ func removeDuplicates(batch []contact.Contact) []contact.Contact {
 }
 
 // Removes dead contacts by pinging and verifying if they are alive.
-func removeDeadNodes(batch []contact.Contact, ping PingRpc) []contact.Contact {
+func removeDeadNodes(batch []contact.Contact, ping pingRPC) []contact.Contact {
 	var wg sync.WaitGroup
 	var deadNodes []int
 	for i := 0; i < len(batch); i++ {
@@ -118,9 +119,7 @@ func removeDeadNodes(batch []contact.Contact, ping PingRpc) []contact.Contact {
 		go func() {
 			defer wg.Done()
 			alive := ping(*contact.GetInstance(), batch[n])
-			if alive {
-				AddContact(batch[n])
-			} else {
+			if !alive {
 				deadNodes = append(deadNodes, n)
 			}
 		}()
