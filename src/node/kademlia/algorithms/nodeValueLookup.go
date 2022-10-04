@@ -16,7 +16,7 @@ type findValueRPC func(contact.Contact, id.KademliaID, contact.Contact) (stored.
 func NodeValueLookup(valueID id.KademliaID) (stored.Value, error) {
 	alphaClosest := NodeLookup(valueID)
 	if len(alphaClosest) > environment.Alpha {
-		alphaClosest = alphaClosest[environment.Alpha:]
+		alphaClosest = alphaClosest[:environment.Alpha]
 	}
 	return alphaNodeValueLookup(valueID, alphaClosest, rpc.FindValueRequest)
 }
