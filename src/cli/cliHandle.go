@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"D7024E/node/kademlia/algorithms"
 	"strings"
 )
 
@@ -9,7 +10,7 @@ func Handle(text string) string {
 	var result string
 	switch split[0] {
 	case "put":
-		result = Put(split)
+		result = Put(split[1], algorithms.NodeStore)
 	case "get":
 		result = Get(split)
 	case "exit":

@@ -2,19 +2,22 @@ package cli
 
 import (
 	"D7024E/node/id"
-	"D7024E/node/kademlia/algorithms"
 	"D7024E/node/stored"
 )
 
-func Put(input []string) string {
-	if len(input) != 2 {
-		return "invalid amount of arguments"
-	}
-	id := *id.NewKademliaID(input[1])
+type NodeStore func(stored.Value) bool
+
+// Returns a hash of the input string if it was stored successfully, otherwise returns "".
+func Put(input string, NS NodeStore) string {
+	id := *id.NewKademliaID(input)
 	value := stored.Value{
-		Data: input[1],
+		Data: input,
 		ID:   id,
 	}
-	algorithms.NodeStore(value)
-	return id.String()
+	var res bool = NS(value)
+	if res {
+		return id.String()
+	} else {
+		return ""
+	}
 }
