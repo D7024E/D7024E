@@ -2,20 +2,18 @@ package cli
 
 import (
 	"D7024E/node/id"
-	"D7024E/node/kademlia/algorithms"
+	"D7024E/node/stored"
 )
 
-func Get(input []string) string {
-	if len(input) != 2 {
-		return "invalid amount of arguments"
-	}
+type NodeValueLookup func(id.KademliaID) (stored.Value, error)
 
-	valueID, err := id.String2KademliaID(input[1])
+func Get(input string, NVL NodeValueLookup) string {
+	valueID, err := id.String2KademliaID(input)
 	if err != nil {
 		return err.Error()
 	}
 
-	value, err := algorithms.NodeValueLookup(*valueID)
+	value, err := NVL(*valueID)
 	if err != nil {
 		return err.Error()
 	}
