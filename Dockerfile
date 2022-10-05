@@ -21,7 +21,8 @@ RUN go mod download
 
 RUN go build -o main
 
-EXPOSE 4000
+EXPOSE 4001
+EXPOSE 4002
 
 CMD ["./main"]
 
