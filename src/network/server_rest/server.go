@@ -4,7 +4,6 @@ import (
 	"D7024E/log"
 	"D7024E/network/server_rest/route"
 	"net/http"
-	"strconv"
 
 	"github.com/gorilla/mux"
 )
@@ -16,5 +15,5 @@ func RestServer(ip string, port int) {
 	router := mux.NewRouter()
 	route.RegisterRoutes(router)
 	log.INFO("Setup for rest over %v:%v", ip, port)
-	log.FATAL("Router has stopped working", http.ListenAndServe(ip+":"+strconv.Itoa(port), router))
+	log.FATAL("Router has stopped working", http.ListenAndServe(":4000", router)) //ip+":"+strconv.Itoa(port)
 }

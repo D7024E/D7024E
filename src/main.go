@@ -12,8 +12,8 @@ import (
 
 func main() {
 	kademlia.GetInstance()
+	go server_rest.RestServer(contact.GetInstance().Address, 4000)
 	go server.UDPListener(net.ParseIP(contact.GetInstance().Address), 4001)
-	go server_rest.RestServer(contact.GetInstance().Address, 4002)
 	go node.StartKademliaNode()
 	cli.CliListener()
 }
