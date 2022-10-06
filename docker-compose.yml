@@ -24,7 +24,7 @@ services:
         max_attempts: 3
         # window: 10s
     ports:
-      - target: 80
+      - target: 4000
         # published: 4000
         protocol: tcp
         mode: ingress 
