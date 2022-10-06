@@ -12,7 +12,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// Test GET "/objects/{hash}" if correct status and response is given. Test request that will get status 200.
+// Test GET "/objects/{hash}" if correct status and response is given.
+// Test request that will get status 200.
 func TestObjects200(t *testing.T) {
 	// Create value
 	value := stored.Value{Data: "this is data"}
@@ -58,7 +59,8 @@ func TestObjects200(t *testing.T) {
 	}
 }
 
-// Test GET "/objects/{hash}" if correct status and response is given. Test request that will get status 400.
+// Test GET "/objects/{hash}" if correct status and response is given.
+// Test request that will get status 400.
 func TestObjects400(t *testing.T) {
 	valueID := id.NewRandomKademliaID().String() + "a"
 	// Create request
@@ -94,7 +96,8 @@ func TestObjects400(t *testing.T) {
 	}
 }
 
-// Test GET "/objects/{hash}" if correct status and response is given. Test request that will get status 404.
+// Test GET "/objects/{hash}" if correct status and response is given.
+// Test request that will get status 404.
 func TestObjects404(t *testing.T) {
 	valueID := id.NewRandomKademliaID().String()
 

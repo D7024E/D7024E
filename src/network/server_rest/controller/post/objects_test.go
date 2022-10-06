@@ -14,7 +14,8 @@ type message struct {
 	Data string `json:"data"`
 }
 
-// Test POST "/objects" if correct status and response is given. Test request that will get status 201.
+// Test POST "/objects" if correct status and response is given.
+// Test request that will get status 201.
 func TestObjects201(t *testing.T) {
 	// Create request
 	jsonMessage, err := json.Marshal(message{Data: "THIS IS THE DATA"})
@@ -46,7 +47,8 @@ func TestObjects201(t *testing.T) {
 	}
 }
 
-// Test POST "/objects" if correct status and response is given. Test request that will get status 400.
+// Test POST "/objects" if correct status and response is given.
+// Test request that will get status 400.
 func TestObjects400(t *testing.T) {
 	// Create request
 	jsonMessage, err := json.Marshal(message{})
