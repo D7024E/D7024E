@@ -5,7 +5,7 @@
 # command line flags, in order to actually get any replicas started. That
 # command requires that a docker swarm is already running in order to function.
 
-version: "3"
+version: "3.2"
 services:
   kademliaNodes:
     image: kadlab:latest # Make sure your Docker image has this name.
@@ -23,8 +23,11 @@ services:
         # delay: 5s
         max_attempts: 3
         # window: 10s
-    # ports:
-    #   - "4000:80"
+    ports:
+      - target: 4000
+        # published: 4000
+        protocol: tcp
+        mode: ingress 
     environment:
       - LOG_CONSOLE=false
     networks:

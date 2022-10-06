@@ -14,7 +14,7 @@ func UDPListener(ip net.IP, port int) {
 	if err != nil {
 		log.ERROR("There was an error:", err)
 	} else {
-		log.INFO("Setup for listning to udp over %v:%v", ip, port)
+		log.INFO("Setup for listening to udp over %v:%v", ip, port)
 	}
 	defer connection.Close()
 	for {

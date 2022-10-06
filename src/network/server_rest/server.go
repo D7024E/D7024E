@@ -1,0 +1,19 @@
+package server_rest
+
+import (
+	"D7024E/log"
+	"D7024E/network/server_rest/route"
+	"net/http"
+
+	"github.com/gorilla/mux"
+)
+
+/**
+ * Start a server with REST http structure.
+ */
+func RestServer(ip string, port int) {
+	router := mux.NewRouter()
+	route.RegisterRoutes(router)
+	log.INFO("Setup for rest over %v:%v", ip, port)
+	log.FATAL("Rest router has stopped working", http.ListenAndServe(":4000", router)) //ip+":"+strconv.Itoa(port)
+}
