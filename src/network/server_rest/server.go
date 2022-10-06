@@ -4,7 +4,6 @@ import (
 	"D7024E/log"
 	"D7024E/network/server_rest/controller/get"
 	"D7024E/network/server_rest/controller/post"
-	"D7024E/network/server_rest/middleware/header"
 	"D7024E/network/server_rest/middleware/logging"
 	"net/http"
 
@@ -23,6 +22,5 @@ func RestServer(ip string, port int) {
 func registerRoutes(router *mux.Router) {
 	router.HandleFunc("/objects", post.Objects).Methods("POST")
 	router.HandleFunc("/objects/{hash}", get.Objects).Methods("GET")
-	router.Use(header.HeaderMiddleware)
 	router.Use(logging.Start())
 }

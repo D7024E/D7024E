@@ -11,6 +11,7 @@ import (
 
 // Get value with given hash.
 func Objects(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
 	valueID, err := id.String2KademliaID(params["hash"])
 	if err != nil {
