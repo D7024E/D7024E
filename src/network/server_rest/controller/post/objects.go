@@ -8,6 +8,7 @@ import (
 	"net/http"
 )
 
+// Create a value, from given json.
 func Objects(w http.ResponseWriter, r *http.Request) {
 	var value stored.Value
 	err := json.NewDecoder(r.Body).Decode(&value)

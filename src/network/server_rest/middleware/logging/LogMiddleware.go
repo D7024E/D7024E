@@ -1,4 +1,4 @@
-package loggingMiddleware
+package logging
 
 import (
 	"D7024E/log"

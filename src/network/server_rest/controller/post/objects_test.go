@@ -14,6 +14,7 @@ type message struct {
 	Data string `json:"data"`
 }
 
+// Test POST "/objects" if correct status and response is given.
 func TestObjects(t *testing.T) {
 	// Create request
 	jsonMessage, err := json.Marshal(message{Data: "THIS IS THE DATA"})
