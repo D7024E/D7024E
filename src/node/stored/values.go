@@ -55,3 +55,27 @@ func (stored *Stored) FindValue(id id.KademliaID) (Value, error) {
 	}
 	return Value{}, &err.ValueNotFound{}
 }
+
+func (stored *Stored) DeleteValue(id id.KademliaID) bool {
+	lock.Lock()
+	defer lock.Unlock()
+	index, err := stored.FindValueIndex(id)
+	if err == nil {
+		stored.values = append(stored.values[:index], stored.values[index+1:]...)
+		return true
+	} else {
+		return false
+	}
+}
+
+// FindValue Index which is used to determine the Index of the value that is to be removed from stored.
+func (stored *Stored) FindValueIndex(id id.KademliaID) (int, error) {
+	var index int
+	for _, item := range stored.values {
+		if id.Equals(&item.ID) {
+			return index, nil
+		}
+		index++
+	}
+	return 0, &err.ValueNotFound{}
+}
