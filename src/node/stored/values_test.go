@@ -2,22 +2,24 @@ package stored
 
 import (
 	"D7024E/node/id"
-	"fmt"
 	"testing"
 )
 
+// Test to Store one value.
 func TestStoreValueSuccess(t *testing.T) {
 	list := GetInstance()
 	value := Value{
 		Data: "Erik",
 		ID:   *id.NewRandomKademliaID(),
 	}
-	list.Store(append(list.values, value))
+	list.Store([]Value{value})
+
 	if list == nil {
 		t.FailNow()
 	}
 }
 
+// Test to find the stored value.
 func TestFindValueSuccess(t *testing.T) {
 
 	list := GetInstance()
@@ -25,7 +27,7 @@ func TestFindValueSuccess(t *testing.T) {
 		Data: "Erik",
 		ID:   *id.NewRandomKademliaID(),
 	}
-	list.Store(append(list.values, value))
+	list.Store([]Value{value})
 	_, err := list.FindValue(value.ID)
 
 	if !(err == nil) {
@@ -33,20 +35,20 @@ func TestFindValueSuccess(t *testing.T) {
 	}
 }
 
+// Test to find value on a empty list.
 func TestFindValueFail(t *testing.T) {
 	list := GetInstance()
 	id := id.NewRandomKademliaID()
 
 	_, err := list.FindValue(*id)
 
-	fmt.Println(err)
-
 	if !(err != nil) {
 		t.FailNow()
 	}
 }
 
-func TestFindValueEqualsTrue(t *testing.T) {
+// Test success on Equal method for values by comparing the same value.
+func TestValueEqualsTrue(t *testing.T) {
 
 	list := GetInstance()
 	value := Value{
@@ -54,9 +56,7 @@ func TestFindValueEqualsTrue(t *testing.T) {
 		ID:   *id.NewRandomKademliaID(),
 	}
 
-	list.Store(append(list.values, value))
-
-	fmt.Println(value.Equals(&value))
+	list.Store([]Value{value})
 
 	if !(value.Equals(&value) == true) {
 		t.FailNow()
@@ -64,6 +64,7 @@ func TestFindValueEqualsTrue(t *testing.T) {
 
 }
 
+// Test failure on Equal method for values by comparing two different values.
 func TestFindValueEqualsFalse(t *testing.T) {
 
 	list := GetInstance()
@@ -76,13 +77,89 @@ func TestFindValueEqualsFalse(t *testing.T) {
 		Data: "Dennis",
 		ID:   *id.NewRandomKademliaID(),
 	}
-	list.Store(append(list.values, value1))
-	list.Store(append(list.values, value2))
-
-	fmt.Println(value1.Equals(&value2))
+	list.Store([]Value{value1, value2})
 
 	if !(value1.Equals(&value2) == false) {
 		t.FailNow()
 	}
 
+}
+
+// Test to delete one and the only element of the storedList.
+func TestDeleteValueSuccessWithOneElementStored(t *testing.T) {
+	list := GetInstance()
+	value := Value{
+		Data: "Erik",
+		ID:   *id.NewRandomKademliaID(),
+	}
+	list.Store([]Value{value})
+
+	boolean := list.DeleteValue(value.ID)
+
+	if boolean == false {
+		t.FailNow()
+	}
+}
+
+// Test to check so that the correct element is deleted from a list containing three elements.
+func TestDeleteValueSuccessWithThreeElementStored(t *testing.T) {
+	list := GetInstance()
+	value1 := Value{
+		Data: "Erik",
+		ID:   *id.NewRandomKademliaID(),
+	}
+
+	value2 := Value{
+		Data: "Dennis",
+		ID:   *id.NewRandomKademliaID(),
+	}
+
+	value3 := Value{
+		Data: "Anders",
+		ID:   *id.NewRandomKademliaID(),
+	}
+
+	list.Store([]Value{value1, value2, value3})
+
+	boolean := list.DeleteValue(value2.ID)
+
+	if boolean == false {
+		t.FailNow()
+	}
+}
+
+// Test to delete an existing value which is not part of the storedList which in this test is empty.
+func TestDeleteValueOnEmptyList(t *testing.T) {
+	list := GetInstance()
+	value := Value{
+		Data: "Erik",
+		ID:   *id.NewRandomKademliaID(),
+	}
+
+	boolean := list.DeleteValue(value.ID)
+
+	if boolean == true {
+		t.FailNow()
+	}
+}
+
+// Test to delete an value which does not exist in an non-empty storedList.
+func TestDeleteValueInAnNonEmptyListFail(t *testing.T) {
+	list := GetInstance()
+	value1 := Value{
+		Data: "Erik",
+		ID:   *id.NewRandomKademliaID(),
+	}
+
+	value2 := Value{
+		Data: "Dennis",
+		ID:   *id.NewRandomKademliaID(),
+	}
+
+	list.Store([]Value{value1})
+	boolean := list.DeleteValue(value2.ID)
+
+	if boolean == true {
+		t.FailNow()
+	}
 }
