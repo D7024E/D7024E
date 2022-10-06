@@ -10,9 +10,10 @@ import (
 
 // Create a value, from given json.
 func Objects(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	var value stored.Value
 	err := json.NewDecoder(r.Body).Decode(&value)
-	if err != nil {
+	if err != nil || (stored.Value{}).Data == value.Data {
 		w.WriteHeader(http.StatusBadRequest)
 	} else {
 		value.ID = *id.NewKademliaID(value.Data)
