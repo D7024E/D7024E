@@ -49,8 +49,10 @@ func TestFindValueEqualsFalse(t *testing.T) {
 func TestRefreshDeadValue(t *testing.T) {
 	t0 := time.Now()
 	value := Value{ID: *id.NewRandomKademliaID(), DeadAt: t0}
-	value.Refresh()
-	if !t0.Equal(value.DeadAt) {
+	res := value.Refresh()
+	if res {
+		t.FailNow()
+	} else if !t0.Equal(value.DeadAt) {
 		t.FailNow()
 	}
 }
@@ -59,8 +61,10 @@ func TestRefreshDeadValue(t *testing.T) {
 func TestRefreshAliveValue(t *testing.T) {
 	t0 := time.Now().Add(time.Minute)
 	value := Value{ID: *id.NewRandomKademliaID(), Ttl: time.Hour, DeadAt: t0}
-	value.Refresh()
-	if !t0.Before(value.DeadAt) {
+	res := value.Refresh()
+	if !res {
+		t.FailNow()
+	} else if !t0.Before(value.DeadAt) {
 		t.FailNow()
 	}
 }

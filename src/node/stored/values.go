@@ -14,12 +14,12 @@ type Value struct {
 	DeadAt time.Time     `json:"deadAt"` // json time where value is dead.
 }
 
-var lock = &sync.Mutex{}
+var valueLock = &sync.Mutex{}
 
 // Equals for two Value, true if equal otherwise false.
 func (v1 *Value) Equals(v2 *Value) bool {
-	lock.Lock()
-	defer lock.Unlock()
+	valueLock.Lock()
+	defer valueLock.Unlock()
 	res := v1.Data == v2.Data
 	res = res && v1.ID.Equals(&v2.ID)
 	res = res && (v1.Ttl.String() == v2.Ttl.String())
@@ -28,24 +28,24 @@ func (v1 *Value) Equals(v2 *Value) bool {
 }
 
 // Checks if value is dead otherwise update the values time to live.
-func (value *Value) Refresh() {
+func (value *Value) Refresh() bool {
+	valueLock.Lock()
 	if !value.isDead() {
-		lock.Lock()
-		defer lock.Unlock()
+		defer valueLock.Unlock()
 		value.DeadAt = time.Now().Add(value.Ttl)
+		return true
+	} else {
+		valueLock.Unlock()
+		GetInstance().deleteValue(value.ID)
+		return false
 	}
 }
 
 // isDead function to check if value is dead, meaning that the deadAt is past.
-// If value is dead silently delete it.
 func (value *Value) isDead() bool {
-	lock.Lock()
 	if value.DeadAt.After(time.Now()) {
-		lock.Unlock()
 		return false
 	} else {
-		lock.Unlock()
-		GetInstance().deleteValue(value.ID)
 		return true
 	}
 }
@@ -55,6 +55,7 @@ type Stored struct {
 }
 
 var instance *Stored
+var lock = &sync.Mutex{}
 
 func GetInstance() *Stored {
 	if instance == nil {
@@ -62,6 +63,7 @@ func GetInstance() *Stored {
 		defer lock.Unlock()
 		if instance == nil {
 			instance = &Stored{}
+			go instance.cleaningDeadValues(time.Minute)
 		}
 	}
 	return instance
@@ -69,7 +71,7 @@ func GetInstance() *Stored {
 
 // Store a value within stored values if values id is not already within stored values.
 func (stored *Stored) Store(val Value) error {
-	_, err := GetInstance().FindValue(val.ID)
+	_, err := stored.FindValue(val.ID)
 	lock.Lock()
 	defer lock.Unlock()
 	if err != nil {
@@ -83,25 +85,50 @@ func (stored *Stored) Store(val Value) error {
 // Find a value within stored values.
 func (stored *Stored) FindValue(valueId id.KademliaID) (Value, error) {
 	lock.Lock()
-	defer lock.Unlock()
 	for _, item := range stored.values {
 		if valueId.Equals(&item.ID) {
-			return item, nil
+			lock.Unlock()
+			res := item.Refresh()
+			if res {
+				return item, nil
+			} else {
+				return Value{}, &errors.ValueTimeout{}
+			}
+
 		}
 	}
+	lock.Unlock()
 	return Value{}, &errors.ValueNotFound{}
 }
 
 // Delete a value with id in stored values.
 func (stored *Stored) deleteValue(valueID id.KademliaID) error {
-	values := GetInstance().values
 	lock.Lock()
 	defer lock.Unlock()
-	for i, val := range values {
+	valueLock.Lock()
+	defer valueLock.Unlock()
+	for i, val := range stored.values {
 		if val.ID.Equals(&valueID) {
 			stored.values = append(stored.values[:i], stored.values[i+1:]...)
 			return nil
 		}
 	}
 	return &errors.ValueNotFound{}
+}
+
+// Cleaning of dead values.
+func (stored *Stored) cleaningDeadValues(sleepTime time.Duration) {
+	time.Sleep(sleepTime)
+	lock.Lock()
+	deleteID := []id.KademliaID{}
+	for _, val := range stored.values {
+		if val.isDead() {
+			deleteID = append(deleteID, val.ID)
+		}
+	}
+	lock.Unlock()
+	for _, valueID := range deleteID {
+		stored.deleteValue(valueID)
+	}
+	stored.cleaningDeadValues(sleepTime)
 }
