@@ -18,14 +18,18 @@ func TestStoreValueSuccess(t *testing.T) {
 	}
 }
 
+// Check if adding duplicate values is accepted.
 func TestStoreValueDuplicate(t *testing.T) {
 	list := GetInstance()
 	value := Value{
 		Data: "Erik",
 		ID:   *id.NewRandomKademliaID(),
 	}
-	list.Store(value)
 	err := list.Store(value)
+	if err != nil {
+		t.FailNow()
+	}
+	err = list.Store(value)
 	if err == nil {
 		t.FailNow()
 	}
