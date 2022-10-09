@@ -46,7 +46,7 @@ func (stored *Stored) Store(val Value) error {
 	lock.Lock()
 	defer lock.Unlock()
 	_, err := instance.FindValue(val.ID)
-	if err == nil {
+	if err != nil {
 		stored.values = append(stored.values, val)
 		return nil
 	} else {

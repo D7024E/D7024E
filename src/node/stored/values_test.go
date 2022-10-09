@@ -12,9 +12,21 @@ func TestStoreValueSuccess(t *testing.T) {
 		Data: "Erik",
 		ID:   *id.NewRandomKademliaID(),
 	}
-	list.Store(value)
+	err := list.Store(value)
+	if err != nil {
+		t.FailNow()
+	}
+}
 
-	if list == nil {
+func TestStoreValueDuplicate(t *testing.T) {
+	list := GetInstance()
+	value := Value{
+		Data: "Erik",
+		ID:   *id.NewRandomKademliaID(),
+	}
+	list.Store(value)
+	err := list.Store(value)
+	if err == nil {
 		t.FailNow()
 	}
 }
