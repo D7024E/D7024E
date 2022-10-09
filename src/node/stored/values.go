@@ -14,6 +14,8 @@ type Value struct {
 	DeadAt time.Time     `json:"deadAt"` // json time where value is dead.
 }
 
+var lock = &sync.Mutex{}
+
 // Equals for two Value, true if equal otherwise false.
 func (v1 *Value) Equals(v2 *Value) bool {
 	lock.Lock()
@@ -29,7 +31,6 @@ type Stored struct {
 	values []Value
 }
 
-var lock = &sync.Mutex{}
 var instance *Stored
 
 func GetInstance() *Stored {
