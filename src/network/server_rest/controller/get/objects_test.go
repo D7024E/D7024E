@@ -18,9 +18,9 @@ import (
 func TestObjects200(t *testing.T) {
 	// Create value
 	value := stored.Value{
-		Data: "this is data", 
-		Ttl: time.Hour, 
-		DeadAt: time.Now().Add(time.Hour)
+		Data:   "this is data",
+		Ttl:    time.Hour,
+		DeadAt: time.Now().Add(time.Hour),
 	}
 	value.ID = *id.NewKademliaID(value.Data)
 
