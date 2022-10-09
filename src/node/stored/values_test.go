@@ -6,6 +6,83 @@ import (
 	"time"
 )
 
+// Test success on Equal method for values by comparing the same value.
+func TestValueEqualsTrue(t *testing.T) {
+
+	list := GetInstance()
+	value := Value{
+		Data: "Erik",
+		ID:   *id.NewRandomKademliaID(),
+	}
+
+	list.Store(value)
+
+	if !(value.Equals(&value) == true) {
+		t.FailNow()
+	}
+
+}
+
+// Test failure on Equal method for values by comparing two different values.
+func TestFindValueEqualsFalse(t *testing.T) {
+
+	list := GetInstance()
+	value1 := Value{
+		Data: "Erik",
+		ID:   *id.NewRandomKademliaID(),
+	}
+
+	value2 := Value{
+		Data: "Dennis",
+		ID:   *id.NewRandomKademliaID(),
+	}
+	list.Store(value1)
+	list.Store(value2)
+
+	if !(value1.Equals(&value2) == false) {
+		t.FailNow()
+	}
+
+}
+
+// See if deadAt is changed when value is not refreshed, since it is dead.
+func TestRefreshDeadValue(t *testing.T) {
+	t0 := time.Now()
+	value := Value{ID: *id.NewRandomKademliaID(), DeadAt: t0}
+	value.Refresh()
+	if !t0.Equal(value.DeadAt) {
+		t.FailNow()
+	}
+}
+
+// See if value is refreshed when value is still alive.
+func TestRefreshAliveValue(t *testing.T) {
+	t0 := time.Now().Add(time.Minute)
+	value := Value{ID: *id.NewRandomKademliaID(), Ttl: time.Hour, DeadAt: t0}
+	value.Refresh()
+	if !t0.Before(value.DeadAt) {
+		t.FailNow()
+	}
+}
+
+// Check if isDead confirmed that value is dead, if deadAt is past.
+func TestIsDeadFalse(t *testing.T) {
+	value := Value{ID: *id.NewRandomKademliaID(), DeadAt: time.Now()}
+	res := value.isDead()
+	if !res {
+		t.FailNow()
+	}
+}
+
+// Check if isDead confirms that value is not dead.
+func TestIsDeadTrue(t *testing.T) {
+	value := Value{ID: *id.NewRandomKademliaID(), DeadAt: time.Now().Add(time.Hour)}
+	res := value.isDead()
+	if res {
+		t.FailNow()
+	}
+}
+
 // Test to Store one value.
 func TestStoreValueSuccess(t *testing.T) {
 	list := GetInstance()
@@ -64,45 +141,6 @@ func TestFindValueFail(t *testing.T) {
 	}
 }
 
-// Test success on Equal method for values by comparing the same value.
-func TestValueEqualsTrue(t *testing.T) {
-
-	list := GetInstance()
-	value := Value{
-		Data: "Erik",
-		ID:   *id.NewRandomKademliaID(),
-	}
-
-	list.Store(value)
-
-	if !(value.Equals(&value) == true) {
-		t.FailNow()
-	}
-
-}
-
-// Test failure on Equal method for values by comparing two different values.
-func TestFindValueEqualsFalse(t *testing.T) {
-
-	list := GetInstance()
-	value1 := Value{
-		Data: "Erik",
-		ID:   *id.NewRandomKademliaID(),
-	}
-
-	value2 := Value{
-		Data: "Dennis",
-		ID:   *id.NewRandomKademliaID(),
-	}
-	list.Store(value1)
-	list.Store(value2)
-
-	if !(value1.Equals(&value2) == false) {
-		t.FailNow()
-	}
-
-}
-
 // Test to delete one and the only element of the storedList.
 func TestDeleteValueSuccessWithOneElementStored(t *testing.T) {
 	list := GetInstance()
@@ -112,7 +150,7 @@ func TestDeleteValueSuccessWithOneElementStored(t *testing.T) {
 	}
 	list.Store(value)
 
-	err := list.DeleteValue(value.ID)
+	err := list.deleteValue(value.ID)
 
 	if err != nil {
 		t.FailNow()
@@ -141,7 +179,7 @@ func TestDeleteValueSuccessWithThreeElementStored(t *testing.T) {
 	list.Store(value2)
 	list.Store(value3)
 
-	err := list.DeleteValue(value2.ID)
+	err := list.deleteValue(value2.ID)
 
 	if err != nil {
 		t.FailNow()
@@ -150,7 +188,7 @@ func TestDeleteValueSuccessWithThreeElementStored(t *testing.T) {
 
 // Test to delete an existing value which is not part of the storedList which in this test is empty.
 func TestDeleteValueOnEmptyList(t *testing.T) {
-	err := GetInstance().DeleteValue(*id.NewRandomKademliaID())
+	err := GetInstance().deleteValue(*id.NewRandomKademliaID())
 
 	if err == nil {
 		t.FailNow()
@@ -171,27 +209,9 @@ func TestDeleteValueInAnNonEmptyListFail(t *testing.T) {
 	}
 
 	list.Store(value1)
-	err := list.DeleteValue(value2.ID)
+	err := list.deleteValue(value2.ID)
 
 	if err == nil {
-		t.FailNow()
-	}
-}
-
-// Check if isDead confirmed that value is dead, if deadAt is past.
-func TestIsDeadFalse(t *testing.T) {
-	value := Value{ID: *id.NewRandomKademliaID(), DeadAt: time.Now()}
-	res := GetInstance().isDead(value)
-	if !res {
-		t.FailNow()
-	}
-}
-
-// Check if isDead confirms that value is not dead.
-func TestIsDeadTrue(t *testing.T) {
-	value := Value{ID: *id.NewRandomKademliaID(), DeadAt: time.Now().Add(time.Hour)}
-	res := GetInstance().isDead(value)
-	if res {
 		t.FailNow()
 	}
 }
