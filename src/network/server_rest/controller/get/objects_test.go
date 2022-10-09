@@ -24,7 +24,7 @@ func TestObjects200(t *testing.T) {
 	}
 
 	// Store value
-	stored.GetInstance().Store([]stored.Value{value})
+	stored.GetInstance().Store(value)
 
 	// Create request
 	route := "/objects/" + value.ID.String()
