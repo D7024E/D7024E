@@ -41,12 +41,17 @@ func GetInstance() *Stored {
 	return instance
 }
 
-func (stored *Stored) Store(val []Value) {
+// Store a value within stored values if values id is not already within stored values.
+func (stored *Stored) Store(val Value) {
 	lock.Lock()
 	defer lock.Unlock()
-	stored.values = append(stored.values, val...)
+	_, err := instance.FindValue(val.ID)
+	if err == nil {
+		stored.values = append(stored.values, val)
+	}
 }
 
+// Find a value within stored values.
 func (stored *Stored) FindValue(id id.KademliaID) (Value, error) {
 	for _, item := range stored.values {
 		if id.Equals(&item.ID) {
@@ -56,6 +61,7 @@ func (stored *Stored) FindValue(id id.KademliaID) (Value, error) {
 	return Value{}, &err.ValueNotFound{}
 }
 
+// Delete a value with id in stored values.
 func (stored *Stored) DeleteValue(id id.KademliaID) bool {
 	lock.Lock()
 	defer lock.Unlock()
@@ -68,7 +74,8 @@ func (stored *Stored) DeleteValue(id id.KademliaID) bool {
 	}
 }
 
-// FindValue Index which is used to determine the Index of the value that is to be removed from stored.
+// FindValue Index which is used to determine the Index of the value that is to
+// be removed from stored.
 func (stored *Stored) FindValueIndex(id id.KademliaID) (int, error) {
 	var index int
 	for _, item := range stored.values {
