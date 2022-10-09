@@ -27,6 +27,20 @@ func (v1 *Value) Equals(v2 *Value) bool {
 	return res
 }
 
+// isDead function to check if value is dead, meaning that the deadAt is past.
+// If value is dead silently delete it.
+func (value *Value) isDead() bool {
+	lock.Lock()
+	if value.DeadAt.After(time.Now()) {
+		lock.Unlock()
+		return false
+	} else {
+		lock.Unlock()
+		GetInstance().deleteValue(value.ID)
+		return true
+	}
+}
+
 type Stored struct {
 	values []Value
 }
@@ -58,11 +72,11 @@ func (stored *Stored) Store(val Value) error {
 }
 
 // Find a value within stored values.
-func (stored *Stored) FindValue(id id.KademliaID) (Value, error) {
+func (stored *Stored) FindValue(valueId id.KademliaID) (Value, error) {
 	lock.Lock()
 	defer lock.Unlock()
 	for _, item := range stored.values {
-		if id.Equals(&item.ID) {
+		if valueId.Equals(&item.ID) {
 			return item, nil
 		}
 	}
@@ -81,18 +95,4 @@ func (stored *Stored) deleteValue(valueID id.KademliaID) error {
 		}
 	}
 	return &errors.ValueNotFound{}
-}
-
-// isDead function to check if value is dead, meaning that the deadAt is past.
-// If value is dead silently delete it.
-func (stored *Stored) isDead(val Value) bool {
-	lock.Lock()
-	if val.DeadAt.After(time.Now()) {
-		lock.Unlock()
-		return false
-	} else {
-		lock.Unlock()
-		GetInstance().deleteValue(val.ID)
-		return true
-	}
 }

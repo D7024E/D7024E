@@ -181,7 +181,7 @@ func TestDeleteValueInAnNonEmptyListFail(t *testing.T) {
 // Check if isDead confirmed that value is dead, if deadAt is past.
 func TestIsDeadFalse(t *testing.T) {
 	value := Value{ID: *id.NewRandomKademliaID(), DeadAt: time.Now()}
-	res := GetInstance().isDead(value)
+	res := value.isDead()
 	if !res {
 		t.FailNow()
 	}
@@ -190,7 +190,7 @@ func TestIsDeadFalse(t *testing.T) {
 // Check if isDead confirms that value is not dead.
 func TestIsDeadTrue(t *testing.T) {
 	value := Value{ID: *id.NewRandomKademliaID(), DeadAt: time.Now().Add(time.Hour)}
-	res := GetInstance().isDead(value)
+	res := value.isDead()
 	if res {
 		t.FailNow()
 	}
