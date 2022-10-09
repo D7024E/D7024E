@@ -70,10 +70,11 @@ func (stored *Stored) FindValue(id id.KademliaID) (Value, error) {
 }
 
 // Delete a value with id in stored values.
-func (stored *Stored) DeleteValue(valueID id.KademliaID) error {
+func (stored *Stored) deleteValue(valueID id.KademliaID) error {
+	values := GetInstance().values
 	lock.Lock()
 	defer lock.Unlock()
-	for i, val := range GetInstance().values {
+	for i, val := range values {
 		if val.ID.Equals(&valueID) {
 			stored.values = append(stored.values[:i], stored.values[i+1:]...)
 			return nil
@@ -91,7 +92,7 @@ func (stored *Stored) isDead(val Value) bool {
 		return false
 	} else {
 		lock.Unlock()
-		GetInstance().DeleteValue(val.ID)
+		GetInstance().deleteValue(val.ID)
 		return true
 	}
 }

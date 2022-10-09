@@ -112,7 +112,7 @@ func TestDeleteValueSuccessWithOneElementStored(t *testing.T) {
 	}
 	list.Store(value)
 
-	err := list.DeleteValue(value.ID)
+	err := list.deleteValue(value.ID)
 
 	if err != nil {
 		t.FailNow()
@@ -141,7 +141,7 @@ func TestDeleteValueSuccessWithThreeElementStored(t *testing.T) {
 	list.Store(value2)
 	list.Store(value3)
 
-	err := list.DeleteValue(value2.ID)
+	err := list.deleteValue(value2.ID)
 
 	if err != nil {
 		t.FailNow()
@@ -150,7 +150,7 @@ func TestDeleteValueSuccessWithThreeElementStored(t *testing.T) {
 
 // Test to delete an existing value which is not part of the storedList which in this test is empty.
 func TestDeleteValueOnEmptyList(t *testing.T) {
-	err := GetInstance().DeleteValue(*id.NewRandomKademliaID())
+	err := GetInstance().deleteValue(*id.NewRandomKademliaID())
 
 	if err == nil {
 		t.FailNow()
@@ -171,7 +171,7 @@ func TestDeleteValueInAnNonEmptyListFail(t *testing.T) {
 	}
 
 	list.Store(value1)
-	err := list.DeleteValue(value2.ID)
+	err := list.deleteValue(value2.ID)
 
 	if err == nil {
 		t.FailNow()
