@@ -37,7 +37,7 @@ func storeRequestMessage(me contact.Contact, reqID string, value stored.Value) [
 // Stores the given value. Then return a rpc message to inform the requesting
 // node that the value is stored.
 func StoreRespond(me contact.Contact, target contact.Contact, reqID string, value stored.Value) {
-	stored.GetInstance().Store([]stored.Value{value})
+	stored.GetInstance().Store(value)
 	message := storeRespondMessage(me, reqID)
 	ip := parseIP(target.Address)
 	sender.UDPSender(ip, 4001, message)

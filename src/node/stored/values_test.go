@@ -12,7 +12,7 @@ func TestStoreValueSuccess(t *testing.T) {
 		Data: "Erik",
 		ID:   *id.NewRandomKademliaID(),
 	}
-	list.Store([]Value{value})
+	list.Store(value)
 
 	if list == nil {
 		t.FailNow()
@@ -27,7 +27,7 @@ func TestFindValueSuccess(t *testing.T) {
 		Data: "Erik",
 		ID:   *id.NewRandomKademliaID(),
 	}
-	list.Store([]Value{value})
+	list.Store(value)
 	_, err := list.FindValue(value.ID)
 
 	if !(err == nil) {
@@ -56,7 +56,7 @@ func TestValueEqualsTrue(t *testing.T) {
 		ID:   *id.NewRandomKademliaID(),
 	}
 
-	list.Store([]Value{value})
+	list.Store(value)
 
 	if !(value.Equals(&value) == true) {
 		t.FailNow()
@@ -77,7 +77,8 @@ func TestFindValueEqualsFalse(t *testing.T) {
 		Data: "Dennis",
 		ID:   *id.NewRandomKademliaID(),
 	}
-	list.Store([]Value{value1, value2})
+	list.Store(value1)
+	list.Store(value2)
 
 	if !(value1.Equals(&value2) == false) {
 		t.FailNow()
@@ -92,7 +93,7 @@ func TestDeleteValueSuccessWithOneElementStored(t *testing.T) {
 		Data: "Erik",
 		ID:   *id.NewRandomKademliaID(),
 	}
-	list.Store([]Value{value})
+	list.Store(value)
 
 	boolean := list.DeleteValue(value.ID)
 
@@ -119,11 +120,13 @@ func TestDeleteValueSuccessWithThreeElementStored(t *testing.T) {
 		ID:   *id.NewRandomKademliaID(),
 	}
 
-	list.Store([]Value{value1, value2, value3})
+	list.Store(value1)
+	list.Store(value2)
+	list.Store(value3)
 
-	boolean := list.DeleteValue(value2.ID)
+	res := list.DeleteValue(value2.ID)
 
-	if boolean == false {
+	if res == false {
 		t.FailNow()
 	}
 }
@@ -156,7 +159,7 @@ func TestDeleteValueInAnNonEmptyListFail(t *testing.T) {
 		ID:   *id.NewRandomKademliaID(),
 	}
 
-	list.Store([]Value{value1})
+	list.Store(value1)
 	boolean := list.DeleteValue(value2.ID)
 
 	if boolean == true {

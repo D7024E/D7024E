@@ -1,7 +1,7 @@
 package stored
 
 import (
-	err "D7024E/error"
+	"D7024E/errors"
 	"D7024E/node/id"
 	"sync"
 	"time"
@@ -42,12 +42,15 @@ func GetInstance() *Stored {
 }
 
 // Store a value within stored values if values id is not already within stored values.
-func (stored *Stored) Store(val Value) {
+func (stored *Stored) Store(val Value) error {
 	lock.Lock()
 	defer lock.Unlock()
 	_, err := instance.FindValue(val.ID)
 	if err == nil {
 		stored.values = append(stored.values, val)
+		return nil
+	} else {
+		return &errors.ValueAlreadyExist{}
 	}
 }
 
@@ -58,7 +61,7 @@ func (stored *Stored) FindValue(id id.KademliaID) (Value, error) {
 			return item, nil
 		}
 	}
-	return Value{}, &err.ValueNotFound{}
+	return Value{}, &errors.ValueNotFound{}
 }
 
 // Delete a value with id in stored values.
@@ -84,5 +87,5 @@ func (stored *Stored) FindValueIndex(id id.KademliaID) (int, error) {
 		}
 		index++
 	}
-	return 0, &err.ValueNotFound{}
+	return 0, &errors.ValueNotFound{}
 }
