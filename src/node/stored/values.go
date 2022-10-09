@@ -16,6 +16,8 @@ type Value struct {
 
 // Equals for two Value, true if equal otherwise false.
 func (v1 *Value) Equals(v2 *Value) bool {
+	lock.Lock()
+	defer lock.Unlock()
 	res := v1.Data == v2.Data
 	res = res && v1.ID.Equals(&v2.ID)
 	res = res && (v1.Ttl.String() == v2.Ttl.String())
@@ -43,9 +45,9 @@ func GetInstance() *Stored {
 
 // Store a value within stored values if values id is not already within stored values.
 func (stored *Stored) Store(val Value) error {
+	_, err := GetInstance().FindValue(val.ID)
 	lock.Lock()
 	defer lock.Unlock()
-	_, err := instance.FindValue(val.ID)
 	if err != nil {
 		stored.values = append(stored.values, val)
 		return nil
@@ -56,6 +58,8 @@ func (stored *Stored) Store(val Value) error {
 
 // Find a value within stored values.
 func (stored *Stored) FindValue(id id.KademliaID) (Value, error) {
+	lock.Lock()
+	defer lock.Unlock()
 	for _, item := range stored.values {
 		if id.Equals(&item.ID) {
 			return item, nil
@@ -65,27 +69,30 @@ func (stored *Stored) FindValue(id id.KademliaID) (Value, error) {
 }
 
 // Delete a value with id in stored values.
-func (stored *Stored) DeleteValue(id id.KademliaID) bool {
+func (stored *Stored) DeleteValue(valueID id.KademliaID) error {
 	lock.Lock()
 	defer lock.Unlock()
-	index, err := stored.FindValueIndex(id)
-	if err == nil {
-		stored.values = append(stored.values[:index], stored.values[index+1:]...)
-		return true
-	} else {
-		return false
+	for i, val := range GetInstance().values {
+		if val.ID.Equals(&valueID) {
+			stored.values = append(stored.values[:i], stored.values[i+1:]...)
+			return nil
+		}
 	}
+	return &errors.ValueNotFound{}
 }
 
-// FindValue Index which is used to determine the Index of the value that is to
-// be removed from stored.
-func (stored *Stored) FindValueIndex(id id.KademliaID) (int, error) {
-	var index int
-	for _, item := range stored.values {
-		if id.Equals(&item.ID) {
-			return index, nil
-		}
-		index++
+// isDead function to check if value is dead, meaning that the deadAt is past.
+// If value is dead silently delete it.
+func (stored *Stored) isDead(valueID id.KademliaID) (bool, error) {
+	val, err := GetInstance().FindValue(valueID)
+	lock.Lock()
+	defer lock.Unlock()
+	if err != nil {
+		return false, err
+	} else if val.DeadAt.After(time.Now()) {
+		return false, nil
+	} else {
+		GetInstance().DeleteValue(val.ID)
+		return true, nil
 	}
-	return 0, &errors.ValueNotFound{}
 }

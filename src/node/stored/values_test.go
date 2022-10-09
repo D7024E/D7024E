@@ -111,9 +111,9 @@ func TestDeleteValueSuccessWithOneElementStored(t *testing.T) {
 	}
 	list.Store(value)
 
-	boolean := list.DeleteValue(value.ID)
+	err := list.DeleteValue(value.ID)
 
-	if boolean == false {
+	if err != nil {
 		t.FailNow()
 	}
 }
@@ -140,24 +140,18 @@ func TestDeleteValueSuccessWithThreeElementStored(t *testing.T) {
 	list.Store(value2)
 	list.Store(value3)
 
-	res := list.DeleteValue(value2.ID)
+	err := list.DeleteValue(value2.ID)
 
-	if res == false {
+	if err != nil {
 		t.FailNow()
 	}
 }
 
 // Test to delete an existing value which is not part of the storedList which in this test is empty.
 func TestDeleteValueOnEmptyList(t *testing.T) {
-	list := GetInstance()
-	value := Value{
-		Data: "Erik",
-		ID:   *id.NewRandomKademliaID(),
-	}
+	err := GetInstance().DeleteValue(*id.NewRandomKademliaID())
 
-	boolean := list.DeleteValue(value.ID)
-
-	if boolean == true {
+	if err == nil {
 		t.FailNow()
 	}
 }
@@ -176,9 +170,9 @@ func TestDeleteValueInAnNonEmptyListFail(t *testing.T) {
 	}
 
 	list.Store(value1)
-	boolean := list.DeleteValue(value2.ID)
+	err := list.DeleteValue(value2.ID)
 
-	if boolean == true {
+	if err == nil {
 		t.FailNow()
 	}
 }
