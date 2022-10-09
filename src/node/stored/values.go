@@ -83,16 +83,14 @@ func (stored *Stored) DeleteValue(valueID id.KademliaID) error {
 
 // isDead function to check if value is dead, meaning that the deadAt is past.
 // If value is dead silently delete it.
-func (stored *Stored) isDead(valueID id.KademliaID) (bool, error) {
-	val, err := GetInstance().FindValue(valueID)
+func (stored *Stored) isDead(val Value) bool {
 	lock.Lock()
-	defer lock.Unlock()
-	if err != nil {
-		return false, err
-	} else if val.DeadAt.After(time.Now()) {
-		return false, nil
+	if val.DeadAt.After(time.Now()) {
+		lock.Unlock()
+		return false
 	} else {
+		lock.Unlock()
 		GetInstance().DeleteValue(val.ID)
-		return true, nil
+		return true
 	}
 }

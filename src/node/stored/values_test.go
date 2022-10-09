@@ -3,6 +3,7 @@ package stored
 import (
 	"D7024E/node/id"
 	"testing"
+	"time"
 )
 
 // Test to Store one value.
@@ -173,6 +174,24 @@ func TestDeleteValueInAnNonEmptyListFail(t *testing.T) {
 	err := list.DeleteValue(value2.ID)
 
 	if err == nil {
+		t.FailNow()
+	}
+}
+
+// Check if isDead confirmed that value is dead, if deadAt is past.
+func TestIsDeadFalse(t *testing.T) {
+	value := Value{ID: *id.NewRandomKademliaID(), DeadAt: time.Now()}
+	res := GetInstance().isDead(value)
+	if !res {
+		t.FailNow()
+	}
+}
+
+// Check if isDead confirms that value is not dead.
+func TestIsDeadTrue(t *testing.T) {
+	value := Value{ID: *id.NewRandomKademliaID(), DeadAt: time.Now().Add(time.Hour)}
+	res := GetInstance().isDead(value)
+	if res {
 		t.FailNow()
 	}
 }
