@@ -14,12 +14,12 @@ type Value struct {
 	DeadAt time.Time     `json:"deadAt"` // json time where value is dead.
 }
 
-var valueLock = &sync.Mutex{}
+var lock = &sync.Mutex{}
 
 // Equals for two Value, true if equal otherwise false.
 func (v1 *Value) Equals(v2 *Value) bool {
-	valueLock.Lock()
-	defer valueLock.Unlock()
+	lock.Lock()
+	defer lock.Unlock()
 	res := v1.Data == v2.Data
 	res = res && v1.ID.Equals(&v2.ID)
 	res = res && (v1.Ttl.String() == v2.Ttl.String())
@@ -28,14 +28,14 @@ func (v1 *Value) Equals(v2 *Value) bool {
 
 // Checks if value is dead otherwise update the values time to live.
 func (value *Value) Refresh() bool {
-	valueLock.Lock()
+	stored := GetInstance()
+	lock.Lock()
+	defer lock.Unlock()
 	if !value.isDead() {
-		defer valueLock.Unlock()
 		value.DeadAt = time.Now().Add(value.Ttl)
 		return true
 	} else {
-		valueLock.Unlock()
-		GetInstance().deleteValue(value.ID)
+		stored.deleteValue(value.ID)
 		return false
 	}
 }
@@ -54,7 +54,6 @@ type Stored struct {
 }
 
 var instance *Stored
-var lock = &sync.Mutex{}
 
 func GetInstance() *Stored {
 	if instance == nil {
@@ -62,7 +61,7 @@ func GetInstance() *Stored {
 		defer lock.Unlock()
 		if instance == nil {
 			instance = &Stored{}
-			go instance.cleaningDeadValues(time.Minute)
+			go instance.cleaningDeadValues(15 * time.Second)
 		}
 	}
 	return instance
@@ -103,10 +102,6 @@ func (stored *Stored) FindValue(valueId id.KademliaID) (Value, error) {
 
 // Delete a value with id in stored values.
 func (stored *Stored) deleteValue(valueID id.KademliaID) error {
-	lock.Lock()
-	defer lock.Unlock()
-	valueLock.Lock()
-	defer valueLock.Unlock()
 	for i, val := range stored.values {
 		if val.ID.Equals(&valueID) {
 			stored.values = append(stored.values[:i], stored.values[i+1:]...)
@@ -126,9 +121,9 @@ func (stored *Stored) cleaningDeadValues(sleepTime time.Duration) {
 			deleteID = append(deleteID, val.ID)
 		}
 	}
-	lock.Unlock()
 	for _, valueID := range deleteID {
 		stored.deleteValue(valueID)
 	}
-	stored.cleaningDeadValues(sleepTime)
+	lock.Unlock()
+	go stored.cleaningDeadValues(sleepTime)
 }

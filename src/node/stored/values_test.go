@@ -9,14 +9,12 @@ import (
 
 // Test success on Equal method for values by comparing the same value.
 func TestValueEqualsTrue(t *testing.T) {
-
-	list := GetInstance()
 	value := Value{
-		Data: "Erik",
-		ID:   *id.NewRandomKademliaID(),
+		Data:   "Erik",
+		ID:     *id.NewRandomKademliaID(),
+		Ttl:    time.Hour,
+		DeadAt: time.Now().Add(time.Hour),
 	}
-
-	list.Store(value)
 
 	if !(value.Equals(&value) == true) {
 		t.FailNow()
@@ -26,20 +24,19 @@ func TestValueEqualsTrue(t *testing.T) {
 
 // Test failure on Equal method for values by comparing two different values.
 func TestFindValueEqualsFalse(t *testing.T) {
-
-	list := GetInstance()
 	value1 := Value{
-		Data: "Erik",
-		ID:   *id.NewRandomKademliaID(),
+		Data:   "Erik",
+		ID:     *id.NewRandomKademliaID(),
+		Ttl:    time.Hour,
+		DeadAt: time.Now().Add(time.Hour),
 	}
 
 	value2 := Value{
-		Data: "Dennis",
-		ID:   *id.NewRandomKademliaID(),
+		Data:   "Dennis",
+		ID:     *id.NewRandomKademliaID(),
+		Ttl:    time.Hour,
+		DeadAt: time.Now().Add(time.Hour),
 	}
-	list.Store(value1)
-	list.Store(value2)
-
 	if !(value1.Equals(&value2) == false) {
 		t.FailNow()
 	}
@@ -71,8 +68,11 @@ func TestRefreshAliveValue(t *testing.T) {
 }
 
 // Check if isDead confirmed that value is dead, if deadAt is past.
-func TestIsDeadFalse(t *testing.T) {
-	value := Value{ID: *id.NewRandomKademliaID(), DeadAt: time.Now()}
+func TestIsDeadTrue(t *testing.T) {
+	value := Value{
+		ID:     *id.NewRandomKademliaID(),
+		DeadAt: time.Now(),
+	}
 	res := value.isDead()
 	if !res {
 		t.FailNow()
@@ -80,8 +80,11 @@ func TestIsDeadFalse(t *testing.T) {
 }
 
 // Check if isDead confirms that value is not dead.
-func TestIsDeadTrue(t *testing.T) {
-	value := Value{ID: *id.NewRandomKademliaID(), DeadAt: time.Now().Add(time.Hour)}
+func TestIsDeadFalse(t *testing.T) {
+	value := Value{
+		ID:     *id.NewRandomKademliaID(),
+		DeadAt: time.Now().Add(time.Hour),
+	}
 	res := value.isDead()
 	if res {
 		t.FailNow()
@@ -90,12 +93,14 @@ func TestIsDeadTrue(t *testing.T) {
 
 // Test to Store one value.
 func TestStoreValueSuccess(t *testing.T) {
-	list := GetInstance()
+	stored := Stored{}
 	value := Value{
-		Data: "Erik",
-		ID:   *id.NewRandomKademliaID(),
+		Data:   "Erik",
+		ID:     *id.NewRandomKademliaID(),
+		Ttl:    time.Hour,
+		DeadAt: time.Now().Add(time.Hour),
 	}
-	err := list.Store(value)
+	err := stored.Store(value)
 	if err != nil {
 		t.FailNow()
 	}
@@ -103,17 +108,18 @@ func TestStoreValueSuccess(t *testing.T) {
 
 // Check if adding duplicate values is accepted.
 func TestStoreValueDuplicate(t *testing.T) {
-	list := GetInstance()
+	stored := Stored{}
 	value := Value{
 		Data:   "Erik",
 		ID:     *id.NewRandomKademliaID(),
+		Ttl:    time.Hour,
 		DeadAt: time.Now().Add(time.Hour),
 	}
-	err := list.Store(value)
+	err := stored.Store(value)
 	if err != nil {
 		t.FailNow()
 	}
-	err = list.Store(value)
+	err = stored.Store(value)
 	if err == nil {
 		fmt.Println(err)
 		t.FailNow()
@@ -122,15 +128,14 @@ func TestStoreValueDuplicate(t *testing.T) {
 
 // Test to find the stored value.
 func TestFindValueSuccess(t *testing.T) {
+	stored := Stored{values: []Value{{
+		Data:   "Erik",
+		ID:     *id.NewRandomKademliaID(),
+		Ttl:    time.Hour,
+		DeadAt: time.Now().Add(time.Hour),
+	}}}
 
-	list := GetInstance()
-	value := Value{
-		Data: "Erik",
-		ID:   *id.NewRandomKademliaID(),
-	}
-	list.Store(value)
-	_, err := list.FindValue(value.ID)
-
+	_, err := stored.FindValue(stored.values[0].ID)
 	if !(err == nil) {
 		t.FailNow()
 	}
@@ -142,7 +147,6 @@ func TestFindValueFail(t *testing.T) {
 	id := id.NewRandomKademliaID()
 
 	_, err := list.FindValue(*id)
-
 	if !(err != nil) {
 		t.FailNow()
 	}
@@ -150,15 +154,14 @@ func TestFindValueFail(t *testing.T) {
 
 // Test to delete one and the only element of the storedList.
 func TestDeleteValueSuccessWithOneElementStored(t *testing.T) {
-	list := GetInstance()
-	value := Value{
-		Data: "Erik",
-		ID:   *id.NewRandomKademliaID(),
-	}
-	list.Store(value)
+	stored := Stored{values: []Value{{
+		Data:   "Erik",
+		ID:     *id.NewRandomKademliaID(),
+		Ttl:    time.Hour,
+		DeadAt: time.Now().Add(time.Hour),
+	}}}
 
-	err := list.deleteValue(value.ID)
-
+	err := stored.deleteValue(stored.values[0].ID)
 	if err != nil {
 		t.FailNow()
 	}
@@ -166,28 +169,25 @@ func TestDeleteValueSuccessWithOneElementStored(t *testing.T) {
 
 // Test to check so that the correct element is deleted from a list containing three elements.
 func TestDeleteValueSuccessWithThreeElementStored(t *testing.T) {
-	list := GetInstance()
-	value1 := Value{
-		Data: "Erik",
-		ID:   *id.NewRandomKademliaID(),
-	}
+	values := []Value{{
+		Data:   "Erik",
+		ID:     *id.NewRandomKademliaID(),
+		Ttl:    time.Hour,
+		DeadAt: time.Now().Add(time.Hour),
+	}, {
+		Data:   "Dennis",
+		ID:     *id.NewRandomKademliaID(),
+		Ttl:    time.Hour,
+		DeadAt: time.Now().Add(time.Hour),
+	}, {
+		Data:   "Anders",
+		ID:     *id.NewRandomKademliaID(),
+		Ttl:    time.Hour,
+		DeadAt: time.Now().Add(time.Hour),
+	}}
 
-	value2 := Value{
-		Data: "Dennis",
-		ID:   *id.NewRandomKademliaID(),
-	}
-
-	value3 := Value{
-		Data: "Anders",
-		ID:   *id.NewRandomKademliaID(),
-	}
-
-	list.Store(value1)
-	list.Store(value2)
-	list.Store(value3)
-
-	err := list.deleteValue(value2.ID)
-
+	stored := Stored{values: values}
+	err := stored.deleteValue(values[1].ID)
 	if err != nil {
 		t.FailNow()
 	}
@@ -195,8 +195,7 @@ func TestDeleteValueSuccessWithThreeElementStored(t *testing.T) {
 
 // Test to delete an existing value which is not part of the storedList which in this test is empty.
 func TestDeleteValueOnEmptyList(t *testing.T) {
-	err := GetInstance().deleteValue(*id.NewRandomKademliaID())
-
+	err := (&Stored{}).deleteValue(*id.NewRandomKademliaID())
 	if err == nil {
 		t.FailNow()
 	}
@@ -204,21 +203,33 @@ func TestDeleteValueOnEmptyList(t *testing.T) {
 
 // Test to delete an value which does not exist in an non-empty storedList.
 func TestDeleteValueInAnNonEmptyListFail(t *testing.T) {
-	list := GetInstance()
-	value1 := Value{
-		Data: "Erik",
-		ID:   *id.NewRandomKademliaID(),
-	}
+	stored := Stored{values: []Value{{
+		Data:   "Erik",
+		ID:     *id.NewRandomKademliaID(),
+		Ttl:    time.Hour,
+		DeadAt: time.Now().Add(time.Hour),
+	}}}
 
 	value2 := Value{
-		Data: "Dennis",
-		ID:   *id.NewRandomKademliaID(),
+		Data:   "Dennis",
+		ID:     *id.NewRandomKademliaID(),
+		Ttl:    time.Hour,
+		DeadAt: time.Now().Add(time.Hour),
 	}
 
-	list.Store(value1)
-	err := list.deleteValue(value2.ID)
-
+	err := stored.deleteValue(value2.ID)
 	if err == nil {
+		t.FailNow()
+	}
+}
+
+func TestCleaningDeadValues(t *testing.T) {
+	stored := Stored{}
+	values := []Value{{ID: *id.NewRandomKademliaID()}}
+	stored.values = values
+	go stored.cleaningDeadValues(time.Duration(0))
+	time.Sleep(1)
+	if len(stored.values) != 0 {
 		t.FailNow()
 	}
 }
