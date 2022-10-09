@@ -7,6 +7,7 @@ import (
 	"D7024E/node/stored"
 	"errors"
 	"testing"
+	"time"
 )
 
 // Test FindValueRequestMessage output correct message.
@@ -74,7 +75,10 @@ func TestFindValueRequestReturnNotFound(t *testing.T) {
 
 // Test FindValueResponseMessage output in success case.
 func TestFindValueResponseMessageSuccess(t *testing.T) {
-	value := stored.Value{ID: *id.NewRandomKademliaID()}
+	value := stored.Value{
+		ID:  *id.NewRandomKademliaID(),
+		Ttl: time.Hour,
+	}
 	err := stored.GetInstance().Store(value)
 	if err != nil {
 		t.FailNow()

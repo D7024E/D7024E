@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/gorilla/mux"
 )
@@ -16,12 +17,12 @@ import (
 // Test request that will get status 200.
 func TestObjects200(t *testing.T) {
 	// Create value
-	value := stored.Value{Data: "this is data"}
-	value.ID = *id.NewKademliaID(value.Data)
-	jsonValue, err := json.Marshal(value)
-	if err != nil {
-		t.FailNow()
+	value := stored.Value{
+		Data:   "this is data",
+		Ttl:    time.Hour,
+		DeadAt: time.Now().Add(time.Hour),
 	}
+	value.ID = *id.NewKademliaID(value.Data)
 
 	// Store value
 	stored.GetInstance().Store(value)
@@ -50,12 +51,11 @@ func TestObjects200(t *testing.T) {
 			status, http.StatusOK)
 	}
 
-	// Check the response body is what we expect.
-	expected := string(jsonValue)
-	body := strings.ReplaceAll(rr.Body.String(), "\n", "")
-	if body != expected {
+	var body stored.Value
+	json.Unmarshal(rr.Body.Bytes(), &body)
+	if !value.Equals(&body) {
 		t.Errorf("handler returned unexpected body: got %v want %v",
-			body, expected)
+			body, value)
 	}
 }
 
