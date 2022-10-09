@@ -141,9 +141,15 @@ func TestDeleteValueSuccessWithThreeElementStored(t *testing.T) {
 	list.Store(value2)
 	list.Store(value3)
 
+<<<<<<< HEAD
 	err := list.DeleteValue(value2.ID)
 
 	if err != nil {
+=======
+	res := list.DeleteValue(value2.ID)
+
+	if res == false {
+>>>>>>> master
 		t.FailNow()
 	}
 }
