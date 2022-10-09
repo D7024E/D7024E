@@ -2,6 +2,7 @@ package stored
 
 import (
 	"D7024E/node/id"
+	"fmt"
 	"testing"
 	"time"
 )
@@ -104,8 +105,9 @@ func TestStoreValueSuccess(t *testing.T) {
 func TestStoreValueDuplicate(t *testing.T) {
 	list := GetInstance()
 	value := Value{
-		Data: "Erik",
-		ID:   *id.NewRandomKademliaID(),
+		Data:   "Erik",
+		ID:     *id.NewRandomKademliaID(),
+		DeadAt: time.Now().Add(time.Hour),
 	}
 	err := list.Store(value)
 	if err != nil {
@@ -113,6 +115,7 @@ func TestStoreValueDuplicate(t *testing.T) {
 	}
 	err = list.Store(value)
 	if err == nil {
+		fmt.Println(err)
 		t.FailNow()
 	}
 }

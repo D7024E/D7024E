@@ -23,7 +23,6 @@ func (v1 *Value) Equals(v2 *Value) bool {
 	res := v1.Data == v2.Data
 	res = res && v1.ID.Equals(&v2.ID)
 	res = res && (v1.Ttl.String() == v2.Ttl.String())
-	res = res && v1.DeadAt.Equal(v2.DeadAt)
 	return res
 }
 
@@ -74,6 +73,7 @@ func (stored *Stored) Store(val Value) error {
 	_, err := stored.FindValue(val.ID)
 	lock.Lock()
 	defer lock.Unlock()
+	val.DeadAt = time.Now().Add(val.Ttl)
 	if err != nil {
 		stored.values = append(stored.values, val)
 		return nil
