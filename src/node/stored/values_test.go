@@ -3,6 +3,7 @@ package stored
 import (
 	"D7024E/node/id"
 	"testing"
+	"time"
 )
 
 // Test to Store one value.
@@ -111,9 +112,9 @@ func TestDeleteValueSuccessWithOneElementStored(t *testing.T) {
 	}
 	list.Store(value)
 
-	boolean := list.DeleteValue(value.ID)
+	err := list.DeleteValue(value.ID)
 
-	if boolean == false {
+	if err != nil {
 		t.FailNow()
 	}
 }
@@ -140,24 +141,18 @@ func TestDeleteValueSuccessWithThreeElementStored(t *testing.T) {
 	list.Store(value2)
 	list.Store(value3)
 
-	res := list.DeleteValue(value2.ID)
+	err := list.DeleteValue(value2.ID)
 
-	if res == false {
+	if err != nil {
 		t.FailNow()
 	}
 }
 
 // Test to delete an existing value which is not part of the storedList which in this test is empty.
 func TestDeleteValueOnEmptyList(t *testing.T) {
-	list := GetInstance()
-	value := Value{
-		Data: "Erik",
-		ID:   *id.NewRandomKademliaID(),
-	}
+	err := GetInstance().DeleteValue(*id.NewRandomKademliaID())
 
-	boolean := list.DeleteValue(value.ID)
-
-	if boolean == true {
+	if err == nil {
 		t.FailNow()
 	}
 }
@@ -176,9 +171,27 @@ func TestDeleteValueInAnNonEmptyListFail(t *testing.T) {
 	}
 
 	list.Store(value1)
-	boolean := list.DeleteValue(value2.ID)
+	err := list.DeleteValue(value2.ID)
 
-	if boolean == true {
+	if err == nil {
+		t.FailNow()
+	}
+}
+
+// Check if isDead confirmed that value is dead, if deadAt is past.
+func TestIsDeadFalse(t *testing.T) {
+	value := Value{ID: *id.NewRandomKademliaID(), DeadAt: time.Now()}
+	res := GetInstance().isDead(value)
+	if !res {
+		t.FailNow()
+	}
+}
+
+// Check if isDead confirms that value is not dead.
+func TestIsDeadTrue(t *testing.T) {
+	value := Value{ID: *id.NewRandomKademliaID(), DeadAt: time.Now().Add(time.Hour)}
+	res := GetInstance().isDead(value)
+	if res {
 		t.FailNow()
 	}
 }
