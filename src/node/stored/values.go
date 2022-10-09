@@ -27,6 +27,15 @@ func (v1 *Value) Equals(v2 *Value) bool {
 	return res
 }
 
+// Checks if value is dead otherwise update the values time to live.
+func (value *Value) Refresh() {
+	if !value.isDead() {
+		lock.Lock()
+		defer lock.Unlock()
+		value.DeadAt = time.Now().Add(value.Ttl)
+	}
+}
+
 // isDead function to check if value is dead, meaning that the deadAt is past.
 // If value is dead silently delete it.
 func (value *Value) isDead() bool {
