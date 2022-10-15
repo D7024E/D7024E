@@ -136,7 +136,7 @@ func TestFindValueSuccess(t *testing.T) {
 	}}}
 
 	_, err := stored.FindValue(stored.values[0].ID)
-	if !(err == nil) {
+	if err != nil {
 		t.FailNow()
 	}
 }
@@ -147,7 +147,7 @@ func TestFindValueFail(t *testing.T) {
 	id := id.NewRandomKademliaID()
 
 	_, err := list.FindValue(*id)
-	if !(err != nil) {
+	if err == nil {
 		t.FailNow()
 	}
 }
