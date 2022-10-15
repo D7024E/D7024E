@@ -88,7 +88,7 @@ func (stored *Stored) FindValue(valueId id.KademliaID) (Value, error) {
 	for i, item := range stored.values {
 		if valueId.Equals(&item.ID) {
 			go stored.values[i].Refresh()
-			if stored.values[i].isDead() {
+			if !item.isDead() {
 				return item, nil
 			} else {
 				return Value{}, &errors.ValueTimeout{}
