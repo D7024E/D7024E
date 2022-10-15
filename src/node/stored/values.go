@@ -85,15 +85,14 @@ func (stored *Stored) Store(val Value) error {
 func (stored *Stored) FindValue(valueId id.KademliaID) (Value, error) {
 	lock.Lock()
 	defer lock.Unlock()
-	for _, item := range stored.values {
+	for i, item := range stored.values {
 		if valueId.Equals(&item.ID) {
-			go item.Refresh()
-			if item.isDead() {
+			go stored.values[i].Refresh()
+			if stored.values[i].isDead() {
 				return item, nil
 			} else {
 				return Value{}, &errors.ValueTimeout{}
 			}
-
 		}
 	}
 	return Value{}, &errors.ValueNotFound{}
