@@ -5,6 +5,7 @@ import (
 	"D7024E/kademliaRPC/rpcmarshal"
 	"D7024E/log"
 	"D7024E/network/requestHandler"
+	"D7024E/network/sender"
 	"D7024E/node/kademlia"
 	"D7024E/node/kademlia/algorithms"
 )
@@ -19,6 +20,8 @@ func HandleCMD(msg []byte) {
 		requestHandler.GetInstance().WriteRespone(rpcMessage.ReqID, msg)
 	case "PING":
 		rpc.Pong(*kademlia.GetInstance().Me, rpcMessage.Contact, rpcMessage.ReqID)
+	case "RESH":
+		rpc.RefreshResponse(rpcMessage.ID, rpcMessage.Contact, rpcMessage.ReqID, sender.UDPSender)
 	case "STRE":
 		rpc.StoreRespond(*kademlia.GetInstance().Me, rpcMessage.Contact, rpcMessage.ReqID, rpcMessage.Content)
 	case "FINO":
