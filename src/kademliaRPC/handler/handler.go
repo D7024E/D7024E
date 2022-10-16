@@ -19,7 +19,7 @@ func HandleCMD(msg []byte) {
 	case "RESP":
 		requestHandler.GetInstance().WriteRespone(rpcMessage.ReqID, msg)
 	case "PING":
-		rpc.Pong(*kademlia.GetInstance().Me, rpcMessage.Contact, rpcMessage.ReqID)
+		rpc.Pong(rpcMessage.Contact, rpcMessage.ReqID, sender.UDPSender)
 	case "RESH":
 		rpc.RefreshResponse(rpcMessage.ID, rpcMessage.Contact, rpcMessage.ReqID, sender.UDPSender)
 	case "STRE":

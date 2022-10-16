@@ -2,69 +2,48 @@ package rpc
 
 import (
 	"D7024E/kademliaRPC/rpcmarshal"
+	"D7024E/network/requestHandler"
 	"D7024E/node/contact"
-	"D7024E/node/id"
+	"net"
 	"testing"
 )
 
-func TestPingRequestMessageSuccess(t *testing.T) {
-	rpc1 := rpcmarshal.RPC{
-		Cmd: "PING",
-		Contact: contact.Contact{
-			ID:      id.NewRandomKademliaID(),
-			Address: "THIS IS ADDRESS"},
-		ReqID: newValidRequestID(),
-	}
-	msg := PingMessage(rpc1.Contact, rpc1.ReqID)
-	var rpc2 rpcmarshal.RPC
-	rpcmarshal.RpcUnmarshal(msg, &rpc2)
-	if !rpc1.Equals(&rpc2) {
+// UDPSender mockup that simulates a successful response.
+func senderPingMockSuccess(_ net.IP, _ int, message []byte) {
+	var request rpcmarshal.RPC
+	rpcmarshal.RpcUnmarshal(message, &request)
+
+	var response []byte
+	rpcmarshal.RpcMarshal(
+		rpcmarshal.RPC{
+			Cmd:     "RESP",
+			Contact: *contact.GetInstance(),
+			ReqID:   request.ReqID,
+		},
+		&response)
+
+	requestHandler.GetInstance().WriteRespone(
+		request.ReqID,
+		response)
+}
+
+// UDPSender mockup that simulates no response.
+func senderPingMockFail(_ net.IP, _ int, _ []byte) {}
+
+func TestPingSuccess(t *testing.T) {
+	target := contact.Contact{
+		Address: "0.0.0.0"}
+	res := Ping(target, senderPingMockSuccess)
+	if !res {
 		t.FailNow()
 	}
 }
 
-func TestPingRequestMessageFail(t *testing.T) {
-	rpc1 := rpcmarshal.RPC{
-		Cmd: "PING",
-		Contact: contact.Contact{
-			ID:      id.NewRandomKademliaID(),
-			Address: "THIS IS ADDRESS"},
-	}
-	msg := PingMessage(rpc1.Contact, newValidRequestID())
-	var rpc2 rpcmarshal.RPC
-	rpcmarshal.RpcUnmarshal(msg, &rpc2)
-	if rpc1.Equals(&rpc2) {
-		t.FailNow()
-	}
-}
-
-func TestPongRequestMessageSuccess(t *testing.T) {
-	rpc1 := rpcmarshal.RPC{
-		Cmd: "RESP",
-		Contact: contact.Contact{
-			ID:      id.NewRandomKademliaID(),
-			Address: "THIS IS ADDRESS"},
-		ReqID: newValidRequestID(),
-	}
-	msg := PongMessage(rpc1.Contact, rpc1.ReqID)
-	var rpc2 rpcmarshal.RPC
-	rpcmarshal.RpcUnmarshal(msg, &rpc2)
-	if !rpc1.Equals(&rpc2) {
-		t.FailNow()
-	}
-}
-
-func TestPongRequestMessageFail(t *testing.T) {
-	rpc1 := rpcmarshal.RPC{
-		Cmd: "RESP",
-		Contact: contact.Contact{
-			ID:      id.NewRandomKademliaID(),
-			Address: "THIS IS ADDRESS"},
-	}
-	msg := PongMessage(rpc1.Contact, newValidRequestID())
-	var rpc2 rpcmarshal.RPC
-	rpcmarshal.RpcUnmarshal(msg, &rpc2)
-	if rpc1.Equals(&rpc2) {
+func TestPingFail(t *testing.T) {
+	target := contact.Contact{
+		Address: "0.0.0.0"}
+	res := Ping(target, senderPingMockFail)
+	if res {
 		t.FailNow()
 	}
 }

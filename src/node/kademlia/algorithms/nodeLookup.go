@@ -3,6 +3,7 @@ package algorithms
 import (
 	"D7024E/environment"
 	rpc "D7024E/kademliaRPC/RPC"
+	"D7024E/network/sender"
 	"D7024E/node/bucket"
 	"D7024E/node/contact"
 	"D7024E/node/id"
@@ -13,7 +14,7 @@ import (
 	"sync"
 )
 
-type pingRPC func(contact.Contact, contact.Contact) bool
+type pingRPC func(contact.Contact, rpc.UDPSender) bool
 type findNodeRPC func(contact.Contact, contact.Contact, id.KademliaID) ([]contact.Contact, error)
 
 // Node lookup initiator.
@@ -118,7 +119,7 @@ func removeDeadNodes(batch []contact.Contact, ping pingRPC) []contact.Contact {
 		n := i
 		go func() {
 			defer wg.Done()
-			alive := ping(*contact.GetInstance(), batch[n])
+			alive := ping(batch[n], sender.UDPSender)
 			if !alive {
 				deadNodes = append(deadNodes, n)
 			}

@@ -1,6 +1,7 @@
 package algorithms
 
 import (
+	rpc "D7024E/kademliaRPC/RPC"
 	"D7024E/node/bucket"
 	"D7024E/node/contact"
 	"D7024E/node/id"
@@ -12,12 +13,12 @@ import (
 )
 
 // Mockup of ping RPC that always succeed.
-func pingSuccess(_ contact.Contact, _ contact.Contact) bool {
+func pingSuccess(_ contact.Contact, _ rpc.UDPSender) bool {
 	return true
 }
 
 // Mockup of ping RPC that always fail.
-func pingFail(_ contact.Contact, _ contact.Contact) bool {
+func pingFail(_ contact.Contact, _ rpc.UDPSender) bool {
 	return false
 }
 
