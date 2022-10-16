@@ -7,7 +7,6 @@ import (
 	"net"
 )
 
-// PING rpc.
 // Ping target node, if there is a response return true, otherwise false.
 func Ping(target contact.Contact, sender UDPSender) bool {
 	reqID := newValidRequestID()
@@ -25,8 +24,7 @@ func Ping(target contact.Contact, sender UDPSender) bool {
 	return !isError(err)
 }
 
-// PONG rpc.
-// Ping target node, if there is a response return true, otherwise false.
+// Respond to ping.
 func Pong(target contact.Contact, reqID string, sender UDPSender) {
 	var msg []byte
 	rpcmarshal.RpcMarshal(
