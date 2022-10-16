@@ -27,7 +27,7 @@ func (v1 *Value) Equals(v2 *Value) bool {
 }
 
 // Checks if value is dead otherwise update the values time to live.
-func (value *Value) Refresh() bool {
+func (value *Value) refresh() bool {
 	stored := GetInstance()
 	lock.Lock()
 	defer lock.Unlock()
@@ -87,7 +87,7 @@ func (stored *Stored) FindValue(valueId id.KademliaID) (Value, error) {
 	defer lock.Unlock()
 	for i, item := range stored.values {
 		if valueId.Equals(&item.ID) {
-			go stored.values[i].Refresh()
+			go stored.values[i].refresh()
 			if !item.isDead() {
 				return item, nil
 			} else {
