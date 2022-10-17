@@ -23,7 +23,7 @@ func HandleCMD(msg []byte) {
 	case "RESH":
 		rpc.RefreshResponse(rpcMessage.ID, rpcMessage.Contact, rpcMessage.ReqID, sender.UDPSender)
 	case "STRE":
-		rpc.StoreRespond(*kademlia.GetInstance().Me, rpcMessage.Contact, rpcMessage.ReqID, rpcMessage.Content)
+		rpc.StoreResponse(rpcMessage.Contact, rpcMessage.ReqID, rpcMessage.Content, sender.UDPSender)
 	case "FINO":
 		rpc.FindNodeResponse(*kademlia.GetInstance().Me, rpcMessage.ReqID, rpcMessage.ID, rpcMessage.Contact)
 	case "FIVA":

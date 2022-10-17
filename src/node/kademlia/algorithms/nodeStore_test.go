@@ -1,6 +1,7 @@
 package algorithms
 
 import (
+	rpc "D7024E/kademliaRPC/RPC"
 	"D7024E/node/contact"
 	"D7024E/node/id"
 	"D7024E/node/stored"
@@ -21,12 +22,12 @@ func nodeLookupMock(_ id.KademliaID) []contact.Contact {
 }
 
 // Store rpc mockup, will always succeed.
-func storeSuccess(_ contact.Contact, _ contact.Contact, _ stored.Value) bool {
+func storeSuccess(contact.Contact, stored.Value, rpc.UDPSender) bool {
 	return true
 }
 
 // Store rpc mockup, will return true 50% of the time.
-func store50RandomSuccess(_ contact.Contact, _ contact.Contact, _ stored.Value) bool {
+func store50RandomSuccess(contact.Contact, stored.Value, rpc.UDPSender) bool {
 	if rand.Intn(2) == 1 {
 		return true
 	} else {

@@ -3,6 +3,7 @@ package algorithms
 import (
 	"D7024E/environment"
 	rpc "D7024E/kademliaRPC/RPC"
+	"D7024E/network/sender"
 	"D7024E/node/contact"
 	"D7024E/node/id"
 	"D7024E/node/stored"
@@ -10,7 +11,7 @@ import (
 )
 
 type lookupAlgorithm func(id.KademliaID) []contact.Contact
-type storeRPC func(contact.Contact, contact.Contact, stored.Value) bool
+type storeRPC func(contact.Contact, stored.Value, rpc.UDPSender) bool
 
 // NodeStore value initiate.
 func NodeStore(value stored.Value) bool {
@@ -30,7 +31,7 @@ func AlphaNodeStoreRec(value stored.Value, store storeRPC, lookup lookupAlgorith
 		target := c
 		go func() {
 			defer wg.Done()
-			val := store(*contact.GetInstance(), target, value)
+			val := store(target, value, sender.UDPSender)
 			if !val {
 				completed = val
 			}
