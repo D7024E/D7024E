@@ -15,7 +15,7 @@ import (
 )
 
 type pingRPC func(contact.Contact, rpc.UDPSender) bool
-type findNodeRPC func(contact.Contact, contact.Contact, id.KademliaID) ([]contact.Contact, error)
+type findNodeRPC func(contact.Contact, id.KademliaID, rpc.UDPSender) ([]contact.Contact, error)
 
 // Node lookup initiator.
 func NodeLookup(targetID id.KademliaID) []contact.Contact {
@@ -70,7 +70,7 @@ func findNodes(targetID id.KademliaID, batch []contact.Contact, findNode findNod
 			n := j
 			go func() {
 				defer wg.Done()
-				kN, err := findNode(*contact.GetInstance(), batch[n], targetID)
+				kN, err := findNode(batch[n], targetID, sender.UDPSender)
 				if err != nil {
 					bucket.GetInstance().RemoveContact(batch[n])
 				} else {

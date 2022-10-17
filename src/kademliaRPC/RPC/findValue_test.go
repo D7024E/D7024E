@@ -5,31 +5,11 @@ import (
 	"D7024E/kademliaRPC/rpcmarshal"
 	"D7024E/network/requestHandler"
 	"D7024E/node/contact"
-	"D7024E/node/id"
 	"D7024E/node/stored"
 	"errors"
 	"net"
 	"testing"
-	"time"
 )
-
-// Return a test value.
-func testValue() stored.Value {
-	return stored.Value{
-		Data:   "DATA",
-		ID:     *id.NewKademliaID("DATA"),
-		Ttl:    time.Hour,
-		DeadAt: time.Now().Add(time.Hour),
-	}
-}
-
-// Return a test target contact.
-func testContact() contact.Contact {
-	return contact.Contact{
-		ID:      id.NewRandomKademliaID(),
-		Address: "0.0.0.0",
-	}
-}
 
 // UDPSender mockup that simulates a successful response.
 func senderFindValueMockSuccess(_ net.IP, _ int, message []byte) {
@@ -74,6 +54,7 @@ func senderFindValueMockNotFound(_ net.IP, _ int, message []byte) {
 // UDPSender mockup that simulates no response.
 func senderFindValueMockFail(_ net.IP, _ int, _ []byte) {}
 
+// Test FindValueRequest if valid response gets the correct output.
 func TestFindValueRequestValidResponse(t *testing.T) {
 	val, err := FindValueRequest(testValue().ID, testContact(), senderFindValueMockSuccess)
 	if err != nil {
@@ -83,6 +64,7 @@ func TestFindValueRequestValidResponse(t *testing.T) {
 	}
 }
 
+// Test FindValueRequest if right output is given when there is no response.
 func TestFindValueRequestNoResponse(t *testing.T) {
 	val, err := FindValueRequest(testValue().ID, testContact(), senderFindValueMockFail)
 	if err == nil {
@@ -92,11 +74,35 @@ func TestFindValueRequestNoResponse(t *testing.T) {
 	}
 }
 
+// Test FindValueRequest if right output is given when value is not found.
 func TestFindValueRequestValueNotFound(t *testing.T) {
 	val, err := FindValueRequest(testValue().ID, testContact(), senderFindValueMockNotFound)
 	if !errors.Is(&kademliaErrors.ValueNotFound{}, err) {
 		t.Fatalf("received wrong error")
 	} else if !val.Equals(&stored.Value{}) {
 		t.Fatalf("received none empty value")
+	}
+}
+
+// Test FindValueResponse if correct response is given.
+func TestFindValueResponseFoundValue(t *testing.T) {
+	value := testValue()
+	reqID := newValidRequestID()
+	err := stored.GetInstance().Store(value)
+	if err != nil {
+		t.FailNow()
+	}
+	FindValueResponse(testContact(), reqID, value.ID, senderFindNodeMockSuccess)
+
+	var response []byte
+	err = requestHandler.GetInstance().ReadResponse(reqID, &response)
+	if err != nil {
+		t.Fatalf("no response")
+	}
+
+	var rpcResponse rpcmarshal.RPC
+	rpcmarshal.RpcUnmarshal(response, &rpcResponse)
+	if rpcResponse.Content.Equals(&value) {
+		t.Fatalf("invalid response")
 	}
 }

@@ -6,7 +6,6 @@ import (
 	"D7024E/log"
 	"D7024E/network/requestHandler"
 	"D7024E/network/sender"
-	"D7024E/node/kademlia"
 	"D7024E/node/kademlia/algorithms"
 )
 
@@ -25,7 +24,7 @@ func HandleCMD(msg []byte) {
 	case "STRE":
 		rpc.StoreResponse(rpcMessage.Contact, rpcMessage.ReqID, rpcMessage.Content, sender.UDPSender)
 	case "FINO":
-		rpc.FindNodeResponse(*kademlia.GetInstance().Me, rpcMessage.ReqID, rpcMessage.ID, rpcMessage.Contact)
+		rpc.FindNodeResponse(rpcMessage.ReqID, rpcMessage.ID, rpcMessage.Contact, sender.UDPSender)
 	case "FIVA":
 		rpc.FindValueResponse(rpcMessage.Contact, rpcMessage.ReqID, rpcMessage.ID, sender.UDPSender)
 	default:
