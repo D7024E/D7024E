@@ -36,7 +36,7 @@ func TestPingSuccess(t *testing.T) {
 		Address: "0.0.0.0"}
 	res := Ping(target, senderPingMockSuccess)
 	if !res {
-		t.FailNow()
+		t.Fatalf("retrieved no response, when given a response")
 	}
 }
 
@@ -46,7 +46,7 @@ func TestPingFail(t *testing.T) {
 		Address: "0.0.0.0"}
 	res := Ping(target, senderPingMockFail)
 	if res {
-		t.FailNow()
+		t.Fatalf("retrieved response, when no response given")
 	}
 }
 
@@ -55,12 +55,12 @@ func TestPong(t *testing.T) {
 	target := contact.Contact{
 		Address: "0.0.0.0"}
 	reqID := newValidRequestID()
-	Pong(target, reqID, senderMockSuccess)
+	Pong(target, reqID, senderPingMockSuccess)
 
 	var response []byte
 	err := requestHandler.GetInstance().ReadResponse(reqID, &response)
 	if err != nil {
-		t.FailNow()
+		t.Fatalf("no response, when given a valid response")
 	}
 
 	var rpcResponse rpcmarshal.RPC
@@ -69,6 +69,6 @@ func TestPong(t *testing.T) {
 		Cmd:     "RESP",
 		Contact: *contact.GetInstance(),
 		ReqID:   reqID}) {
-		t.Errorf("wrong rpc response")
+		t.Fatalf("wrong rpc response")
 	}
 }

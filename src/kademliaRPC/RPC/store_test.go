@@ -85,10 +85,27 @@ func TestStoreResponseSuccess(t *testing.T) {
 		DeadAt: time.Now().Add(time.Hour),
 	}
 
-	StoreResponse(target, reqID, value, func(net.IP, int, []byte) {})
+	StoreResponse(target, reqID, value, senderStoreMockSuccess)
 
 	_, err := stored.GetInstance().FindValue(value.ID)
 	if err != nil {
-		t.Fatalf("value not stored")
+		t.Errorf("value not stored")
+	}
+
+	var response []byte
+	err = requestHandler.GetInstance().ReadResponse(reqID, &response)
+	if err != nil {
+		t.Fatalf("no response received")
+	}
+
+	var rpcResponse rpcmarshal.RPC
+	rpcmarshal.RpcUnmarshal(response, &rpcResponse)
+	if !rpcResponse.Equals(
+		&rpcmarshal.RPC{
+			Cmd:     "RESP",
+			Contact: *contact.GetInstance(),
+			ReqID:   reqID,
+		}) {
+		t.Fatalf("invalid response message sent")
 	}
 }
