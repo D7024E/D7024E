@@ -3,6 +3,7 @@ package algorithms
 import (
 	"D7024E/environment"
 	rpc "D7024E/kademliaRPC/RPC"
+	"D7024E/network/sender"
 	"D7024E/node/contact"
 	"D7024E/node/id"
 	"D7024E/node/stored"
@@ -10,7 +11,7 @@ import (
 	"sync"
 )
 
-type findValueRPC func(contact.Contact, id.KademliaID, contact.Contact) (stored.Value, error)
+type findValueRPC func(id.KademliaID, contact.Contact, rpc.UDPSender) (stored.Value, error)
 
 // Initiates NodeValueLookup with alpha nodes.
 func NodeValueLookup(valueID id.KademliaID) (stored.Value, error) {
@@ -30,7 +31,7 @@ func alphaNodeValueLookup(valueID id.KademliaID, alphaClosest []contact.Contact,
 		target := c
 		go func() {
 			defer wg.Done()
-			val, err := fn(*contact.GetInstance(), valueID, target)
+			val, err := fn(valueID, target, sender.UDPSender)
 			if err == nil {
 				result = append(result, val)
 			}

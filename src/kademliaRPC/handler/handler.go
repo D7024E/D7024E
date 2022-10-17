@@ -27,7 +27,7 @@ func HandleCMD(msg []byte) {
 	case "FINO":
 		rpc.FindNodeResponse(*kademlia.GetInstance().Me, rpcMessage.ReqID, rpcMessage.ID, rpcMessage.Contact)
 	case "FIVA":
-		rpc.FindValueResponse(*kademlia.GetInstance().Me, rpcMessage.Contact, rpcMessage.ReqID, rpcMessage.ID)
+		rpc.FindValueResponse(rpcMessage.Contact, rpcMessage.ReqID, rpcMessage.ID, sender.UDPSender)
 	default:
 		log.ERROR("UNKNOWN CMD")
 	}
