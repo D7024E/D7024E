@@ -47,7 +47,7 @@ func TestFindValueEqualsFalse(t *testing.T) {
 func TestRefreshDeadValue(t *testing.T) {
 	t0 := time.Now()
 	value := Value{ID: *id.NewRandomKademliaID(), DeadAt: t0}
-	res := value.Refresh()
+	res := value.refresh()
 	if res {
 		t.FailNow()
 	} else if !t0.Equal(value.DeadAt) {
@@ -59,7 +59,7 @@ func TestRefreshDeadValue(t *testing.T) {
 func TestRefreshAliveValue(t *testing.T) {
 	t0 := time.Now().Add(time.Minute)
 	value := Value{ID: *id.NewRandomKademliaID(), Ttl: time.Hour, DeadAt: t0}
-	res := value.Refresh()
+	res := value.refresh()
 	if !res {
 		t.FailNow()
 	} else if !t0.Before(value.DeadAt) {
@@ -136,7 +136,7 @@ func TestFindValueSuccess(t *testing.T) {
 	}}}
 
 	_, err := stored.FindValue(stored.values[0].ID)
-	if !(err == nil) {
+	if err != nil {
 		t.FailNow()
 	}
 }
@@ -147,7 +147,7 @@ func TestFindValueFail(t *testing.T) {
 	id := id.NewRandomKademliaID()
 
 	_, err := list.FindValue(*id)
-	if !(err != nil) {
+	if err == nil {
 		t.FailNow()
 	}
 }

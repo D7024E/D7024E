@@ -8,10 +8,10 @@ import (
 )
 
 type Value struct {
-	Data   string        `json:"data"`   // json data as string.
-	ID     id.KademliaID `json:"id"`     // json id as kademlia id.
-	Ttl    time.Duration `json:"ttl"`    // json time-to-live.
-	DeadAt time.Time     `json:"deadAt"` // json time where value is dead.
+	Data   string        `json:"data"` // json data as string.
+	ID     id.KademliaID `json:"id"`   // json id as kademlia id.
+	Ttl    time.Duration `json:"ttl"`  // json time-to-live.
+	DeadAt time.Time     `json:"-"`    // json time where value is dead.
 }
 
 var lock = &sync.Mutex{}
@@ -27,7 +27,7 @@ func (v1 *Value) Equals(v2 *Value) bool {
 }
 
 // Checks if value is dead otherwise update the values time to live.
-func (value *Value) Refresh() bool {
+func (value *Value) refresh() bool {
 	stored := GetInstance()
 	lock.Lock()
 	defer lock.Unlock()
@@ -84,19 +84,17 @@ func (stored *Stored) Store(val Value) error {
 // Find a value within stored values.
 func (stored *Stored) FindValue(valueId id.KademliaID) (Value, error) {
 	lock.Lock()
-	for _, item := range stored.values {
+	defer lock.Unlock()
+	for i, item := range stored.values {
 		if valueId.Equals(&item.ID) {
-			lock.Unlock()
-			res := item.Refresh()
-			if res {
+			go stored.values[i].refresh()
+			if !item.isDead() {
 				return item, nil
 			} else {
 				return Value{}, &errors.ValueTimeout{}
 			}
-
 		}
 	}
-	lock.Unlock()
 	return Value{}, &errors.ValueNotFound{}
 }
 

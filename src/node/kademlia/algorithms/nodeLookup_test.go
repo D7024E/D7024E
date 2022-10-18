@@ -1,6 +1,7 @@
 package algorithms
 
 import (
+	rpc "D7024E/kademliaRPC/RPC"
 	"D7024E/node/bucket"
 	"D7024E/node/contact"
 	"D7024E/node/id"
@@ -12,17 +13,17 @@ import (
 )
 
 // Mockup of ping RPC that always succeed.
-func pingSuccess(_ contact.Contact, _ contact.Contact) bool {
+func pingSuccess(contact.Contact, rpc.UDPSender) bool {
 	return true
 }
 
 // Mockup of ping RPC that always fail.
-func pingFail(_ contact.Contact, _ contact.Contact) bool {
+func pingFail(contact.Contact, rpc.UDPSender) bool {
 	return false
 }
 
 // Mockup of find node rpc that will succeed.
-func findNodeSuccess(contact.Contact, contact.Contact, id.KademliaID) ([]contact.Contact, error) {
+func findNodeSuccess(contact.Contact, id.KademliaID, rpc.UDPSender) ([]contact.Contact, error) {
 	return []contact.Contact{
 		{ID: id.NewKademliaID("127.21.0.2"), Address: "127.21.0.2"},
 		{ID: id.NewKademliaID("127.21.0.3"), Address: "127.21.0.3"},
@@ -31,7 +32,7 @@ func findNodeSuccess(contact.Contact, contact.Contact, id.KademliaID) ([]contact
 }
 
 // Mockup of find node rpc that will fail.
-func findNodeFail(contact.Contact, contact.Contact, id.KademliaID) ([]contact.Contact, error) {
+func findNodeFail(contact.Contact, id.KademliaID, rpc.UDPSender) ([]contact.Contact, error) {
 	return []contact.Contact{}, errors.New("not found")
 }
 

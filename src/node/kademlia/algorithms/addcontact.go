@@ -1,6 +1,7 @@
 package algorithms
 
 import (
+	"D7024E/network/sender"
 	"D7024E/node/bucket"
 	"D7024E/node/contact"
 )
@@ -12,7 +13,7 @@ func AddContact(newContact contact.Contact, ping pingRPC) {
 	if res {
 		return
 	} else {
-		resp := ping(*contact.GetInstance(), head)
+		resp := ping(head, sender.UDPSender)
 		if !resp {
 			AddContact(newContact, ping)
 		}

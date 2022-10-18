@@ -4,12 +4,15 @@ import (
 	"D7024E/kademliaRPC/rpcmarshal"
 	"D7024E/network/requestHandler"
 	"D7024E/node/contact"
+	"D7024E/node/id"
+	"D7024E/node/stored"
 	"net"
 	"testing"
+	"time"
 )
 
 // UDPSender mockup that simulates a successful response.
-func senderPingMockSuccess(_ net.IP, _ int, message []byte) {
+func senderRefreshMockSuccess(_ net.IP, _ int, message []byte) {
 	var request rpcmarshal.RPC
 	rpcmarshal.RpcUnmarshal(message, &request)
 
@@ -28,10 +31,10 @@ func senderPingMockSuccess(_ net.IP, _ int, message []byte) {
 }
 
 // UDPSender mockup that simulates no response.
-func senderPingMockFail(_ net.IP, _ int, _ []byte) {}
+func senderRefreshMockFail(_ net.IP, _ int, _ []byte) {}
 
 // UDPSender mockup that simulates a response.
-func senderPingMock(_ net.IP, _ int, message []byte) {
+func senderRefreshMock(_ net.IP, _ int, message []byte) {
 	var request rpcmarshal.RPC
 	rpcmarshal.RpcUnmarshal(message, &request)
 
@@ -40,37 +43,52 @@ func senderPingMock(_ net.IP, _ int, message []byte) {
 		message)
 }
 
-// Test Ping request to node that responds.
-func TestPingSuccess(t *testing.T) {
+// RefreshRequest that receives a valid response.
+func TestRefreshRequestSuccess(t *testing.T) {
+	valueID := *id.NewRandomKademliaID()
 	target := contact.Contact{
-		Address: "0.0.0.0"}
-	res := Ping(target, senderPingMockSuccess)
+		ID:      id.NewRandomKademliaID(),
+		Address: "ADDRESS",
+	}
+	res := RefreshRequest(valueID, target, senderRefreshMockSuccess)
 	if !res {
-		t.Fatalf("retrieved no response, when given a response")
+		t.FailNow()
 	}
 }
 
-// Test Ping request to node that does not responds.
-func TestPingFail(t *testing.T) {
+// RefreshRequest that receives no response.
+func TestRefreshRequestFail(t *testing.T) {
+	valueID := *id.NewRandomKademliaID()
 	target := contact.Contact{
-		Address: "0.0.0.0"}
-	res := Ping(target, senderPingMockFail)
+		ID:      id.NewRandomKademliaID(),
+		Address: "ADDRESS",
+	}
+	res := RefreshRequest(valueID, target, senderRefreshMockFail)
 	if res {
-		t.Fatalf("retrieved response, when no response given")
+		t.FailNow()
 	}
 }
 
-// Test if pong does respond and that it returns correct response.
-func TestPong(t *testing.T) {
+// Test RefreshResponse that it responds and that the response is correct.
+func TestRefreshResponse(t *testing.T) {
+	valueID := *id.NewRandomKademliaID()
 	target := contact.Contact{
-		Address: "0.0.0.0"}
+		ID:      id.NewRandomKademliaID(),
+		Address: "ADDRESS",
+	}
 	reqID := newValidRequestID()
-	Pong(target, reqID, senderPingMock)
+	stored.GetInstance().Store(stored.Value{
+		Data:   "DATA",
+		ID:     valueID,
+		Ttl:    time.Hour,
+		DeadAt: time.Now().Add(time.Hour)})
+
+	RefreshResponse(valueID, target, reqID, senderRefreshMock)
 
 	var response []byte
 	err := requestHandler.GetInstance().ReadResponse(reqID, &response)
 	if err != nil {
-		t.Fatalf("no response, when given a valid response")
+		t.Fatalf("no response when given one")
 	}
 
 	var rpcResponse rpcmarshal.RPC
@@ -81,4 +99,5 @@ func TestPong(t *testing.T) {
 		ReqID:   reqID}) {
 		t.Fatalf("wrong rpc response")
 	}
+
 }
