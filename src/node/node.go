@@ -21,7 +21,7 @@ func StartKademliaNode() {
 		for _, c := range kClosest {
 			kID = append(kID, c.ID.String())
 		}
-		res := "\n" + strings.Join(kID, "\t\n")
+		res := "\n" + strings.Join(kID, "          \n")
 		log.INFO("KCLOSEST NODES - [%v]", res)
 	}
 	log.INFO("CONNECTED - [KADEMLIA NETWORK]")
