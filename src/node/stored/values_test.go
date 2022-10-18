@@ -263,3 +263,24 @@ func TestIsRefreshedFalseNoneEmpty(t *testing.T) {
 		t.Fatalf("value is within refreshed when it was never added")
 	}
 }
+
+// Test whether if the value id is deleted from stored.refreshed.
+func TestStopRefresh(t *testing.T) {
+	valueID := *id.NewRandomKademliaID()
+	stored := Stored{refreshed: []id.KademliaID{valueID}}
+	stored.StopRefresh(valueID)
+	if len(stored.refreshed) != 0 {
+		t.Fatalf("value was note deleted from refreshed values")
+	}
+}
+
+// Test whether if the value id is not deleted from stored.refreshed,
+// when another id is inserted.
+func TestStopRefreshDifferentID(t *testing.T) {
+	valueID := *id.NewRandomKademliaID()
+	stored := Stored{refreshed: []id.KademliaID{valueID}}
+	stored.StopRefresh(*id.NewRandomKademliaID())
+	if len(stored.refreshed) != 1 {
+		t.Fatalf("value was deleted, when stop refresh attempted to delete another value")
+	}
+}

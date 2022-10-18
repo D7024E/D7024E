@@ -138,3 +138,14 @@ func (stored *Stored) IsRefreshed(valueID id.KademliaID) bool {
 	}
 	return false
 }
+
+// Stop the refreshing of value by removing it from refreshed slice.
+func (stored *Stored) StopRefresh(valueID id.KademliaID) {
+	lock.Lock()
+	defer lock.Unlock()
+	for i, refreshedValueID := range stored.refreshed {
+		if refreshedValueID.Equals(&valueID) {
+			stored.refreshed = append(stored.refreshed[:i], stored.refreshed[i+1:]...)
+		}
+	}
+}
