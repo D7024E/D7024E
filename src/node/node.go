@@ -16,9 +16,9 @@ func StartKademliaNode() {
 		contact.GetInstance().ID = id.NewKademliaID("172.21.0.2")
 	} else {
 		kClosest := algorithms.NodeLookup(*id.NewKademliaID("172.21.0.2"))
-		kID := []id.KademliaID{}
+		kID := []string{}
 		for _, c := range kClosest {
-			kID = append(kID, *c.ID)
+			kID = append(kID, c.ID.String())
 		}
 		log.INFO("The k closest nodes found %v", kID)
 	}
