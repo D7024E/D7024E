@@ -223,6 +223,7 @@ func TestDeleteValueInAnNonEmptyListFail(t *testing.T) {
 	}
 }
 
+// Test if dead values are cleaned by function correctly.
 func TestCleaningDeadValues(t *testing.T) {
 	stored := Stored{}
 	values := []Value{{ID: *id.NewRandomKademliaID()}}
@@ -231,5 +232,34 @@ func TestCleaningDeadValues(t *testing.T) {
 	time.Sleep(1)
 	if len(stored.values) != 0 {
 		t.FailNow()
+	}
+}
+
+// Test if IsRefreshed returns the correct bool if valueID is within stored.refreshed.
+func TestIsRefreshedTrue(t *testing.T) {
+	valueID := *id.NewRandomKademliaID()
+	stored := Stored{refreshed: []id.KademliaID{valueID}}
+	stored.refreshed = append(stored.refreshed, valueID)
+	res := stored.IsRefreshed(valueID)
+	if !res {
+		t.Fatalf("refreshed value is not within refreshed, where it was added")
+	}
+}
+
+// Test IsRefreshed if value is not within empty stored.refreshed.
+func TestIsRefreshedFalseEmpty(t *testing.T) {
+	stored := Stored{}
+	res := stored.IsRefreshed(*id.NewRandomKademliaID())
+	if res {
+		t.Fatalf("value is within refreshed when it was never added")
+	}
+}
+
+// Test IsRefreshed if value is not within none empty stored.refreshed.
+func TestIsRefreshedFalseNoneEmpty(t *testing.T) {
+	stored := Stored{refreshed: []id.KademliaID{*id.NewRandomKademliaID()}}
+	res := stored.IsRefreshed(*id.NewRandomKademliaID())
+	if res {
+		t.Fatalf("value is within refreshed when it was never added")
 	}
 }
