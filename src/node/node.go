@@ -6,6 +6,7 @@ import (
 	"D7024E/node/contact"
 	"D7024E/node/id"
 	"D7024E/node/kademlia/algorithms"
+	"strings"
 	"time"
 )
 
@@ -20,7 +21,8 @@ func StartKademliaNode() {
 		for _, c := range kClosest {
 			kID = append(kID, c.ID.String())
 		}
-		log.INFO("The k closest nodes found %v", kID)
+		res := "\n" + strings.Join(kID, "\t\n")
+		log.INFO("KCLOSEST NODES - [%v]", res)
 	}
-	log.INFO("Connected to kademlia network")
+	log.INFO("CONNECTED - [KADEMLIA NETWORK]")
 }
