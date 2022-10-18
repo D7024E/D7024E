@@ -17,10 +17,6 @@ func RefreshMockupFail(id.KademliaID, contact.Contact, rpc.UDPSender) bool {
 	return false
 }
 
-func StoreMockup(stored.Value) bool {
-	return true
-}
-
 // Verify that the refresh does refresh the value.
 func TestNodeRefreshRecSuccessfulRefresh(t *testing.T) {
 	value := stored.Value{
@@ -30,7 +26,7 @@ func TestNodeRefreshRecSuccessfulRefresh(t *testing.T) {
 		DeadAt: time.Now().Add(time.Hour),
 	}
 	stored.GetInstance().AddRefresh(value.ID)
-	res := NodeRefreshRec(value, RefreshMockupSuccess, StoreMockup)
+	res := NodeRefreshRec(value, nil, RefreshMockupSuccess)
 	stored.GetInstance().StopRefresh(value.ID)
 	if !res {
 		t.Fatalf("value was not being refreshed after being added to refreshed")
@@ -46,7 +42,7 @@ func TestNodeRefreshRecFailedRefresh(t *testing.T) {
 		DeadAt: time.Now().Add(time.Hour),
 	}
 	stored.GetInstance().AddRefresh(value.ID)
-	res := NodeRefreshRec(value, RefreshMockupFail, StoreMockup)
+	res := NodeRefreshRec(value, nil, RefreshMockupFail)
 	stored.GetInstance().StopRefresh(value.ID)
 	if !res {
 		t.Fatalf("value was not being refreshed after being added to refreshed")
@@ -61,7 +57,7 @@ func TestNodeRefreshRecNotRefreshed(t *testing.T) {
 		Ttl:    time.Second,
 		DeadAt: time.Now().Add(time.Hour),
 	}
-	res := NodeRefreshRec(value, RefreshMockupFail, StoreMockup)
+	res := NodeRefreshRec(value, nil, RefreshMockupFail)
 	if res {
 		t.Fatalf("value not being refreshed found and refreshed")
 	}

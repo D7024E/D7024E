@@ -9,7 +9,7 @@ import (
 
 type Value struct {
 	Data   string        `json:"data"` // json data as string.
-	ID     id.KademliaID `json:"id"`   // json id as kademlia id.
+	ID     id.KademliaID `json:"-"`    // json id as kademlia id.
 	Ttl    time.Duration `json:"ttl"`  // json time-to-live.
 	DeadAt time.Time     `json:"-"`    // json time where value is dead.
 }
