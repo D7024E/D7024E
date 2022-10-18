@@ -143,7 +143,9 @@ func (stored *Stored) IsRefreshed(valueID id.KademliaID) bool {
 func (stored *Stored) StopRefresh(valueID id.KademliaID) {
 	lock.Lock()
 	defer lock.Unlock()
-	for i := range stored.refreshed {
-		stored.refreshed = append(stored.refreshed[:i], stored.refreshed[i+1:]...)
+	for i, refreshedValueID := range stored.refreshed {
+		if refreshedValueID.Equals(&valueID) {
+			stored.refreshed = append(stored.refreshed[:i], stored.refreshed[i+1:]...)
+		}
 	}
 }
