@@ -2,69 +2,83 @@ package rpc
 
 import (
 	"D7024E/kademliaRPC/rpcmarshal"
+	"D7024E/network/requestHandler"
 	"D7024E/node/contact"
-	"D7024E/node/id"
+	"net"
 	"testing"
 )
 
-func TestPingRequestMessageSuccess(t *testing.T) {
-	rpc1 := rpcmarshal.RPC{
-		Cmd: "PING",
-		Contact: contact.Contact{
-			ID:      id.NewRandomKademliaID(),
-			Address: "THIS IS ADDRESS"},
-		ReqID: newValidRequestID(),
-	}
-	msg := PingMessage(rpc1.Contact, rpc1.ReqID)
-	var rpc2 rpcmarshal.RPC
-	rpcmarshal.RpcUnmarshal(msg, &rpc2)
-	if !rpc1.Equals(&rpc2) {
-		t.FailNow()
+// UDPSender mockup that simulates a successful response.
+func senderPingMockSuccess(_ net.IP, _ int, message []byte) {
+	var request rpcmarshal.RPC
+	rpcmarshal.RpcUnmarshal(message, &request)
+
+	var response []byte
+	rpcmarshal.RpcMarshal(
+		rpcmarshal.RPC{
+			Cmd:     "RESP",
+			Contact: *contact.GetInstance(),
+			ReqID:   request.ReqID,
+		},
+		&response)
+
+	requestHandler.GetInstance().WriteRespone(
+		request.ReqID,
+		response)
+}
+
+// UDPSender mockup that simulates no response.
+func senderPingMockFail(_ net.IP, _ int, _ []byte) {}
+
+// UDPSender mockup that simulates a response.
+func senderPingMock(_ net.IP, _ int, message []byte) {
+	var request rpcmarshal.RPC
+	rpcmarshal.RpcUnmarshal(message, &request)
+
+	requestHandler.GetInstance().WriteRespone(
+		request.ReqID,
+		message)
+}
+
+// Test Ping request to node that responds.
+func TestPingSuccess(t *testing.T) {
+	target := contact.Contact{
+		Address: "0.0.0.0"}
+	res := Ping(target, senderPingMockSuccess)
+	if !res {
+		t.Fatalf("retrieved no response, when given a response")
 	}
 }
 
-func TestPingRequestMessageFail(t *testing.T) {
-	rpc1 := rpcmarshal.RPC{
-		Cmd: "PING",
-		Contact: contact.Contact{
-			ID:      id.NewRandomKademliaID(),
-			Address: "THIS IS ADDRESS"},
-	}
-	msg := PingMessage(rpc1.Contact, newValidRequestID())
-	var rpc2 rpcmarshal.RPC
-	rpcmarshal.RpcUnmarshal(msg, &rpc2)
-	if rpc1.Equals(&rpc2) {
-		t.FailNow()
+// Test Ping request to node that does not responds.
+func TestPingFail(t *testing.T) {
+	target := contact.Contact{
+		Address: "0.0.0.0"}
+	res := Ping(target, senderPingMockFail)
+	if res {
+		t.Fatalf("retrieved response, when no response given")
 	}
 }
 
-func TestPongRequestMessageSuccess(t *testing.T) {
-	rpc1 := rpcmarshal.RPC{
-		Cmd: "RESP",
-		Contact: contact.Contact{
-			ID:      id.NewRandomKademliaID(),
-			Address: "THIS IS ADDRESS"},
-		ReqID: newValidRequestID(),
-	}
-	msg := PongMessage(rpc1.Contact, rpc1.ReqID)
-	var rpc2 rpcmarshal.RPC
-	rpcmarshal.RpcUnmarshal(msg, &rpc2)
-	if !rpc1.Equals(&rpc2) {
-		t.FailNow()
-	}
-}
+// Test if pong does respond and that it returns correct response.
+func TestPong(t *testing.T) {
+	target := contact.Contact{
+		Address: "0.0.0.0"}
+	reqID := newValidRequestID()
+	Pong(target, reqID, senderPingMock)
 
-func TestPongRequestMessageFail(t *testing.T) {
-	rpc1 := rpcmarshal.RPC{
-		Cmd: "RESP",
-		Contact: contact.Contact{
-			ID:      id.NewRandomKademliaID(),
-			Address: "THIS IS ADDRESS"},
+	var response []byte
+	err := requestHandler.GetInstance().ReadResponse(reqID, &response)
+	if err != nil {
+		t.Fatalf("no response, when given a valid response")
 	}
-	msg := PongMessage(rpc1.Contact, newValidRequestID())
-	var rpc2 rpcmarshal.RPC
-	rpcmarshal.RpcUnmarshal(msg, &rpc2)
-	if rpc1.Equals(&rpc2) {
-		t.FailNow()
+
+	var rpcResponse rpcmarshal.RPC
+	rpcmarshal.RpcUnmarshal(response, &rpcResponse)
+	if !rpcResponse.Equals(&rpcmarshal.RPC{
+		Cmd:     "RESP",
+		Contact: *contact.GetInstance(),
+		ReqID:   reqID}) {
+		t.Fatalf("wrong rpc response")
 	}
 }

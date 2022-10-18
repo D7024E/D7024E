@@ -12,7 +12,7 @@ import (
 )
 
 // UDPSender mockup that simulates a successful response.
-func senderMockSuccess(_ net.IP, _ int, message []byte) {
+func senderRefreshMockSuccess(_ net.IP, _ int, message []byte) {
 	var request rpcmarshal.RPC
 	rpcmarshal.RpcUnmarshal(message, &request)
 
@@ -31,7 +31,17 @@ func senderMockSuccess(_ net.IP, _ int, message []byte) {
 }
 
 // UDPSender mockup that simulates no response.
-func senderMockFail(_ net.IP, _ int, _ []byte) {}
+func senderRefreshMockFail(_ net.IP, _ int, _ []byte) {}
+
+// UDPSender mockup that simulates a response.
+func senderRefreshMock(_ net.IP, _ int, message []byte) {
+	var request rpcmarshal.RPC
+	rpcmarshal.RpcUnmarshal(message, &request)
+
+	requestHandler.GetInstance().WriteRespone(
+		request.ReqID,
+		message)
+}
 
 // RefreshRequest that receives a valid response.
 func TestRefreshRequestSuccess(t *testing.T) {
@@ -40,7 +50,7 @@ func TestRefreshRequestSuccess(t *testing.T) {
 		ID:      id.NewRandomKademliaID(),
 		Address: "ADDRESS",
 	}
-	res := RefreshRequest(valueID, target, senderMockSuccess)
+	res := RefreshRequest(valueID, target, senderRefreshMockSuccess)
 	if !res {
 		t.FailNow()
 	}
@@ -53,7 +63,7 @@ func TestRefreshRequestFail(t *testing.T) {
 		ID:      id.NewRandomKademliaID(),
 		Address: "ADDRESS",
 	}
-	res := RefreshRequest(valueID, target, senderMockFail)
+	res := RefreshRequest(valueID, target, senderRefreshMockFail)
 	if res {
 		t.FailNow()
 	}
@@ -73,12 +83,12 @@ func TestRefreshResponse(t *testing.T) {
 		Ttl:    time.Hour,
 		DeadAt: time.Now().Add(time.Hour)})
 
-	RefreshResponse(valueID, target, reqID, senderMockSuccess)
+	RefreshResponse(valueID, target, reqID, senderRefreshMock)
 
 	var response []byte
 	err := requestHandler.GetInstance().ReadResponse(reqID, &response)
 	if err != nil {
-		t.FailNow()
+		t.Fatalf("no response when given one")
 	}
 
 	var rpcResponse rpcmarshal.RPC
@@ -87,7 +97,7 @@ func TestRefreshResponse(t *testing.T) {
 		Cmd:     "RESP",
 		Contact: *contact.GetInstance(),
 		ReqID:   reqID}) {
-		t.Errorf("wrong rpc response")
+		t.Fatalf("wrong rpc response")
 	}
 
 }

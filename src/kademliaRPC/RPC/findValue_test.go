@@ -1,120 +1,126 @@
 package rpc
 
 import (
+	kademliaErrors "D7024E/errors"
 	"D7024E/kademliaRPC/rpcmarshal"
+	"D7024E/network/requestHandler"
 	"D7024E/node/contact"
-	"D7024E/node/id"
 	"D7024E/node/stored"
 	"errors"
+	"fmt"
+	"net"
 	"testing"
-	"time"
 )
 
-// Test FindValueRequestMessage output correct message.
-func TestFindValueRequestMessageSuccess(t *testing.T) {
-	rpc1 := rpcmarshal.RPC{
-		Cmd: "FIVA",
-		Contact: contact.Contact{
-			ID:      id.NewRandomKademliaID(),
-			Address: "THIS IS ADDRESS"},
-		ReqID: newValidRequestID(),
-		ID:    *id.NewRandomKademliaID(),
-	}
-	message := findValueRequestMessage(rpc1.Contact, rpc1.ReqID, rpc1.ID)
-	var rpc2 rpcmarshal.RPC
-	rpcmarshal.RpcUnmarshal(message, &rpc2)
-	if !rpc1.Equals(&rpc2) {
-		t.FailNow()
+// UDPSender mockup that simulates a successful response.
+func senderFindValueMockSuccess(_ net.IP, _ int, message []byte) {
+	var request rpcmarshal.RPC
+	rpcmarshal.RpcUnmarshal(message, &request)
+
+	var response []byte
+	rpcmarshal.RpcMarshal(
+		rpcmarshal.RPC{
+			Cmd:     "RESP",
+			Contact: *contact.GetInstance(),
+			ReqID:   request.ReqID,
+			Content: testValue(),
+		},
+		&response)
+
+	requestHandler.GetInstance().WriteRespone(
+		request.ReqID,
+		response)
+}
+
+// UDPSender mockup that simulates value not found.
+func senderFindValueMockNotFound(_ net.IP, _ int, message []byte) {
+	var request rpcmarshal.RPC
+	rpcmarshal.RpcUnmarshal(message, &request)
+
+	var response []byte
+	rpcmarshal.RpcMarshal(
+		rpcmarshal.RPC{
+			Cmd:     "RESP",
+			Contact: *contact.GetInstance(),
+			ReqID:   request.ReqID,
+			Content: stored.Value{},
+		},
+		&response)
+
+	requestHandler.GetInstance().WriteRespone(
+		request.ReqID,
+		response)
+}
+
+// UDPSender mockup that simulates a response.
+func senderFindValueMock(_ net.IP, _ int, message []byte) {
+	var request rpcmarshal.RPC
+	rpcmarshal.RpcUnmarshal(message, &request)
+
+	requestHandler.GetInstance().WriteRespone(
+		request.ReqID,
+		message)
+}
+
+// UDPSender mockup that simulates no response.
+func senderFindValueMockFail(_ net.IP, _ int, _ []byte) {}
+
+// Test FindValueRequest if valid response gets the correct output.
+func TestFindValueRequestValidResponse(t *testing.T) {
+	val, err := FindValueRequest(testValue().ID, testContact(), senderFindValueMockSuccess)
+	if err != nil {
+		t.Fatalf("received error from request that got a valid response")
+	} else if !val.Equals(&val) {
+		t.Fatalf("value does not equal received value from response")
 	}
 }
 
-// Test FindValueRequestMessage output correct message.
-func TestFindValueRequestMessageFail(t *testing.T) {
-	rpc1 := rpcmarshal.RPC{
-		Cmd: "FIVA",
-		Contact: contact.Contact{
-			ID:      id.NewRandomKademliaID(),
-			Address: "THIS IS ADDRESS"},
-		ReqID: newValidRequestID(),
-	}
-	message := findValueRequestMessage(rpc1.Contact, rpc1.ReqID, *id.NewRandomKademliaID())
-	var rpc2 rpcmarshal.RPC
-	rpcmarshal.RpcUnmarshal(message, &rpc2)
-	if rpc1.Equals(&rpc2) {
-		t.FailNow()
+// Test FindValueRequest if right output is given when there is no response.
+func TestFindValueRequestNoResponse(t *testing.T) {
+	val, err := FindValueRequest(testValue().ID, testContact(), senderFindValueMockFail)
+	if err == nil {
+		t.Fatalf("received no error from request that got a no response")
+	} else if !val.Equals(&stored.Value{}) {
+		t.Fatalf("received a value containing data, when no response")
 	}
 }
 
-// Test successful return of request.
-func TestFindValueRequestReturnSuccess(t *testing.T) {
-	var message []byte
-	rpcmarshal.RpcMarshal(rpcmarshal.RPC{Content: stored.Value{Data: "something"}}, &message)
-	_, err := findValueRequestReturn(message, nil)
-	if isError(err) {
-		t.FailNow()
+// Test FindValueRequest if right output is given when value is not found.
+func TestFindValueRequestValueNotFound(t *testing.T) {
+	val, err := FindValueRequest(testValue().ID, testContact(), senderFindValueMockNotFound)
+	if !errors.Is(&kademliaErrors.ValueNotFound{}, err) {
+		t.Fatalf("received wrong error")
+	} else if !val.Equals(&stored.Value{}) {
+		t.Fatalf("received none empty value")
 	}
 }
 
-// Test timeout error FindValueRequest.
-func TestFindValueRequestReturnTimeout(t *testing.T) {
-	_, err := findValueRequestReturn([]byte{}, errors.New("timeout"))
-	if !isError(err) {
-		t.FailNow()
-	}
-}
-
-// Test not found error FindValueRequest.
-func TestFindValueRequestReturnNotFound(t *testing.T) {
-	var message []byte
-	rpcmarshal.RpcMarshal(rpcmarshal.RPC{Content: stored.Value{}}, &message)
-	_, err := findValueRequestReturn(message, nil)
-	if !isError(err) {
-		t.FailNow()
-	}
-}
-
-// Test FindValueResponseMessage output in success case.
-func TestFindValueResponseMessageSuccess(t *testing.T) {
-	value := stored.Value{
-		ID:  *id.NewRandomKademliaID(),
-		Ttl: time.Hour,
-	}
+// Test FindValueResponse if correct response is given.
+func TestFindValueResponseFoundValue(t *testing.T) {
+	value := testValue()
+	reqID := newValidRequestID()
 	err := stored.GetInstance().Store(value)
 	if err != nil {
 		t.FailNow()
 	}
-	rpc1 := rpcmarshal.RPC{
-		Cmd: "RESP",
-		Contact: contact.Contact{
-			ID:      id.NewRandomKademliaID(),
-			Address: "THIS IS ADDRESS"},
-		ReqID:   newValidRequestID(),
-		Content: value,
-	}
-	message := findValueResponseMessage(rpc1.Contact, rpc1.ReqID, value.ID)
-	var rpc2 rpcmarshal.RPC
-	rpcmarshal.RpcUnmarshal(message, &rpc2)
-	if !rpc1.Content.Equals(&rpc2.Content) {
-		t.FailNow()
-	}
-}
+	FindValueResponse(testContact(), reqID, value.ID, senderFindValueMock)
 
-// Test FindValueResponseMessage output in not found case.
-func TestFindValueResponseMessageNotFound(t *testing.T) {
-	value := stored.Value{ID: *id.NewRandomKademliaID()}
-	stored.GetInstance().Store(value)
-	rpc1 := rpcmarshal.RPC{
-		Cmd: "RESP",
-		Contact: contact.Contact{
-			ID:      id.NewRandomKademliaID(),
-			Address: "THIS IS ADDRESS"},
-		ReqID:   newValidRequestID(),
-		Content: value,
+	var response []byte
+	err = requestHandler.GetInstance().ReadResponse(reqID, &response)
+	if err != nil {
+		t.Fatalf("no response")
 	}
-	message := findValueResponseMessage(rpc1.Contact, rpc1.ReqID, *id.NewRandomKademliaID())
-	var rpc2 rpcmarshal.RPC
-	rpcmarshal.RpcUnmarshal(message, &rpc2)
-	if rpc1.Content.Equals(&rpc2.Content) {
-		t.FailNow()
+
+	var rpcResponse rpcmarshal.RPC
+	rpcmarshal.RpcUnmarshal(response, &rpcResponse)
+	fmt.Println(rpcResponse)
+	if !rpcResponse.Equals(
+		&rpcmarshal.RPC{
+			Cmd:     "RESP",
+			Contact: *contact.GetInstance(),
+			ReqID:   reqID,
+			Content: value,
+		}) {
+		t.Fatalf("invalid response")
 	}
 }

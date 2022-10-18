@@ -6,6 +6,7 @@ import (
 	"D7024E/node/stored"
 	"encoding/json"
 	"net/http"
+	"time"
 )
 
 // Create a value, from given json.
@@ -17,6 +18,9 @@ func Objects(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 	} else {
 		value.ID = *id.NewKademliaID(value.Data)
+		if value.Ttl.Nanoseconds() == 0 {
+			value.Ttl = time.Minute
+		}
 		algorithms.NodeStore(value)
 		response := "/objects/" + value.ID.String()
 		w.WriteHeader(http.StatusCreated)

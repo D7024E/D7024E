@@ -8,10 +8,10 @@ import (
 )
 
 type Value struct {
-	Data   string        `json:"data"`   // json data as string.
-	ID     id.KademliaID `json:"id"`     // json id as kademlia id.
-	Ttl    time.Duration `json:"ttl"`    // json time-to-live.
-	DeadAt time.Time     `json:"deadAt"` // json time where value is dead.
+	Data   string        `json:"data"` // json data as string.
+	ID     id.KademliaID `json:"id"`   // json id as kademlia id.
+	Ttl    time.Duration `json:"ttl"`  // json time-to-live.
+	DeadAt time.Time     `json:"-"`    // json time where value is dead.
 }
 
 var lock = &sync.Mutex{}

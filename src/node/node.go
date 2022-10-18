@@ -6,6 +6,7 @@ import (
 	"D7024E/node/contact"
 	"D7024E/node/id"
 	"D7024E/node/kademlia/algorithms"
+	"strings"
 	"time"
 )
 
@@ -15,7 +16,13 @@ func StartKademliaNode() {
 	if contact.GetInstance().Address == "172.21.0.2" {
 		contact.GetInstance().ID = id.NewKademliaID("172.21.0.2")
 	} else {
-		algorithms.NodeLookup(*id.NewKademliaID("172.21.0.2"))
+		kClosest := algorithms.NodeLookup(*id.NewKademliaID("172.21.0.2"))
+		kID := []string{}
+		for _, c := range kClosest {
+			kID = append(kID, c.ID.String())
+		}
+		res := "\n" + strings.Join(kID, "          \n")
+		log.INFO("KCLOSEST NODES - [%v]", res)
 	}
-	log.INFO("Connected to kademlia network")
+	log.INFO("CONNECTED - [KADEMLIA NETWORK]")
 }

@@ -44,7 +44,7 @@ func TestFindValueEqualsFalse(t *testing.T) {
 }
 
 // See if deadAt is changed when value is not refreshed, since it is dead.
-func TestrefreshDeadValue(t *testing.T) {
+func TestRefreshDeadValue(t *testing.T) {
 	t0 := time.Now()
 	value := Value{ID: *id.NewRandomKademliaID(), DeadAt: t0}
 	res := value.refresh()
@@ -56,7 +56,7 @@ func TestrefreshDeadValue(t *testing.T) {
 }
 
 // See if value is refreshed when value is still alive.
-func TestrefreshAliveValue(t *testing.T) {
+func TestRefreshAliveValue(t *testing.T) {
 	t0 := time.Now().Add(time.Minute)
 	value := Value{ID: *id.NewRandomKademliaID(), Ttl: time.Hour, DeadAt: t0}
 	res := value.refresh()
