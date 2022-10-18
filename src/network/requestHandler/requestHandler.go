@@ -70,7 +70,7 @@ func (rt *requestTable) WriteRespone(reqID string, message []byte) error {
 // Reads the response message to the given request id and clears the request from the table.
 // Note that it also handles the TTL for the RPCs' since it sleeps before taking the mutex.
 func (rt *requestTable) ReadResponse(reqID string, res *[]byte) error {
-	time.Sleep(500 * time.Millisecond)
+	time.Sleep(250 * time.Millisecond)
 	lock.Lock()
 	defer lock.Unlock()
 

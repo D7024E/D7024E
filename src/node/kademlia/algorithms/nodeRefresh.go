@@ -17,21 +17,24 @@ type NodeStoreAlgorithm func(value stored.Value) bool
 
 // Initiate value refresh.
 func NodeRefresh(value stored.Value) {
+	go func() {
+		time.Sleep(value.Ttl / 2)
+		NodeRefreshRec(value, rpc.RefreshRequest, NodeStore)
+	}()
 	stored.GetInstance().AddRefresh(value.ID)
-	go NodeRefreshRec(value, rpc.RefreshRequest, NodeStore)
 }
 
 // Refresh a stored value in alpha closest nodes.
 func NodeRefreshRec(value stored.Value, refresh RefreshRPC, store NodeStoreAlgorithm) bool {
 	if !stored.GetInstance().IsRefreshed(value.ID) {
-		fmt.Println("No longer refreshing")
 		return false
 	} else {
 		go func() {
-			time.Sleep(value.Ttl)
+			time.Sleep(value.Ttl / 2)
 			NodeRefreshRec(value, refresh, store)
 		}()
 	}
+	fmt.Println("Refresh")
 	alphaClosest := NodeLookup(value.ID)
 	if len(alphaClosest) > environment.Alpha {
 		alphaClosest = alphaClosest[:environment.Alpha]
@@ -43,9 +46,10 @@ func NodeRefreshRec(value stored.Value, refresh RefreshRPC, store NodeStoreAlgor
 		target := c
 		go func() {
 			defer wg.Done()
-			val := refresh(value.ID, target, sender.UDPSender)
-			if !val {
-				completed = val
+			res := refresh(value.ID, target, sender.UDPSender)
+			if !res {
+				fmt.Println(target.Address)
+				completed = res
 			}
 		}()
 	}
