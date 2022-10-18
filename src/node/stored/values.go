@@ -127,6 +127,18 @@ func (stored *Stored) cleaningDeadValues(sleepTime time.Duration) {
 	go stored.cleaningDeadValues(sleepTime)
 }
 
+// Add new value id to refresh.
+func (stored *Stored) AddRefresh(valueID id.KademliaID) {
+	lock.Lock()
+	defer lock.Unlock()
+	for _, refreshedValueID := range stored.refreshed {
+		if refreshedValueID.Equals(&valueID) {
+			return
+		}
+	}
+	stored.refreshed = append(stored.refreshed, valueID)
+}
+
 // Is refresh checks if valueID is and should be refreshed.
 func (stored *Stored) IsRefreshed(valueID id.KademliaID) bool {
 	lock.Lock()

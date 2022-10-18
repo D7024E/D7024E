@@ -18,7 +18,7 @@ func NodeStore(value stored.Value) bool {
 	return AlphaNodeStoreRec(value, rpc.StoreRequest, NodeLookup)
 }
 
-// Store value in alpha nodes using fn.
+// Store value in alpha nodes using store rpc.
 func AlphaNodeStoreRec(value stored.Value, store storeRPC, lookup lookupAlgorithm) bool {
 	alphaClosest := lookup(value.ID)
 	if len(alphaClosest) > environment.Alpha {

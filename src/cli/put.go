@@ -7,17 +7,19 @@ import (
 )
 
 type NodeStore func(stored.Value) bool
+type RefreshAlgorithm func(stored.Value)
 
 // Returns a hash of the input string if it was stored successfully, otherwise returns "".
-func Put(input string, NS NodeStore) string {
+func Put(input string, NS NodeStore, RA RefreshAlgorithm) string {
 	id := *id.NewKademliaID(input)
 	value := stored.Value{
 		Data: input,
 		ID:   id,
 		Ttl:  time.Minute,
 	}
-	var res bool = NS(value)
+	res := NS(value)
 	if res {
+		go RA(value)
 		return id.String()
 	} else {
 		return ""

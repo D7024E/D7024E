@@ -10,7 +10,7 @@ func Handle(text string) string {
 	var result string
 	switch split[0] {
 	case "put":
-		result = Put(split[1], algorithms.NodeStore)
+		result = Put(split[1], algorithms.NodeStore, algorithms.NodeRefresh)
 	case "get":
 		result = Get(split[1], algorithms.NodeValueLookup)
 	case "exit":
