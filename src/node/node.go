@@ -15,7 +15,12 @@ func StartKademliaNode() {
 	if contact.GetInstance().Address == "172.21.0.2" {
 		contact.GetInstance().ID = id.NewKademliaID("172.21.0.2")
 	} else {
-		algorithms.NodeLookup(*id.NewKademliaID("172.21.0.2"))
+		kClosest := algorithms.NodeLookup(*id.NewKademliaID("172.21.0.2"))
+		kID := []id.KademliaID{}
+		for _, c := range kClosest {
+			kID = append(kID, *c.ID)
+		}
+		log.INFO("The k closest nodes found %v", kID)
 	}
 	log.INFO("Connected to kademlia network")
 }
