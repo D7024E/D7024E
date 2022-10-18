@@ -50,7 +50,8 @@ func (value *Value) isDead() bool {
 }
 
 type Stored struct {
-	values []Value
+	values    []Value
+	refreshed []id.KademliaID
 }
 
 var instance *Stored
