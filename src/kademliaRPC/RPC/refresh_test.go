@@ -33,6 +33,16 @@ func senderRefreshMockSuccess(_ net.IP, _ int, message []byte) {
 // UDPSender mockup that simulates no response.
 func senderRefreshMockFail(_ net.IP, _ int, _ []byte) {}
 
+// UDPSender mockup that simulates a response.
+func senderRefreshMock(_ net.IP, _ int, message []byte) {
+	var request rpcmarshal.RPC
+	rpcmarshal.RpcUnmarshal(message, &request)
+
+	requestHandler.GetInstance().WriteRespone(
+		request.ReqID,
+		message)
+}
+
 // RefreshRequest that receives a valid response.
 func TestRefreshRequestSuccess(t *testing.T) {
 	valueID := *id.NewRandomKademliaID()
@@ -73,12 +83,12 @@ func TestRefreshResponse(t *testing.T) {
 		Ttl:    time.Hour,
 		DeadAt: time.Now().Add(time.Hour)})
 
-	RefreshResponse(valueID, target, reqID, senderRefreshMockSuccess)
+	RefreshResponse(valueID, target, reqID, senderRefreshMock)
 
 	var response []byte
 	err := requestHandler.GetInstance().ReadResponse(reqID, &response)
 	if err != nil {
-		t.Fatalf("N")
+		t.Fatalf("no response when given one")
 	}
 
 	var rpcResponse rpcmarshal.RPC

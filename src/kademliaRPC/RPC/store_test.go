@@ -34,6 +34,16 @@ func senderStoreMockSuccess(_ net.IP, _ int, message []byte) {
 // UDPSender mockup that simulates no response.
 func senderStoreMockFail(_ net.IP, _ int, _ []byte) {}
 
+// UDPSender mockup that simulates a response.
+func senderStoreMock(_ net.IP, _ int, message []byte) {
+	var request rpcmarshal.RPC
+	rpcmarshal.RpcUnmarshal(message, &request)
+
+	requestHandler.GetInstance().WriteRespone(
+		request.ReqID,
+		message)
+}
+
 // Test StoreRequest when valid response is given.
 func TestStoreRequestWithResponse(t *testing.T) {
 	target := contact.Contact{
@@ -85,7 +95,7 @@ func TestStoreResponseSuccess(t *testing.T) {
 		DeadAt: time.Now().Add(time.Hour),
 	}
 
-	StoreResponse(target, reqID, value, senderStoreMockSuccess)
+	StoreResponse(target, reqID, value, senderStoreMock)
 
 	_, err := stored.GetInstance().FindValue(value.ID)
 	if err != nil {

@@ -30,6 +30,16 @@ func senderPingMockSuccess(_ net.IP, _ int, message []byte) {
 // UDPSender mockup that simulates no response.
 func senderPingMockFail(_ net.IP, _ int, _ []byte) {}
 
+// UDPSender mockup that simulates a response.
+func senderPingMock(_ net.IP, _ int, message []byte) {
+	var request rpcmarshal.RPC
+	rpcmarshal.RpcUnmarshal(message, &request)
+
+	requestHandler.GetInstance().WriteRespone(
+		request.ReqID,
+		message)
+}
+
 // Test Ping request to node that responds.
 func TestPingSuccess(t *testing.T) {
 	target := contact.Contact{
@@ -55,7 +65,7 @@ func TestPong(t *testing.T) {
 	target := contact.Contact{
 		Address: "0.0.0.0"}
 	reqID := newValidRequestID()
-	Pong(target, reqID, senderPingMockSuccess)
+	Pong(target, reqID, senderPingMock)
 
 	var response []byte
 	err := requestHandler.GetInstance().ReadResponse(reqID, &response)

@@ -7,6 +7,7 @@ import (
 	"D7024E/node/contact"
 	"D7024E/node/stored"
 	"errors"
+	"fmt"
 	"net"
 	"testing"
 )
@@ -51,6 +52,16 @@ func senderFindValueMockNotFound(_ net.IP, _ int, message []byte) {
 		response)
 }
 
+// UDPSender mockup that simulates a response.
+func senderFindValueMock(_ net.IP, _ int, message []byte) {
+	var request rpcmarshal.RPC
+	rpcmarshal.RpcUnmarshal(message, &request)
+
+	requestHandler.GetInstance().WriteRespone(
+		request.ReqID,
+		message)
+}
+
 // UDPSender mockup that simulates no response.
 func senderFindValueMockFail(_ net.IP, _ int, _ []byte) {}
 
@@ -92,7 +103,7 @@ func TestFindValueResponseFoundValue(t *testing.T) {
 	if err != nil {
 		t.FailNow()
 	}
-	FindValueResponse(testContact(), reqID, value.ID, senderFindNodeMockSuccess)
+	FindValueResponse(testContact(), reqID, value.ID, senderFindValueMock)
 
 	var response []byte
 	err = requestHandler.GetInstance().ReadResponse(reqID, &response)
@@ -102,7 +113,14 @@ func TestFindValueResponseFoundValue(t *testing.T) {
 
 	var rpcResponse rpcmarshal.RPC
 	rpcmarshal.RpcUnmarshal(response, &rpcResponse)
-	if rpcResponse.Content.Equals(&value) {
+	fmt.Println(rpcResponse)
+	if !rpcResponse.Equals(
+		&rpcmarshal.RPC{
+			Cmd:     "RESP",
+			Contact: *contact.GetInstance(),
+			ReqID:   reqID,
+			Content: value,
+		}) {
 		t.Fatalf("invalid response")
 	}
 }
