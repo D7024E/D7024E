@@ -7,25 +7,30 @@ import (
 	"D7024E/node/contact"
 	"D7024E/node/id"
 	"D7024E/node/stored"
+	"fmt"
 	"sync"
 	"time"
 )
 
 type RefreshRPC func(id.KademliaID, contact.Contact, rpc.UDPSender) bool
+type NodeStoreAlgorithm func(value stored.Value) bool
 
 // Initiate value refresh.
 func NodeRefresh(value stored.Value) {
 	stored.GetInstance().AddRefresh(value.ID)
-	go NodeRefreshRec(value, rpc.RefreshRequest)
+	go NodeRefreshRec(value, rpc.RefreshRequest, NodeStore)
 }
 
 // Refresh a stored value in alpha closest nodes.
-func NodeRefreshRec(value stored.Value, refresh RefreshRPC) bool {
-	time.Sleep(time.Now().Add(500 * time.Millisecond).Sub(value.DeadAt))
+func NodeRefreshRec(value stored.Value, refresh RefreshRPC, store NodeStoreAlgorithm) bool {
 	if !stored.GetInstance().IsRefreshed(value.ID) {
+		fmt.Println("No longer refreshing")
 		return false
 	} else {
-		go NodeRefreshRec(value, refresh)
+		go func() {
+			time.Sleep(value.Ttl)
+			NodeRefreshRec(value, refresh, store)
+		}()
 	}
 	alphaClosest := NodeLookup(value.ID)
 	if len(alphaClosest) > environment.Alpha {
@@ -46,7 +51,8 @@ func NodeRefreshRec(value stored.Value, refresh RefreshRPC) bool {
 	}
 	wg.Wait()
 	if !completed {
-		NodeStore(value)
+		fmt.Println("Storing for refresh")
+		store(value)
 	}
 	return true
 }

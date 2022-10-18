@@ -7,7 +7,6 @@ import (
 	"D7024E/node/contact"
 	"D7024E/node/stored"
 	"errors"
-	"fmt"
 	"net"
 	"testing"
 )
@@ -113,7 +112,6 @@ func TestFindValueResponseFoundValue(t *testing.T) {
 
 	var rpcResponse rpcmarshal.RPC
 	rpcmarshal.RpcUnmarshal(response, &rpcResponse)
-	fmt.Println(rpcResponse)
 	if !rpcResponse.Equals(
 		&rpcmarshal.RPC{
 			Cmd:     "RESP",
