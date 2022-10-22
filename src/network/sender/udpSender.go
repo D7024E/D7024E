@@ -2,24 +2,33 @@ package sender
 
 import (
 	"D7024E/log"
+
 	"net"
 	"strconv"
+	"time"
 )
+
+// Should be able to replace read response now since it returns the marshalled response?
+// Still need to fix the listener side? Maybe just rework how the handler responds to data?
 
 /**
  * Establish udp4 connection with given address created from ip and port.
  * Send message over connection.
  */
-func UDPSender(ip net.IP, port int, message []byte) {
+func UDPSender(ip net.IP, port int, message []byte) []byte {
 	addr := ip.String() + ":" + strconv.Itoa(port)
-	connection, err := net.Dial("udp4", addr)
+	conn, err := net.Dial("udp4", addr)
 	if err != nil {
-		log.ERROR("Reccived error ", err)
+		log.ERROR("%v", err)
 	}
-	defer connection.Close()
+	defer conn.Close()
 
-	_, err = connection.Write(message)
+	res := make([]byte, 4096)
+	conn.SetReadDeadline(time.Now().Add(1 * time.Second))
+	_, err = conn.Write(message)
 	if err != nil {
 		log.ERROR("Something went wrong in the sender...")
 	}
+
+	_, err = conn.Read(res)
 }
