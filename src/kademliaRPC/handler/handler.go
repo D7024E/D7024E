@@ -19,17 +19,19 @@ func HandleCMD(msg []byte) []byte {
 	log.INFO("OPERATION - [%s] SENDER - [%s]", rpcMessage.Cmd, rpcMessage.Contact.ID.String())
 	startTime := time.Now()
 
+	var res []byte
+
 	switch rpcMessage.Cmd {
 	case "PING":
-		res := rpc.Pong(rpcMessage.Contact, rpcMessage.ReqID, sender.UDPSender)
+		res = rpc.Pong(rpcMessage.Contact, rpcMessage.ReqID, sender.UDPSender)
 	case "RESH":
-		res := rpc.RefreshResponse(rpcMessage.ID, rpcMessage.Contact, rpcMessage.ReqID, sender.UDPSender)
+		res = rpc.RefreshResponse(rpcMessage.ID, rpcMessage.Contact, rpcMessage.ReqID, sender.UDPSender)
 	case "STRE":
-		res := rpc.StoreResponse(rpcMessage.Contact, rpcMessage.ReqID, rpcMessage.Content, sender.UDPSender)
+		res = rpc.StoreResponse(rpcMessage.Contact, rpcMessage.ReqID, rpcMessage.Content, sender.UDPSender)
 	case "FINO":
-		res := rpc.FindNodeResponse(rpcMessage.ReqID, rpcMessage.ID, rpcMessage.Contact, sender.UDPSender)
+		res = rpc.FindNodeResponse(rpcMessage.ReqID, rpcMessage.ID, rpcMessage.Contact, sender.UDPSender)
 	case "FIVA":
-		res := rpc.FindValueResponse(rpcMessage.Contact, rpcMessage.ReqID, rpcMessage.ID, sender.UDPSender)
+		res = rpc.FindValueResponse(rpcMessage.Contact, rpcMessage.ReqID, rpcMessage.ID, sender.UDPSender)
 	default:
 		log.ERROR("UNKNOWN CMD")
 	}
