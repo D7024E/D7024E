@@ -10,7 +10,7 @@ import (
 )
 
 // Depending on the RPC command initiate go routine.
-func HandleCMD(msg []byte) {
+func HandleCMD(msg []byte) []byte {
 	var rpcMessage rpcmarshal.RPC
 	rpcmarshal.RpcUnmarshal(msg, &rpcMessage)
 
@@ -21,15 +21,15 @@ func HandleCMD(msg []byte) {
 
 	switch rpcMessage.Cmd {
 	case "PING":
-		rpc.Pong(rpcMessage.Contact, rpcMessage.ReqID, sender.UDPSender)
+		res := rpc.Pong(rpcMessage.Contact, rpcMessage.ReqID, sender.UDPSender)
 	case "RESH":
-		rpc.RefreshResponse(rpcMessage.ID, rpcMessage.Contact, rpcMessage.ReqID, sender.UDPSender)
+		res := rpc.RefreshResponse(rpcMessage.ID, rpcMessage.Contact, rpcMessage.ReqID, sender.UDPSender)
 	case "STRE":
-		rpc.StoreResponse(rpcMessage.Contact, rpcMessage.ReqID, rpcMessage.Content, sender.UDPSender)
+		res := rpc.StoreResponse(rpcMessage.Contact, rpcMessage.ReqID, rpcMessage.Content, sender.UDPSender)
 	case "FINO":
-		rpc.FindNodeResponse(rpcMessage.ReqID, rpcMessage.ID, rpcMessage.Contact, sender.UDPSender)
+		res := rpc.FindNodeResponse(rpcMessage.ReqID, rpcMessage.ID, rpcMessage.Contact, sender.UDPSender)
 	case "FIVA":
-		rpc.FindValueResponse(rpcMessage.Contact, rpcMessage.ReqID, rpcMessage.ID, sender.UDPSender)
+		res := rpc.FindValueResponse(rpcMessage.Contact, rpcMessage.ReqID, rpcMessage.ID, sender.UDPSender)
 	default:
 		log.ERROR("UNKNOWN CMD")
 	}
@@ -38,4 +38,5 @@ func HandleCMD(msg []byte) {
 		rpcMessage.Cmd,
 		rpcMessage.Contact.ID.String(),
 		time.Since(startTime).String())
+	return res
 }

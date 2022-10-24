@@ -30,7 +30,7 @@ func Ping(target contact.Contact, sender UDPSender) bool {
 }
 
 // Respond to ping.
-func Pong(target contact.Contact, reqID string, sender UDPSender) {
+func Pong(target contact.Contact, reqID string, sender UDPSender) []byte {
 	var msg []byte
 	rpcmarshal.RpcMarshal(
 		rpcmarshal.RPC{
@@ -39,5 +39,6 @@ func Pong(target contact.Contact, reqID string, sender UDPSender) {
 			ReqID:   reqID,
 		},
 		&msg)
-	sender(net.ParseIP(target.Address), 4001, msg)
+
+	return msg
 }

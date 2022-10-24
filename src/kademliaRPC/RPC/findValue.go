@@ -6,7 +6,6 @@ import (
 	"D7024E/node/contact"
 	"D7024E/node/id"
 	"D7024E/node/stored"
-	"net"
 )
 
 // FIND_VALUE RPC
@@ -44,7 +43,7 @@ func FindValueRequest(valueID id.KademliaID, target contact.Contact, sender UDPS
 // Checks own stored values for Value with ID valueID, if found add value to
 // rpc response message, otherwise send message without a value
 // (thereby Content will be nil).
-func FindValueResponse(target contact.Contact, reqID string, valueID id.KademliaID, sender UDPSender) {
+func FindValueResponse(target contact.Contact, reqID string, valueID id.KademliaID, sender UDPSender) []byte {
 	rpcMessage := rpcmarshal.RPC{
 		Cmd:     "RESP",
 		Contact: *contact.GetInstance(),
@@ -56,5 +55,5 @@ func FindValueResponse(target contact.Contact, reqID string, valueID id.Kademlia
 	}
 	var message []byte
 	rpcmarshal.RpcMarshal(rpcMessage, &message)
-	sender(net.ParseIP(target.Address), 4001, message)
+	return message
 }

@@ -22,18 +22,18 @@ func FindNodeRequest(target contact.Contact, kademliaID id.KademliaID, sender UD
 		},
 		&message,
 	)
-	sender(parseIP(target.Address), environment.Port, message)
+	resMessage, err := sender(parseIP(target.Address), environment.Port, message)
 	if isError(err) {
 		return nil, err
 	}
 	var rpcMessage rpcmarshal.RPC
-	rpcmarshal.RpcUnmarshal(message, &rpcMessage)
+	rpcmarshal.RpcUnmarshal(resMessage, &rpcMessage)
 	return rpcMessage.KNodes, nil
 }
 
 // Creates a response RPC struct and populates it with the K, (K = 20), closest nodes to the destination node.
 // Which is then sent back to the sender.
-func FindNodeResponse(reqID string, kademliaID id.KademliaID, target contact.Contact, sender UDPSender) {
+func FindNodeResponse(reqID string, kademliaID id.KademliaID, target contact.Contact, sender UDPSender) []byte {
 	rpcMessage := rpcmarshal.RPC{
 		Cmd:     "RESP",
 		Contact: *contact.GetInstance(),
@@ -42,5 +42,5 @@ func FindNodeResponse(reqID string, kademliaID id.KademliaID, target contact.Con
 	rpcMessage.KNodes = bucket.GetInstance().FindClosestContacts(&kademliaID, 20)
 	var message []byte
 	rpcmarshal.RpcMarshal(rpcMessage, &message)
-	sender(parseIP(target.Address), environment.Port, message)
+	return message
 }

@@ -33,7 +33,7 @@ func RefreshRequest(valueID id.KademliaID, target contact.Contact, sender UDPSen
 }
 
 // Respond to a refresh unless the node does not hold the value.
-func RefreshResponse(valueID id.KademliaID, target contact.Contact, reqID string, sender UDPSender) {
+func RefreshResponse(valueID id.KademliaID, target contact.Contact, reqID string, sender UDPSender) []byte {
 	_, err := stored.GetInstance().FindValue(valueID)
 	if err == nil {
 		var message []byte
@@ -44,6 +44,7 @@ func RefreshResponse(valueID id.KademliaID, target contact.Contact, reqID string
 				ReqID:   reqID,
 			},
 			&message)
-		sender(parseIP(target.Address), 4001, message)
+		return message
 	}
+	return nil
 }
