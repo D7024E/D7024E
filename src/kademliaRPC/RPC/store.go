@@ -2,7 +2,7 @@ package rpc
 
 import (
 	"D7024E/kademliaRPC/rpcmarshal"
-	"D7024E/network/requestHandler"
+	"D7024E/log"
 	"D7024E/node/contact"
 	"D7024E/node/stored"
 )
@@ -22,8 +22,15 @@ func StoreRequest(target contact.Contact, value stored.Value, sender UDPSender) 
 		},
 		&message,
 	)
-	sender(parseIP(target.Address), 4001, message)
-	err := requestHandler.GetInstance().ReadResponse(reqID, &message)
+	resMessage, err := sender(parseIP(target.Address), 4001, message)
+	if err != nil {
+		log.ERROR("Error when sending rpc")
+		return false
+	}
+
+	var rpcMessage rpcmarshal.RPC
+	rpcmarshal.RpcUnmarshal(resMessage, &rpcMessage)
+
 	return !isError(err)
 
 }
