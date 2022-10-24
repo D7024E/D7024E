@@ -3,7 +3,6 @@ package rpc
 import (
 	"D7024E/errors"
 	"D7024E/kademliaRPC/rpcmarshal"
-	"D7024E/network/requestHandler"
 	"D7024E/node/contact"
 	"D7024E/node/id"
 	"D7024E/node/stored"
@@ -27,14 +26,13 @@ func FindValueRequest(valueID id.KademliaID, target contact.Contact, sender UDPS
 		&message,
 	)
 
-	sender(parseIP(target.Address), 4001, message)
-	err := requestHandler.GetInstance().ReadResponse(reqID, &message)
+	resMessage, err := sender(parseIP(target.Address), 4001, message)
 	if isError(err) {
 		return stored.Value{}, err
 	}
 
 	var rpcMessage rpcmarshal.RPC
-	rpcmarshal.RpcUnmarshal(message, &rpcMessage)
+	rpcmarshal.RpcUnmarshal(resMessage, &rpcMessage)
 	if (stored.Value{} == rpcMessage.Content) {
 		return stored.Value{}, &errors.ValueNotFound{}
 	} else {
