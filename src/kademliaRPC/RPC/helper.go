@@ -6,7 +6,7 @@ import (
 	"net"
 )
 
-type UDPSender func(net.IP, int, []byte)
+type UDPSender func(net.IP, int, []byte) ([]byte, error)
 
 // Returns a new valid requestID.
 func newValidRequestID() string {

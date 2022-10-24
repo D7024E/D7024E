@@ -26,7 +26,7 @@ func Ping(target contact.Contact, sender UDPSender) bool {
 	}
 	var rpcMessage rpcmarshal.RPC
 	rpcmarshal.RpcUnmarshal(resMessage, &rpcMessage)
-	return true
+	return !isError(err)
 }
 
 // Respond to ping.
