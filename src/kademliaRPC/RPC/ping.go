@@ -8,7 +8,7 @@ import (
 )
 
 // Ping target node, if there is a response return true, otherwise false.
-func Ping(target contact.Contact, sender UDPSender) bool {
+func Ping(target contact.Contact, sender UDPSender) (rpcmarshal.RPC, bool) {
 	reqID := newValidRequestID()
 	var msg []byte
 	rpcmarshal.RpcMarshal(
@@ -20,13 +20,14 @@ func Ping(target contact.Contact, sender UDPSender) bool {
 		&msg)
 	ip := net.ParseIP(target.Address)
 	resMessage, err := sender(ip, 4001, msg)
+
 	if err != nil {
 		log.ERROR("Error when sending rpc")
-		return false
+		return rpcmarshal.RPC{Cmd: "This is test"}, false
 	}
 	var rpcMessage rpcmarshal.RPC
 	rpcmarshal.RpcUnmarshal(resMessage, &rpcMessage)
-	return !isError(err)
+	return rpcMessage, !isError(err)
 }
 
 // Respond to ping.
