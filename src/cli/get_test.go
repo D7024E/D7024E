@@ -25,6 +25,8 @@ func TestGetValidFail(t *testing.T) {
 
 // Validate incorrect hash length rejection
 func TestGetInvalidHash(t *testing.T) {
+	genID := id.NewRandomKademliaID().String()
+	println("a random id", genID)
 	var shortRes string = Get("Too short hash", NodeValueLookupMockSuccess)
 	var longRes string = Get("Too long hash sadjnmaslsdasndoasndoasindoasindoas", NodeValueLookupMockSuccess)
 	if shortRes != "invalid length str 2 kademlia" {
