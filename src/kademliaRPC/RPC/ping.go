@@ -2,7 +2,7 @@ package rpc
 
 import (
 	"D7024E/kademliaRPC/rpcmarshal"
-	"D7024E/network/requestHandler"
+	"D7024E/log"
 	"D7024E/node/contact"
 	"net"
 )
@@ -19,9 +19,14 @@ func Ping(target contact.Contact, sender UDPSender) bool {
 		},
 		&msg)
 	ip := net.ParseIP(target.Address)
-	sender(ip, 4001, msg)
-	err := requestHandler.GetInstance().ReadResponse(reqID, &msg)
-	return !isError(err)
+	resMessage, err := sender(ip, 4001, msg)
+	if err != nil {
+		log.ERROR("Error when sending rpc")
+		return false
+	}
+	var unmarchaledMsg rpcmarshal.RPC
+	rpcmarshal.RpcUnmarshal(resMessage, &unmarchaledMsg)
+	return true
 }
 
 // Respond to ping.
