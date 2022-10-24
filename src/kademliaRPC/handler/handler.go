@@ -4,7 +4,6 @@ import (
 	rpc "D7024E/kademliaRPC/RPC"
 	"D7024E/kademliaRPC/rpcmarshal"
 	"D7024E/log"
-	"D7024E/network/requestHandler"
 	"D7024E/network/sender"
 	"D7024E/node/kademlia/algorithms"
 	"time"
@@ -21,8 +20,6 @@ func HandleCMD(msg []byte) {
 	startTime := time.Now()
 
 	switch rpcMessage.Cmd {
-	case "RESP":
-		requestHandler.GetInstance().WriteRespone(rpcMessage.ReqID, msg)
 	case "PING":
 		rpc.Pong(rpcMessage.Contact, rpcMessage.ReqID, sender.UDPSender)
 	case "RESH":
