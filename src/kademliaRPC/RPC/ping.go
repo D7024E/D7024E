@@ -24,8 +24,8 @@ func Ping(target contact.Contact, sender UDPSender) bool {
 		log.ERROR("Error when sending rpc")
 		return false
 	}
-	var unmarchaledMsg rpcmarshal.RPC
-	rpcmarshal.RpcUnmarshal(resMessage, &unmarchaledMsg)
+	var rpcMessage rpcmarshal.RPC
+	rpcmarshal.RpcUnmarshal(resMessage, &rpcMessage)
 	return true
 }
 
