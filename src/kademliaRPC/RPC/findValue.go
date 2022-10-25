@@ -24,7 +24,7 @@ func FindValueRequest(valueID id.KademliaID, target contact.Contact, sender UDPS
 	)
 
 	resMessage, err := sender(parseIP(target.Address), 4001, message)
-	if isError(err) {
+	if isError(err) || resMessage == nil {
 		return stored.Value{}, err
 	}
 
@@ -41,7 +41,7 @@ func FindValueRequest(valueID id.KademliaID, target contact.Contact, sender UDPS
 // Checks own stored values for Value with ID valueID, if found add value to
 // rpc response message, otherwise send message without a value
 // (thereby Content will be nil).
-func FindValueResponse(target contact.Contact, valueID id.KademliaID, sender UDPSender) []byte {
+func FindValueResponse(target contact.Contact, valueID id.KademliaID) []byte {
 	rpcMessage := rpcmarshal.RPC{
 		Cmd:     "RESP",
 		Contact: *contact.GetInstance(),

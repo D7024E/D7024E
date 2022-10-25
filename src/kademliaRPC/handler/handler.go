@@ -31,7 +31,7 @@ func HandleCMD(msg []byte) []byte {
 	case "FINO":
 		res = rpc.FindNodeResponse(rpcMessage.ID, rpcMessage.Contact)
 	case "FIVA":
-		res = rpc.FindValueResponse(rpcMessage.Contact, rpcMessage.ID, sender.UDPSender)
+		res = rpc.FindValueResponse(rpcMessage.Contact, rpcMessage.ID)
 	default:
 		log.ERROR("UNKNOWN CMD")
 	}
