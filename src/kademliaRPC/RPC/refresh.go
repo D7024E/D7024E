@@ -17,21 +17,20 @@ func RefreshRequest(valueID id.KademliaID, target contact.Contact, sender UDPSen
 			Contact: *contact.GetInstance(),
 		},
 		&message)
-	resMessage, err := sender(parseIP(target.Address), 4001, message)
 
-	if err != nil {
+	resMessage, err := sender(parseIP(target.Address), 4001, message)
+	if err != nil || resMessage == nil {
 		log.ERROR("Error when sending rpc")
 		return false
 	}
 
 	var rpcMessage rpcmarshal.RPC
 	rpcmarshal.RpcUnmarshal(resMessage, &rpcMessage)
-
-	return !isError(err)
+	return true
 }
 
 // Respond to a refresh unless the node does not hold the value.
-func RefreshResponse(valueID id.KademliaID, target contact.Contact, sender UDPSender) []byte {
+func RefreshResponse(valueID id.KademliaID, target contact.Contact) []byte {
 	_, err := stored.GetInstance().FindValue(valueID)
 	if err == nil {
 		var message []byte

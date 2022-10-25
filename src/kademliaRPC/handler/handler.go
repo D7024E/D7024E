@@ -23,9 +23,9 @@ func HandleCMD(msg []byte) []byte {
 
 	switch rpcMessage.Cmd {
 	case "PING":
-		res = rpc.Pong(rpcMessage.Contact, sender.UDPSender)
+		res = rpc.Pong(rpcMessage.Contact)
 	case "RESH":
-		res = rpc.RefreshResponse(rpcMessage.ID, rpcMessage.Contact, sender.UDPSender)
+		res = rpc.RefreshResponse(rpcMessage.ID, rpcMessage.Contact)
 	case "STRE":
 		res = rpc.StoreResponse(rpcMessage.Contact, rpcMessage.Content, sender.UDPSender)
 	case "FINO":
