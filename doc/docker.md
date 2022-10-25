@@ -32,3 +32,10 @@ How to setup a docker swarm, can be found here, https://docs.docker.com/engine/r
 ### Exit: 
 > docker swarm leave --force
 
+# CLI
+In order to access a running nodes active terminal use the command:
+> docker  attach <"the nodes id">
+
+Beware that closing this terminal process will close the node. For testing purposes you can use this randomly genated kademlia hash.
+> 6b5106626a8bcfa1d12a940294d286aa2ae0f54c
+

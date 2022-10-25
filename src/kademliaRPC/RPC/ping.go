@@ -2,37 +2,38 @@ package rpc
 
 import (
 	"D7024E/kademliaRPC/rpcmarshal"
-	"D7024E/network/requestHandler"
 	"D7024E/node/contact"
-	"net"
 )
 
 // Ping target node, if there is a response return true, otherwise false.
 func Ping(target contact.Contact, sender UDPSender) bool {
-	reqID := newValidRequestID()
 	var msg []byte
 	rpcmarshal.RpcMarshal(
 		rpcmarshal.RPC{
 			Cmd:     "PING",
 			Contact: *contact.GetInstance(),
-			ReqID:   reqID,
 		},
 		&msg)
-	ip := net.ParseIP(target.Address)
-	sender(ip, 4001, msg)
-	err := requestHandler.GetInstance().ReadResponse(reqID, &msg)
-	return !isError(err)
+
+	resMessage, err := sender(parseIP(target.Address), 4001, msg)
+	if isError(err) || resMessage == nil {
+		return false
+	}
+
+	var rpcMessage rpcmarshal.RPC
+	rpcmarshal.RpcUnmarshal(resMessage, &rpcMessage)
+	return true
 }
 
 // Respond to ping.
-func Pong(target contact.Contact, reqID string, sender UDPSender) {
+func Pong(target contact.Contact) []byte {
 	var msg []byte
 	rpcmarshal.RpcMarshal(
 		rpcmarshal.RPC{
 			Cmd:     "RESP",
 			Contact: *contact.GetInstance(),
-			ReqID:   reqID,
 		},
 		&msg)
-	sender(net.ParseIP(target.Address), 4001, msg)
+
+	return msg
 }

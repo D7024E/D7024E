@@ -1,4 +1,5 @@
 cd ./src
+go clean -testcache .
 go test -p 1 -coverprofile cover.out =./... ./...
 echo "-------------------------------------------------------------"
 go tool cover -func cover.out 

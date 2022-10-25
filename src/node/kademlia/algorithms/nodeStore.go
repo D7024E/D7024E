@@ -25,6 +25,7 @@ func AlphaNodeStoreRec(value stored.Value, store storeRPC, lookup lookupAlgorith
 		alphaClosest = alphaClosest[:environment.Alpha]
 	}
 	var wg sync.WaitGroup
+	lock := sync.Mutex{}
 	completed := true
 	for _, c := range alphaClosest {
 		wg.Add(1)
@@ -33,6 +34,8 @@ func AlphaNodeStoreRec(value stored.Value, store storeRPC, lookup lookupAlgorith
 			defer wg.Done()
 			val := store(target, value, sender.UDPSender)
 			if !val {
+				lock.Lock()
+				defer lock.Unlock()
 				completed = val
 			}
 		}()

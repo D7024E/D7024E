@@ -3,7 +3,6 @@ package rpc
 import (
 	kademliaErrors "D7024E/errors"
 	"D7024E/kademliaRPC/rpcmarshal"
-	"D7024E/network/requestHandler"
 	"D7024E/node/contact"
 	"D7024E/node/stored"
 	"errors"
@@ -12,7 +11,7 @@ import (
 )
 
 // UDPSender mockup that simulates a successful response.
-func senderFindValueMockSuccess(_ net.IP, _ int, message []byte) {
+func senderFindValueMockSuccess(_ net.IP, _ int, message []byte) ([]byte, error) {
 	var request rpcmarshal.RPC
 	rpcmarshal.RpcUnmarshal(message, &request)
 
@@ -21,18 +20,14 @@ func senderFindValueMockSuccess(_ net.IP, _ int, message []byte) {
 		rpcmarshal.RPC{
 			Cmd:     "RESP",
 			Contact: *contact.GetInstance(),
-			ReqID:   request.ReqID,
 			Content: testValue(),
 		},
 		&response)
-
-	requestHandler.GetInstance().WriteRespone(
-		request.ReqID,
-		response)
+	return response, nil
 }
 
 // UDPSender mockup that simulates value not found.
-func senderFindValueMockNotFound(_ net.IP, _ int, message []byte) {
+func senderFindValueMockNotFound(_ net.IP, _ int, message []byte) ([]byte, error) {
 	var request rpcmarshal.RPC
 	rpcmarshal.RpcUnmarshal(message, &request)
 
@@ -41,28 +36,16 @@ func senderFindValueMockNotFound(_ net.IP, _ int, message []byte) {
 		rpcmarshal.RPC{
 			Cmd:     "RESP",
 			Contact: *contact.GetInstance(),
-			ReqID:   request.ReqID,
 			Content: stored.Value{},
 		},
 		&response)
-
-	requestHandler.GetInstance().WriteRespone(
-		request.ReqID,
-		response)
-}
-
-// UDPSender mockup that simulates a response.
-func senderFindValueMock(_ net.IP, _ int, message []byte) {
-	var request rpcmarshal.RPC
-	rpcmarshal.RpcUnmarshal(message, &request)
-
-	requestHandler.GetInstance().WriteRespone(
-		request.ReqID,
-		message)
+	return response, nil
 }
 
 // UDPSender mockup that simulates no response.
-func senderFindValueMockFail(_ net.IP, _ int, _ []byte) {}
+func senderFindValueMockFail(_ net.IP, _ int, _ []byte) ([]byte, error) {
+	return nil, errors.New("sender error")
+}
 
 // Test FindValueRequest if valid response gets the correct output.
 func TestFindValueRequestValidResponse(t *testing.T) {
@@ -97,18 +80,11 @@ func TestFindValueRequestValueNotFound(t *testing.T) {
 // Test FindValueResponse if correct response is given.
 func TestFindValueResponseFoundValue(t *testing.T) {
 	value := testValue()
-	reqID := newValidRequestID()
 	err := stored.GetInstance().Store(value)
 	if err != nil {
 		t.FailNow()
 	}
-	FindValueResponse(testContact(), reqID, value.ID, senderFindValueMock)
-
-	var response []byte
-	err = requestHandler.GetInstance().ReadResponse(reqID, &response)
-	if err != nil {
-		t.Fatalf("no response")
-	}
+	response := FindValueResponse(testContact(), value.ID)
 
 	var rpcResponse rpcmarshal.RPC
 	rpcmarshal.RpcUnmarshal(response, &rpcResponse)
@@ -116,7 +92,6 @@ func TestFindValueResponseFoundValue(t *testing.T) {
 		&rpcmarshal.RPC{
 			Cmd:     "RESP",
 			Contact: *contact.GetInstance(),
-			ReqID:   reqID,
 			Content: value,
 		}) {
 		t.Fatalf("invalid response")

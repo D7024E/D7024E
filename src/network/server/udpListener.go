@@ -17,9 +17,12 @@ func UDPListener(ip net.IP, port int) {
 		log.INFO("Setup for listening to udp over %v:%v", ip, port)
 	}
 	defer connection.Close()
+
 	for {
 		buffer := make([]byte, 4096)
-		n, _, _ := connection.ReadFromUDP(buffer)
-		go handler.HandleCMD((buffer[0:n]))
+		n, addr, _ := connection.ReadFromUDP(buffer)
+		res := handler.HandleCMD((buffer[0:n]))
+		connection.WriteToUDP(res, addr)
+
 	}
 }

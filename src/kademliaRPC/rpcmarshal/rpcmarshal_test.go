@@ -16,8 +16,7 @@ func TestRpcMarshalSuccess(t *testing.T) {
 			ID:      id.NewRandomKademliaID(),
 			Address: "0.0.0.0",
 		},
-		ReqID: "THIS IS REQUEST ID",
-		ID:    *id.NewRandomKademliaID(),
+		ID: *id.NewRandomKademliaID(),
 		Content: stored.Value{
 			Data:   "THIS IS DATA",
 			ID:     *id.NewRandomKademliaID(),
@@ -46,8 +45,7 @@ func TestRpcMarshalFail(t *testing.T) {
 			ID:      id.NewRandomKademliaID(),
 			Address: "0.0.0.0",
 		},
-		ReqID: "THIS IS REQUEST ID 2",
-		ID:    *id.NewRandomKademliaID(),
+		ID: *id.NewRandomKademliaID(),
 		Content: stored.Value{
 			Data:   "THIS IS DATA 2",
 			ID:     *id.NewRandomKademliaID(),
@@ -60,7 +58,6 @@ func TestRpcMarshalFail(t *testing.T) {
 		"Contact":{
 			"ID":[33,15,199,187,129,134,57,172,72,164,198,175,162,241,88,26,139,149,37,226],
 			"Address":"0.0.0.0"},
-		"ReqID":"THIS IS REQUEST ID",
 		"ID":[15,218,104,146,127,43,47,248,54,247,53,120,219,15,165,76,41,247,253,146],
 		"Content":{
 			"name":"THIS IS DATA",
@@ -83,8 +80,7 @@ func TestRPCEqualsSuccess(t *testing.T) {
 			ID:      id.NewRandomKademliaID(),
 			Address: "0.0.0.0",
 		},
-		ReqID: "THIS IS REQUEST ID",
-		ID:    *id.NewRandomKademliaID(),
+		ID: *id.NewRandomKademliaID(),
 		Content: stored.Value{
 			Data:   "THIS IS DATA",
 			ID:     *id.NewRandomKademliaID(),
@@ -105,8 +101,7 @@ func TestRPCEqualsFail(t *testing.T) {
 			ID:      id.NewRandomKademliaID(),
 			Address: "0.0.0.0",
 		},
-		ReqID: "THIS IS REQUEST ID",
-		ID:    *id.NewRandomKademliaID(),
+		ID: *id.NewRandomKademliaID(),
 		Content: stored.Value{
 			Data:   "THIS IS DATA",
 			ID:     *id.NewRandomKademliaID(),
@@ -120,8 +115,7 @@ func TestRPCEqualsFail(t *testing.T) {
 			ID:      id.NewRandomKademliaID(),
 			Address: "0.0.0.0",
 		},
-		ReqID: "THIS IS REQUEST ID 2",
-		ID:    *id.NewRandomKademliaID(),
+		ID: *id.NewRandomKademliaID(),
 		Content: stored.Value{
 			Data:   "THIS IS DATA 2",
 			ID:     *id.NewRandomKademliaID(),
@@ -156,18 +150,6 @@ func TestRPCEqualsFailMissingContact(t *testing.T) {
 		ID:      id.NewRandomKademliaID(),
 		Address: "0.0.0.0",
 	}
-	if rpc.Equals(&rpc2) {
-		t.FailNow()
-	} else if rpc2.Equals(&rpc) {
-		t.FailNow()
-	}
-}
-
-// Test RPC Equals for fail case with missing ReqID.
-func TestRPCEqualsFailMissingReqID(t *testing.T) {
-	rpc := RPC{}
-	rpc2 := rpc
-	rpc2.ReqID = "THIS IS REQUEST ID"
 	if rpc.Equals(&rpc2) {
 		t.FailNow()
 	} else if rpc2.Equals(&rpc) {

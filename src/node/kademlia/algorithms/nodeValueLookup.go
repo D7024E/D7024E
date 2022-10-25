@@ -26,6 +26,7 @@ func NodeValueLookup(valueID id.KademliaID) (stored.Value, error) {
 func alphaNodeValueLookup(valueID id.KademliaID, alphaClosest []contact.Contact, fn findValueRPC) (stored.Value, error) {
 	var wg sync.WaitGroup
 	var result []stored.Value
+	lock := sync.Mutex{}
 	for _, c := range alphaClosest {
 		wg.Add(1)
 		target := c
@@ -33,6 +34,8 @@ func alphaNodeValueLookup(valueID id.KademliaID, alphaClosest []contact.Contact,
 			defer wg.Done()
 			val, err := fn(valueID, target, sender.UDPSender)
 			if err == nil {
+				lock.Lock()
+				defer lock.Unlock()
 				result = append(result, val)
 			}
 		}()
