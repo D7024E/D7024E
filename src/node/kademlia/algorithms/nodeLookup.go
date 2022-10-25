@@ -25,9 +25,14 @@ func NodeLookup(targetID id.KademliaID) []contact.Contact {
 
 // Algorithm for Node lookup.
 func NodeLookupRec(targetID id.KademliaID, batch []contact.Contact, findNode findNodeRPC, ping pingRPC) []contact.Contact {
-	batch = getAllDistances(batch)
-	batch = removeDeadNodes(batch, ping)
-	newBatch := findNodes(targetID, batch, findNode)
+	var newBatch [][]contact.Contact
+	if batch == nil {
+		newBatch = findNodes(targetID, []contact.Contact{{ID: id.NewKademliaID("172.21.0.2"), Address: "172.21.0.2"}}, findNode)
+	} else {
+		batch = getAllDistances(batch)
+		batch = removeDeadNodes(batch, ping)
+		newBatch = findNodes(targetID, batch, findNode)
+	}
 	updatedBatch := mergeBatch(newBatch)
 	updatedBatch = removeDuplicates(updatedBatch)
 	updatedBatch = removeDeadNodes(updatedBatch, ping)
@@ -112,24 +117,24 @@ func removeDuplicates(batch []contact.Contact) []contact.Contact {
 
 // Removes dead contacts by pinging and verifying if they are alive.
 func removeDeadNodes(batch []contact.Contact, ping pingRPC) []contact.Contact {
-	var wg sync.WaitGroup
 	var deadNodes []int
-	for i := 0; i < len(batch); i++ {
-		wg.Add(1)
-		n := i
-		go func() {
-			defer wg.Done()
-			alive := ping(batch[n], sender.UDPSender)
-			if !alive {
-				deadNodes = append(deadNodes, n)
-			}
-		}()
+	for i := 0; i < len(batch); i += environment.Alpha {
+		var wg sync.WaitGroup
+		for j := i; j < min((i+environment.Alpha), len(batch)); j++ {
+			wg.Add(1)
+			n := i
+			go func() {
+				defer wg.Done()
+				alive := ping(batch[n], sender.UDPSender)
+				if !alive {
+					deadNodes = append(deadNodes, n)
+				}
+			}()
+		}
+		wg.Wait()
 	}
 
-	wg.Wait()
-
 	sort.Ints(deadNodes)
-
 	for i := 0; i < len(deadNodes); i++ {
 		idx := deadNodes[i] - i
 		if idx != len(batch)-1 {

@@ -3,11 +3,9 @@ package rpc
 import (
 	"D7024E/errors"
 	"D7024E/kademliaRPC/rpcmarshal"
-	"D7024E/network/requestHandler"
 	"D7024E/node/contact"
 	"D7024E/node/id"
 	"D7024E/node/stored"
-	"net"
 )
 
 // FIND_VALUE RPC
@@ -15,26 +13,23 @@ import (
 // have value or that the request timeout, return error. Otherwise return the
 // value ID valueID.
 func FindValueRequest(valueID id.KademliaID, target contact.Contact, sender UDPSender) (stored.Value, error) {
-	reqID := newValidRequestID()
 	var message []byte
 	rpcmarshal.RpcMarshal(
 		rpcmarshal.RPC{
 			Cmd:     "FIVA",
 			Contact: *contact.GetInstance(),
-			ReqID:   reqID,
 			ID:      valueID,
 		},
 		&message,
 	)
 
-	sender(parseIP(target.Address), 4001, message)
-	err := requestHandler.GetInstance().ReadResponse(reqID, &message)
-	if isError(err) {
+	resMessage, err := sender(parseIP(target.Address), 4001, message)
+	if isError(err) || resMessage == nil {
 		return stored.Value{}, err
 	}
 
 	var rpcMessage rpcmarshal.RPC
-	rpcmarshal.RpcUnmarshal(message, &rpcMessage)
+	rpcmarshal.RpcUnmarshal(resMessage, &rpcMessage)
 	if (stored.Value{} == rpcMessage.Content) {
 		return stored.Value{}, &errors.ValueNotFound{}
 	} else {
@@ -46,11 +41,10 @@ func FindValueRequest(valueID id.KademliaID, target contact.Contact, sender UDPS
 // Checks own stored values for Value with ID valueID, if found add value to
 // rpc response message, otherwise send message without a value
 // (thereby Content will be nil).
-func FindValueResponse(target contact.Contact, reqID string, valueID id.KademliaID, sender UDPSender) {
+func FindValueResponse(target contact.Contact, valueID id.KademliaID) []byte {
 	rpcMessage := rpcmarshal.RPC{
 		Cmd:     "RESP",
 		Contact: *contact.GetInstance(),
-		ReqID:   reqID,
 	}
 	value, err := stored.GetInstance().FindValue(valueID)
 	if err == nil {
@@ -58,5 +52,5 @@ func FindValueResponse(target contact.Contact, reqID string, valueID id.Kademlia
 	}
 	var message []byte
 	rpcmarshal.RpcMarshal(rpcMessage, &message)
-	sender(net.ParseIP(target.Address), 4001, message)
+	return message
 }

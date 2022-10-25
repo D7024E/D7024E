@@ -1,31 +1,10 @@
 package rpc
 
 import (
-	"D7024E/network/requestHandler"
-	"D7024E/node/id"
 	"net"
 )
 
-type UDPSender func(net.IP, int, []byte)
-
-// Returns a new valid requestID.
-func newValidRequestID() string {
-	// Get pointer to request id instance.
-	requestInstance := requestHandler.GetInstance()
-
-	// Find valid request id then proceed.
-	var reqID string
-	var err error
-	for {
-		reqID = id.NewRandomKademliaID().String()
-		err = requestInstance.NewRequest(reqID)
-		if err == nil {
-			break
-		}
-	}
-
-	return reqID
-}
+type UDPSender func(net.IP, int, []byte) ([]byte, error)
 
 // Verify if it is an error.
 func isError(err error) bool {

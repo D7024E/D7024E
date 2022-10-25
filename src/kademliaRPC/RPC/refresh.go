@@ -2,7 +2,7 @@ package rpc
 
 import (
 	"D7024E/kademliaRPC/rpcmarshal"
-	"D7024E/network/requestHandler"
+	"D7024E/log"
 	"D7024E/node/contact"
 	"D7024E/node/id"
 	"D7024E/node/stored"
@@ -10,22 +10,27 @@ import (
 
 // Send a refresh request to target.
 func RefreshRequest(valueID id.KademliaID, target contact.Contact, sender UDPSender) bool {
-	reqID := newValidRequestID()
 	var message []byte
 	rpcmarshal.RpcMarshal(
 		rpcmarshal.RPC{
 			Cmd:     "RESH",
 			Contact: *contact.GetInstance(),
-			ReqID:   reqID,
 		},
 		&message)
-	sender(parseIP(target.Address), 4001, message)
-	err := requestHandler.GetInstance().ReadResponse(reqID, &message)
-	return !isError(err)
+
+	resMessage, err := sender(parseIP(target.Address), 4001, message)
+	if isError(err) || resMessage == nil {
+		log.ERROR("Error when sending rpc")
+		return false
+	}
+
+	var rpcMessage rpcmarshal.RPC
+	rpcmarshal.RpcUnmarshal(resMessage, &rpcMessage)
+	return true
 }
 
 // Respond to a refresh unless the node does not hold the value.
-func RefreshResponse(valueID id.KademliaID, target contact.Contact, reqID string, sender UDPSender) {
+func RefreshResponse(valueID id.KademliaID, target contact.Contact) []byte {
 	_, err := stored.GetInstance().FindValue(valueID)
 	if err == nil {
 		var message []byte
@@ -33,9 +38,9 @@ func RefreshResponse(valueID id.KademliaID, target contact.Contact, reqID string
 			rpcmarshal.RPC{
 				Cmd:     "RESP",
 				Contact: *contact.GetInstance(),
-				ReqID:   reqID,
 			},
 			&message)
-		sender(parseIP(target.Address), 4001, message)
+		return message
 	}
+	return nil
 }
