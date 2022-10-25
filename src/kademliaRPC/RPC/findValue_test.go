@@ -85,14 +85,16 @@ func TestFindValueResponseFoundValue(t *testing.T) {
 		t.FailNow()
 	}
 	response := FindValueResponse(testContact(), value.ID)
-
 	var rpcResponse rpcmarshal.RPC
 	rpcmarshal.RpcUnmarshal(response, &rpcResponse)
 	if !rpcResponse.Equals(
 		&rpcmarshal.RPC{
 			Cmd:     "RESP",
 			Contact: *contact.GetInstance(),
-			Content: value,
+			Content: stored.Value{
+				Data: value.Data,
+				Ttl:  value.Ttl,
+			},
 		}) {
 		t.Fatalf("invalid response")
 	}

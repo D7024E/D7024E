@@ -93,7 +93,7 @@ func (stored *Stored) FindValue(valueID id.KademliaID) (Value, error) {
 	for i, item := range stored.values {
 		if valueID.Equals(&item.ID) {
 			go stored.values[i].refresh()
-			fmt.Println("[VALUES] - Find value with id: ", item)
+			fmt.Println("[VALUES] - find value: ", item)
 			if !item.isDead() {
 				return item, nil
 			} else {

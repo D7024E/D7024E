@@ -59,19 +59,17 @@ func TestRefreshRequestFail(t *testing.T) {
 
 // Test RefreshResponse that it responds and that the response is correct.
 func TestRefreshResponse(t *testing.T) {
-	valueID := *id.NewRandomKademliaID()
+	valueID := *id.NewKademliaID("TestRefreshResponse")
 	target := contact.Contact{
 		ID:      id.NewRandomKademliaID(),
 		Address: "ADDRESS",
 	}
 	stored.GetInstance().Store(stored.Value{
-		Data:   "DATA",
-		ID:     valueID,
-		Ttl:    time.Hour,
-		DeadAt: time.Now().Add(time.Hour)})
+		Data: "TestRefreshResponse",
+		Ttl:  time.Hour,
+	})
 
 	response := RefreshResponse(valueID, target)
-
 	var rpcResponse rpcmarshal.RPC
 	rpcmarshal.RpcUnmarshal(response, &rpcResponse)
 	if !rpcResponse.Equals(&rpcmarshal.RPC{
