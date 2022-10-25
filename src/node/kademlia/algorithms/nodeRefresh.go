@@ -48,7 +48,6 @@ func NodeRefreshRec(value stored.Value, alphaClosest []contact.Contact, refresh 
 
 	lock := sync.Mutex{}
 	restore := false
-	var failed []string
 	var wg sync.WaitGroup
 	for _, c := range alphaClosest {
 		wg.Add(1)
@@ -60,12 +59,10 @@ func NodeRefreshRec(value stored.Value, alphaClosest []contact.Contact, refresh 
 				lock.Lock()
 				defer lock.Unlock()
 				restore = true
-				failed = append(failed, target.Address)
 			}
 		}()
 	}
 	wg.Wait()
-	fmt.Println(failed)
 	fmt.Println("[NODE REFRESH] - sent refresh for value: ", value.ID.String())
 	if restore {
 		fmt.Println("[NODE REFRESH] - store value again, for value: ", value.ID.String())
