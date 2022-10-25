@@ -5,6 +5,7 @@ import (
 	"D7024E/node/kademlia/algorithms"
 	"D7024E/node/stored"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 )
@@ -18,6 +19,7 @@ func Objects(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 	} else {
 		value.ID = *id.NewKademliaID(value.Data)
+		fmt.Println("store value with id: ", value.ID.String())
 		if value.Ttl.Nanoseconds() == 0 {
 			value.Ttl = time.Minute
 		}
