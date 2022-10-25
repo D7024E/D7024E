@@ -17,7 +17,6 @@ func senderPingMockSuccess(_ net.IP, _ int, message []byte) ([]byte, error) {
 		rpcmarshal.RPC{
 			Cmd:     "RESP",
 			Contact: *contact.GetInstance(),
-			ReqID:   request.ReqID,
 		},
 		&response)
 	return response, nil
@@ -25,13 +24,6 @@ func senderPingMockSuccess(_ net.IP, _ int, message []byte) ([]byte, error) {
 
 // UDPSender mockup that simulates no response.
 func senderPingMockFail(_ net.IP, _ int, _ []byte) ([]byte, error) {
-	return nil, nil
-}
-
-// UDPSender mockup that simulates a response.
-func senderPingMock(_ net.IP, _ int, message []byte) ([]byte, error) {
-	var request rpcmarshal.RPC
-	rpcmarshal.RpcUnmarshal(message, &request)
 	return nil, nil
 }
 
@@ -57,18 +49,14 @@ func TestPingFail(t *testing.T) {
 
 // Test if pong does respond and that it returns correct response.
 func TestPong(t *testing.T) {
-	target := contact.Contact{
-		Address: "0.0.0.0"}
-	reqID := newValidRequestID()
-	Pong(target, reqID, senderPingMock)
-
-	var response []byte
+	target := contact.Contact{Address: "0.0.0.0"}
+	response := Pong(target)
 	var rpcResponse rpcmarshal.RPC
 	rpcmarshal.RpcUnmarshal(response, &rpcResponse)
 	if !rpcResponse.Equals(&rpcmarshal.RPC{
 		Cmd:     "RESP",
 		Contact: *contact.GetInstance(),
-		ReqID:   reqID}) {
+	}) {
 		t.Fatalf("wrong rpc response")
 	}
 }

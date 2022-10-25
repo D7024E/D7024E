@@ -2,9 +2,7 @@ package rpc
 
 import (
 	"D7024E/kademliaRPC/rpcmarshal"
-	"D7024E/log"
 	"D7024E/node/contact"
-	"net"
 )
 
 // Ping target node, if there is a response return true, otherwise false.
@@ -16,20 +14,19 @@ func Ping(target contact.Contact, sender UDPSender) bool {
 			Contact: *contact.GetInstance(),
 		},
 		&msg)
-	ip := net.ParseIP(target.Address)
-	resMessage, err := sender(ip, 4001, msg)
 
-	if err != nil {
-		log.ERROR("Error when sending rpc")
+	resMessage, err := sender(parseIP(target.Address), 4001, msg)
+	if err != nil || resMessage == nil {
 		return false
 	}
+
 	var rpcMessage rpcmarshal.RPC
 	rpcmarshal.RpcUnmarshal(resMessage, &rpcMessage)
-	return !isError(err)
+	return true
 }
 
 // Respond to ping.
-func Pong(target contact.Contact, sender UDPSender) []byte {
+func Pong(target contact.Contact) []byte {
 	var msg []byte
 	rpcmarshal.RpcMarshal(
 		rpcmarshal.RPC{
