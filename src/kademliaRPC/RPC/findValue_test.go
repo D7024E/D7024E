@@ -98,12 +98,11 @@ func TestFindValueRequestValueNotFound(t *testing.T) {
 // Test FindValueResponse if correct response is given.
 func TestFindValueResponseFoundValue(t *testing.T) {
 	value := testValue()
-	reqID := newValidRequestID()
 	err := stored.GetInstance().Store(value)
 	if err != nil {
 		t.FailNow()
 	}
-	FindValueResponse(testContact(), reqID, value.ID, senderFindValueMock)
+	FindValueResponse(testContact(), value.ID, senderFindValueMock)
 
 	var response []byte
 	err = requestHandler.GetInstance().ReadResponse(reqID, &response)

@@ -11,13 +11,11 @@ import (
 // Attempt to store value into target node. If successful return true otherwise
 // return false.
 func StoreRequest(target contact.Contact, value stored.Value, sender UDPSender) bool {
-	reqID := newValidRequestID()
 	var message []byte
 	rpcmarshal.RpcMarshal(
 		rpcmarshal.RPC{
 			Cmd:     "STRE",
 			Contact: *contact.GetInstance(),
-			ReqID:   reqID,
 			Content: value,
 		},
 		&message,
@@ -38,14 +36,13 @@ func StoreRequest(target contact.Contact, value stored.Value, sender UDPSender) 
 // STORE RPC Response
 // Stores the given value. Then return a rpc message to inform the requesting
 // node that the value is stored.
-func StoreResponse(target contact.Contact, reqID string, value stored.Value, sender UDPSender) []byte {
+func StoreResponse(target contact.Contact, value stored.Value, sender UDPSender) []byte {
 	stored.GetInstance().Store(value)
 	var message []byte
 	rpcmarshal.RpcMarshal(
 		rpcmarshal.RPC{
 			Cmd:     "RESP",
 			Contact: *contact.GetInstance(),
-			ReqID:   reqID,
 		},
 		&message,
 	)

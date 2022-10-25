@@ -2,14 +2,13 @@ package rpc
 
 import (
 	"D7024E/kademliaRPC/rpcmarshal"
-	"D7024E/network/requestHandler"
 	"D7024E/node/contact"
 	"net"
 	"testing"
 )
 
 // UDPSender mockup that simulates a successful response.
-func senderPingMockSuccess(_ net.IP, _ int, message []byte) {
+func senderPingMockSuccess(_ net.IP, _ int, message []byte) ([]byte, error) {
 	var request rpcmarshal.RPC
 	rpcmarshal.RpcUnmarshal(message, &request)
 
@@ -21,23 +20,19 @@ func senderPingMockSuccess(_ net.IP, _ int, message []byte) {
 			ReqID:   request.ReqID,
 		},
 		&response)
-
-	requestHandler.GetInstance().WriteRespone(
-		request.ReqID,
-		response)
+	return response, nil
 }
 
 // UDPSender mockup that simulates no response.
-func senderPingMockFail(_ net.IP, _ int, _ []byte) {}
+func senderPingMockFail(_ net.IP, _ int, _ []byte) ([]byte, error) {
+	return nil, nil
+}
 
 // UDPSender mockup that simulates a response.
-func senderPingMock(_ net.IP, _ int, message []byte) {
+func senderPingMock(_ net.IP, _ int, message []byte) ([]byte, error) {
 	var request rpcmarshal.RPC
 	rpcmarshal.RpcUnmarshal(message, &request)
-
-	requestHandler.GetInstance().WriteRespone(
-		request.ReqID,
-		message)
+	return nil, nil
 }
 
 // Test Ping request to node that responds.
@@ -68,11 +63,6 @@ func TestPong(t *testing.T) {
 	Pong(target, reqID, senderPingMock)
 
 	var response []byte
-	err := requestHandler.GetInstance().ReadResponse(reqID, &response)
-	if err != nil {
-		t.Fatalf("no response, when given a valid response")
-	}
-
 	var rpcResponse rpcmarshal.RPC
 	rpcmarshal.RpcUnmarshal(response, &rpcResponse)
 	if !rpcResponse.Equals(&rpcmarshal.RPC{

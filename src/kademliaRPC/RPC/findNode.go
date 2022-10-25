@@ -11,13 +11,11 @@ import (
 // FindNode RPC request
 // Retrieve k contacts from target node, return error if request timeout.
 func FindNodeRequest(target contact.Contact, kademliaID id.KademliaID, sender UDPSender) ([]contact.Contact, error) {
-	reqID := newValidRequestID()
 	var message []byte
 	rpcmarshal.RpcMarshal(
 		rpcmarshal.RPC{
 			Cmd:     "FINO",
 			Contact: *contact.GetInstance(),
-			ReqID:   reqID,
 			ID:      kademliaID,
 		},
 		&message,
@@ -33,11 +31,10 @@ func FindNodeRequest(target contact.Contact, kademliaID id.KademliaID, sender UD
 
 // Creates a response RPC struct and populates it with the K, (K = 20), closest nodes to the destination node.
 // Which is then sent back to the sender.
-func FindNodeResponse(reqID string, kademliaID id.KademliaID, target contact.Contact, sender UDPSender) []byte {
+func FindNodeResponse(kademliaID id.KademliaID, target contact.Contact, sender UDPSender) []byte {
 	rpcMessage := rpcmarshal.RPC{
 		Cmd:     "RESP",
 		Contact: *contact.GetInstance(),
-		ReqID:   reqID,
 	}
 	rpcMessage.KNodes = bucket.GetInstance().FindClosestContacts(&kademliaID, 20)
 	var message []byte

@@ -9,13 +9,11 @@ import (
 
 // Ping target node, if there is a response return true, otherwise false.
 func Ping(target contact.Contact, sender UDPSender) bool {
-	reqID := newValidRequestID()
 	var msg []byte
 	rpcmarshal.RpcMarshal(
 		rpcmarshal.RPC{
 			Cmd:     "PING",
 			Contact: *contact.GetInstance(),
-			ReqID:   reqID,
 		},
 		&msg)
 	ip := net.ParseIP(target.Address)
@@ -31,13 +29,12 @@ func Ping(target contact.Contact, sender UDPSender) bool {
 }
 
 // Respond to ping.
-func Pong(target contact.Contact, reqID string, sender UDPSender) []byte {
+func Pong(target contact.Contact, sender UDPSender) []byte {
 	var msg []byte
 	rpcmarshal.RpcMarshal(
 		rpcmarshal.RPC{
 			Cmd:     "RESP",
 			Contact: *contact.GetInstance(),
-			ReqID:   reqID,
 		},
 		&msg)
 

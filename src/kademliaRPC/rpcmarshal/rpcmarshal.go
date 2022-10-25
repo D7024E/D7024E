@@ -11,7 +11,6 @@ import (
 type RPC struct {
 	Cmd     string            `json:"cmd"`
 	Contact contact.Contact   `json:"contact"`
-	ReqID   string            `json:"reqid"`
 	ID      id.KademliaID     `json:"id"`
 	Content stored.Value      `json:"content"`
 	KNodes  []contact.Contact `json:"knodes"`
@@ -31,13 +30,6 @@ func (r1 *RPC) Equals(r2 *RPC) bool {
 	if !(reflect.ValueOf(*r1).FieldByName("Contact").IsZero()) {
 		res = res && r1.Contact.Equals(&r2.Contact)
 	} else if !(reflect.ValueOf(*r2).FieldByName("Contact").IsZero()) {
-		return false
-	}
-
-	// ReqID
-	if !(reflect.ValueOf(*r1).FieldByName("ReqID").IsZero()) {
-		res = res && (r2.ReqID == r1.ReqID)
-	} else if !(reflect.ValueOf(*r2).FieldByName("ReqID").IsZero()) {
 		return false
 	}
 

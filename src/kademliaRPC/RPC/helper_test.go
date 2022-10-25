@@ -1,7 +1,6 @@
 package rpc
 
 import (
-	"D7024E/network/requestHandler"
 	"D7024E/node/contact"
 	"D7024E/node/id"
 	"D7024E/node/stored"
@@ -25,16 +24,6 @@ func testContact() contact.Contact {
 	return contact.Contact{
 		ID:      id.NewKademliaID("CONTACT"),
 		Address: "0.0.0.0",
-	}
-}
-
-// Test to verify that a valid request id is created.
-func TestNewValidRequestIDSuccess(t *testing.T) {
-	requestInstance := requestHandler.GetInstance()
-	reqID := newValidRequestID()
-	err := requestInstance.WriteRespone(reqID, []byte("this is response"))
-	if err != nil {
-		t.FailNow()
 	}
 }
 
