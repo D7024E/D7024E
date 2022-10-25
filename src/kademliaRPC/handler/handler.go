@@ -18,7 +18,7 @@ func HandleCMD(msg []byte) []byte {
 	log.INFO(
 		"OPERATION - [%s] SENDER - [%s]",
 		rpcMessage.Cmd,
-		rpcMessage.Contact.ID.String())
+		rpcMessage.Contact.Address)
 	startTime := time.Now()
 
 	var res []byte
@@ -39,7 +39,7 @@ func HandleCMD(msg []byte) []byte {
 	log.INFO(
 		"OPERATION - [%s] SENDER - [%s] DURATION - [%s]",
 		rpcMessage.Cmd,
-		rpcMessage.Contact.ID.String(),
+		rpcMessage.Contact.Address,
 		time.Since(startTime).String())
 	return res
 }

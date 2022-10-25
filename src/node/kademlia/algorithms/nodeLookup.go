@@ -25,9 +25,14 @@ func NodeLookup(targetID id.KademliaID) []contact.Contact {
 
 // Algorithm for Node lookup.
 func NodeLookupRec(targetID id.KademliaID, batch []contact.Contact, findNode findNodeRPC, ping pingRPC) []contact.Contact {
-	batch = getAllDistances(batch)
-	batch = removeDeadNodes(batch, ping)
-	newBatch := findNodes(targetID, batch, findNode)
+	var newBatch [][]contact.Contact
+	if batch == nil {
+		newBatch = findNodes(targetID, []contact.Contact{{ID: id.NewKademliaID("172.21.0.2"), Address: "172.21.0.2"}}, findNode)
+	} else {
+		batch = getAllDistances(batch)
+		batch = removeDeadNodes(batch, ping)
+		newBatch = findNodes(targetID, batch, findNode)
+	}
 	updatedBatch := mergeBatch(newBatch)
 	updatedBatch = removeDuplicates(updatedBatch)
 	updatedBatch = removeDeadNodes(updatedBatch, ping)

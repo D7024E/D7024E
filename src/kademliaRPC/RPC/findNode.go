@@ -6,6 +6,7 @@ import (
 	"D7024E/node/bucket"
 	"D7024E/node/contact"
 	"D7024E/node/id"
+	"errors"
 )
 
 // FindNode RPC request
@@ -22,7 +23,7 @@ func FindNodeRequest(target contact.Contact, kademliaID id.KademliaID, sender UD
 	)
 	resMessage, err := sender(parseIP(target.Address), environment.Port, message)
 	if isError(err) || resMessage == nil {
-		return nil, err
+		return nil, errors.New("invalid response")
 	}
 	var rpcMessage rpcmarshal.RPC
 	rpcmarshal.RpcUnmarshal(resMessage, &rpcMessage)

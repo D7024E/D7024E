@@ -1,9 +1,11 @@
 package rpcmarshal
 
 import (
+	"D7024E/log"
 	"D7024E/node/contact"
 	"D7024E/node/id"
 	"D7024E/node/stored"
+	"bytes"
 	"encoding/json"
 	"reflect"
 )
@@ -67,5 +69,9 @@ func RpcMarshal(rpc RPC, res *[]byte) error {
 
 // Takes a marshaled message and unmarshals it to a RPC struct and writes it to res.
 func RpcUnmarshal(msg []byte, res *RPC) {
-	json.Unmarshal(msg, res)
+	msg = bytes.Trim(msg, "\x00")
+	err := json.Unmarshal(msg, res)
+	if err != nil {
+		log.ERROR("UNMARSHAL -%v", err)
+	}
 }

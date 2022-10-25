@@ -2,7 +2,6 @@ package sender
 
 import (
 	"D7024E/log"
-
 	"net"
 	"strconv"
 	"time"
@@ -19,22 +18,28 @@ func UDPSender(ip net.IP, port int, message []byte) ([]byte, error) {
 	addr := ip.String() + ":" + strconv.Itoa(port)
 	conn, err := net.Dial("udp4", addr)
 	if err != nil {
-		log.ERROR("%v", err)
+		log.ERROR("Sender - [%v]", err)
+		return nil, err
 	}
 	defer conn.Close()
 
-	res := make([]byte, 4096)
-	conn.SetReadDeadline(time.Now().Add(1 * time.Second))
-
 	_, err = conn.Write(message)
 	if err != nil {
-		log.ERROR("Something went wrong in the sender...")
+		log.ERROR("Sender - [%v]", err)
+		return nil, err
 	}
 
+	res := make([]byte, 4096)
+	err = conn.SetReadDeadline(time.Now().Add(500 * time.Millisecond))
+	if err != nil {
+		log.ERROR("Sender - [%v]", err)
+		return nil, err
+	}
 	_, err = conn.Read(res)
 	if err != nil {
-		log.ERROR("Something went wrong in the sender...")
+		log.ERROR("Sender - [%v]", err)
+		return nil, err
 	}
 
-	return res, err
+	return res, nil
 }
