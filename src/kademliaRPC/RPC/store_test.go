@@ -77,7 +77,7 @@ func TestStoreResponseSuccess(t *testing.T) {
 	}
 	value := stored.Value{
 		Data:   "DATA",
-		ID:     *id.NewRandomKademliaID(),
+		ID:     *id.NewKademliaID("DATA"),
 		Ttl:    time.Hour,
 		DeadAt: time.Now().Add(time.Hour),
 	}

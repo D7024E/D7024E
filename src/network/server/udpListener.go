@@ -12,7 +12,7 @@ import (
 func UDPListener(ip net.IP, port int) {
 	connection, err := net.ListenUDP("udp4", &net.UDPAddr{IP: ip, Port: port})
 	if err != nil {
-		log.ERROR("There was an error:", err)
+		log.ERROR("There was an error: %v", err)
 	} else {
 		log.INFO("Setup for listening to udp over %v:%v", ip, port)
 	}

@@ -13,10 +13,8 @@ import (
 // Mockup function for FindValue rpc, which always succeeds.
 func findValueSuccess(valueID id.KademliaID, _ contact.Contact, _ rpc.UDPSender) (stored.Value, error) {
 	return stored.Value{
-		Data:   "DATA",
-		ID:     valueID,
-		Ttl:    time.Hour,
-		DeadAt: time.Now().Add(time.Hour),
+		Data: "DATA",
+		Ttl:  time.Hour,
 	}, nil
 }
 
@@ -28,7 +26,7 @@ func findValueFail(id.KademliaID, contact.Contact, rpc.UDPSender) (stored.Value,
 // Test for AlphaNodesValueLookup which utilizes findValueSuccess mockup which
 // should result in the function always succeeding.
 func TestAlphaNodeValueLookupSuccess(t *testing.T) {
-	valueID := id.NewRandomKademliaID()
+	valueID := id.NewKademliaID("DATA")
 	alphaClosest := []contact.Contact{
 		{
 			ID:      id.NewRandomKademliaID(),

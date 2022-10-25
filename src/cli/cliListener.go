@@ -1,8 +1,8 @@
 package cli
 
 import (
-	"D7024E/log"
 	"bufio"
+	"fmt"
 	"os"
 )
 
@@ -10,6 +10,6 @@ func CliListener() {
 	scanner := bufio.NewScanner(os.Stdin)
 	for {
 		scanner.Scan()
-		log.INFO("%v", Handler(scanner.Text()))
+		fmt.Println(Handler(scanner.Text()))
 	}
 }

@@ -12,7 +12,7 @@ func Handler(text string) string {
 	var result string
 	switch cmd {
 	case "put":
-		result = Put(content, algorithms.NodeStore)
+		result = Put(content, algorithms.NodeStore, algorithms.NodeRefresh)
 	case "get":
 		result = Get(content, algorithms.NodeValueLookup)
 	case "forget":

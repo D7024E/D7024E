@@ -7,6 +7,7 @@ import (
 	"D7024E/node/contact"
 	"D7024E/node/id"
 	"D7024E/node/stored"
+	"fmt"
 	"sync"
 )
 
@@ -18,12 +19,13 @@ func NodeStore(value stored.Value) bool {
 	return AlphaNodeStoreRec(value, rpc.StoreRequest, NodeLookup)
 }
 
-// Store value in alpha nodes using fn.
+// Store value in alpha nodes using store rpc.
 func AlphaNodeStoreRec(value stored.Value, store storeRPC, lookup lookupAlgorithm) bool {
 	alphaClosest := lookup(value.ID)
 	if len(alphaClosest) > environment.Alpha {
 		alphaClosest = alphaClosest[:environment.Alpha]
 	}
+	fmt.Println("[NODE STORE] - storing value with id: ", value.ID.String(), " in \n", alphaClosest)
 	var wg sync.WaitGroup
 	lock := sync.Mutex{}
 	completed := true

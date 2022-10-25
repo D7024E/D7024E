@@ -235,6 +235,42 @@ func TestCleaningDeadValues(t *testing.T) {
 	}
 }
 
+// Test whether value id is added to empty refreshed.
+func TestAddRefreshAddToEmpty(t *testing.T) {
+	valueID := *id.NewRandomKademliaID()
+	stored := Stored{refreshed: []id.KademliaID{}}
+	stored.AddRefresh(valueID)
+	if len(stored.refreshed) != 1 {
+		t.Fatalf("invalid length of refreshed values")
+	} else if !stored.refreshed[0].Equals(&valueID) {
+		t.Fatalf("invalid refreshed id")
+	}
+}
+
+// Test whether value id is added to none empty refreshed.
+func TestAddRefreshNoneEmpty(t *testing.T) {
+	valueID := *id.NewRandomKademliaID()
+	stored := Stored{refreshed: []id.KademliaID{*id.NewRandomKademliaID()}}
+	stored.AddRefresh(valueID)
+	if len(stored.refreshed) != 2 {
+		t.Fatalf("invalid length of refreshed values")
+	} else if !stored.refreshed[1].Equals(&valueID) {
+		t.Fatalf("invalid refreshed id")
+	}
+}
+
+// Test wether duplicate values id are handled.
+func TestAddRefreshDuplicate(t *testing.T) {
+	valueID := *id.NewRandomKademliaID()
+	stored := Stored{refreshed: []id.KademliaID{valueID}}
+	stored.AddRefresh(valueID)
+	if len(stored.refreshed) != 1 {
+		t.Fatalf("invalid length of refreshed values")
+	} else if !stored.refreshed[0].Equals(&valueID) {
+		t.Fatalf("invalid refreshed id")
+	}
+}
+
 // Test if IsRefreshed returns the correct bool if valueID is within stored.refreshed.
 func TestIsRefreshedTrue(t *testing.T) {
 	valueID := *id.NewRandomKademliaID()

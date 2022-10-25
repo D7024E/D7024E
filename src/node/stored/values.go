@@ -3,13 +3,14 @@ package stored
 import (
 	"D7024E/errors"
 	"D7024E/node/id"
+	"fmt"
 	"sync"
 	"time"
 )
 
 type Value struct {
 	Data   string        `json:"data"` // json data as string.
-	ID     id.KademliaID `json:"id"`   // json id as kademlia id.
+	ID     id.KademliaID `json:"-"`    // json id as kademlia id.
 	Ttl    time.Duration `json:"ttl"`  // json time-to-live.
 	DeadAt time.Time     `json:"-"`    // json time where value is dead.
 }
@@ -70,25 +71,29 @@ func GetInstance() *Stored {
 
 // Store a value within stored values if values id is not already within stored values.
 func (stored *Stored) Store(val Value) error {
+	val.ID = *id.NewKademliaID(val.Data)
 	_, err := stored.FindValue(val.ID)
 	lock.Lock()
 	defer lock.Unlock()
 	val.DeadAt = time.Now().Add(val.Ttl)
 	if err != nil {
+		fmt.Println("[VALUES] - storing value with id: ", val.ID.String())
 		stored.values = append(stored.values, val)
 		return nil
 	} else {
+		fmt.Println("[VALUES] - attempt to store duplicate value with id: ", val.ID.String())
 		return &errors.ValueAlreadyExist{}
 	}
 }
 
 // Find a value within stored values.
-func (stored *Stored) FindValue(valueId id.KademliaID) (Value, error) {
+func (stored *Stored) FindValue(valueID id.KademliaID) (Value, error) {
 	lock.Lock()
 	defer lock.Unlock()
 	for i, item := range stored.values {
-		if valueId.Equals(&item.ID) {
+		if valueID.Equals(&item.ID) {
 			go stored.values[i].refresh()
+			fmt.Println("[VALUES] - find value: ", item)
 			if !item.isDead() {
 				return item, nil
 			} else {
@@ -101,6 +106,7 @@ func (stored *Stored) FindValue(valueId id.KademliaID) (Value, error) {
 
 // Delete a value with id in stored values.
 func (stored *Stored) deleteValue(valueID id.KademliaID) error {
+	fmt.Println("[VALUES] - delete value with id: ", valueID.String())
 	for i, val := range stored.values {
 		if val.ID.Equals(&valueID) {
 			stored.values = append(stored.values[:i], stored.values[i+1:]...)
@@ -125,6 +131,18 @@ func (stored *Stored) cleaningDeadValues(sleepTime time.Duration) {
 	}
 	lock.Unlock()
 	go stored.cleaningDeadValues(sleepTime)
+}
+
+// Add new value id to refresh.
+func (stored *Stored) AddRefresh(valueID id.KademliaID) {
+	lock.Lock()
+	defer lock.Unlock()
+	for _, refreshedValueID := range stored.refreshed {
+		if refreshedValueID.Equals(&valueID) {
+			return
+		}
+	}
+	stored.refreshed = append(stored.refreshed, valueID)
 }
 
 // Is refresh checks if valueID is and should be refreshed.

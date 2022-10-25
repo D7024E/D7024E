@@ -34,7 +34,10 @@ func HandleCMD(msg []byte) []byte {
 	case "FIVA":
 		res = rpc.FindValueResponse(rpcMessage.Contact, rpcMessage.ID)
 	default:
-		log.ERROR("OPERATION - [%s] SENDER - [%s] STATUS - FAILED")
+		log.ERROR(
+			"OPERATION - [%s] SENDER - [%s] STATUS - FAILED",
+			rpcMessage.Cmd,
+			rpcMessage.Contact.ID.String())
 	}
 	log.INFO(
 		"OPERATION - [%s] SENDER - [%s] DURATION - [%s]",

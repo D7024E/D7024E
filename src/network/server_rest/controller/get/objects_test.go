@@ -13,22 +13,27 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// Mockup of NodeValueLookup algorithm.
+func NodeValueLookupAlgorithmMock(valueID id.KademliaID) (stored.Value, error) {
+	return stored.GetInstance().FindValue(valueID)
+}
+
 // Test GET "/objects/{hash}" if correct status and response is given.
 // Test request that will get status 200.
 func TestObjects200(t *testing.T) {
 	// Create value
 	value := stored.Value{
-		Data:   "this is data",
-		Ttl:    time.Hour,
-		DeadAt: time.Now().Add(time.Hour),
+		Data: "this is data",
+		Ttl:  time.Hour,
 	}
-	value.ID = *id.NewKademliaID(value.Data)
+	valueID := *id.NewKademliaID(value.Data)
 
 	// Store value
 	stored.GetInstance().Store(value)
+	nvl = NodeValueLookupAlgorithmMock
 
 	// Create request
-	route := "/objects/" + value.ID.String()
+	route := "/objects/" + valueID.String()
 	req, err := http.NewRequest("GET", route, nil)
 	if err != nil {
 		t.FailNow()
@@ -36,7 +41,7 @@ func TestObjects200(t *testing.T) {
 
 	// Set request parameters
 	vars := map[string]string{
-		"hash": value.ID.String(),
+		"hash": valueID.String(),
 	}
 	req = mux.SetURLVars(req, vars)
 
@@ -53,6 +58,7 @@ func TestObjects200(t *testing.T) {
 
 	var body stored.Value
 	json.Unmarshal(rr.Body.Bytes(), &body)
+
 	if !value.Equals(&body) {
 		t.Errorf("handler returned unexpected body: got %v want %v",
 			body, value)

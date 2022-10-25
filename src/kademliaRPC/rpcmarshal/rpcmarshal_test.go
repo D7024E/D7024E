@@ -4,6 +4,7 @@ import (
 	"D7024E/node/contact"
 	"D7024E/node/id"
 	"D7024E/node/stored"
+	"fmt"
 	"testing"
 	"time"
 )
@@ -18,11 +19,10 @@ func TestRpcMarshalSuccess(t *testing.T) {
 		},
 		ID: *id.NewRandomKademliaID(),
 		Content: stored.Value{
-			Data:   "THIS IS DATA",
-			ID:     *id.NewRandomKademliaID(),
-			Ttl:    time.Second,
-			DeadAt: time.Now().Add(time.Second),
+			Data: "THIS IS DATA",
+			Ttl:  time.Second,
 		},
+		Acknowledge: true,
 	}
 	var message []byte
 	var rpc2 RPC
@@ -31,6 +31,9 @@ func TestRpcMarshalSuccess(t *testing.T) {
 		t.FailNow()
 	}
 	RpcUnmarshal(message, &rpc2)
+
+	fmt.Println(rpc)
+	fmt.Println(rpc2)
 
 	if !rpc.Equals(&rpc2) {
 		t.FailNow()
@@ -63,7 +66,8 @@ func TestRpcMarshalFail(t *testing.T) {
 			"name":"THIS IS DATA",
 			"id":[141,146,202,67,241,147,222,228,127,89,21,73,245,151,168,17,200,250,103,171],
 			"ttl":1000000000,"deadAt":"2022-09-21T15:31:33.7349182+02:00"},
-			"KNodes":null}`)
+			"KNodes":null},
+		"Acknowledge":false`)
 	var rpc2 RPC
 	RpcUnmarshal(message, &rpc2)
 

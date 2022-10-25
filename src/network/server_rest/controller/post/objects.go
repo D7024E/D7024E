@@ -21,7 +21,8 @@ func Objects(w http.ResponseWriter, r *http.Request) {
 		if value.Ttl.Nanoseconds() == 0 {
 			value.Ttl = time.Minute
 		}
-		algorithms.NodeStore(value)
+		go algorithms.NodeStore(value)
+		go algorithms.NodeRefresh(value)
 		response := "/objects/" + value.ID.String()
 		w.WriteHeader(http.StatusCreated)
 		json.NewEncoder(w).Encode(response)

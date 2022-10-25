@@ -11,11 +11,12 @@ import (
 )
 
 type RPC struct {
-	Cmd     string            `json:"cmd"`
-	Contact contact.Contact   `json:"contact"`
-	ID      id.KademliaID     `json:"id"`
-	Content stored.Value      `json:"content"`
-	KNodes  []contact.Contact `json:"knodes"`
+	Cmd         string            `json:"cmd"`
+	Contact     contact.Contact   `json:"contact"`
+	ID          id.KademliaID     `json:"id"`
+	Content     stored.Value      `json:"content"`
+	KNodes      []contact.Contact `json:"knodes"`
+	Acknowledge bool              `json:"acknowledge"`
 }
 
 // Check if two RPC are equal, return true if they are otherwise false.
@@ -56,6 +57,13 @@ func (r1 *RPC) Equals(r2 *RPC) bool {
 		return false
 	}
 
+	// Acknowledge
+	if !(reflect.ValueOf(*r1).FieldByName("Acknowledge").IsZero()) {
+		res = res && (r1.Acknowledge == r2.Acknowledge)
+	} else if !(reflect.ValueOf(*r2).FieldByName("Acknowledge").IsZero()) {
+		return false
+	}
+
 	return res
 }
 
@@ -72,6 +80,6 @@ func RpcUnmarshal(msg []byte, res *RPC) {
 	msg = bytes.Trim(msg, "\x00")
 	err := json.Unmarshal(msg, res)
 	if err != nil {
-		log.ERROR("UNMARSHAL -%v", err)
+		log.ERROR("UNMARSHAL - %v", err)
 	}
 }
