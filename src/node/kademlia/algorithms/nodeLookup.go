@@ -67,9 +67,10 @@ func min(a, b int) int {
 
 // Find all nodes from the know contacts in batch.
 func findNodes(targetID id.KademliaID, batch []contact.Contact, findNode findNodeRPC) [][]contact.Contact {
+	lock := sync.Mutex{}
+	var wg sync.WaitGroup
 	newBatch := [][]contact.Contact{batch}
 	for i := 0; i < len(batch); i += environment.Alpha {
-		var wg sync.WaitGroup
 		for j := i; j < min((i+environment.Alpha), len(batch)); j++ {
 			wg.Add(1)
 			n := j
@@ -79,6 +80,8 @@ func findNodes(targetID id.KademliaID, batch []contact.Contact, findNode findNod
 				if err != nil {
 					bucket.GetInstance().RemoveContact(batch[n])
 				} else {
+					lock.Lock()
+					defer lock.Unlock()
 					newBatch = append(newBatch, kN)
 				}
 			}()
@@ -117,16 +120,19 @@ func removeDuplicates(batch []contact.Contact) []contact.Contact {
 
 // Removes dead contacts by pinging and verifying if they are alive.
 func removeDeadNodes(batch []contact.Contact, ping pingRPC) []contact.Contact {
+	lock := sync.Mutex{}
 	var deadNodes []int
+	var wg sync.WaitGroup
 	for i := 0; i < len(batch); i += environment.Alpha {
-		var wg sync.WaitGroup
 		for j := i; j < min((i+environment.Alpha), len(batch)); j++ {
 			wg.Add(1)
-			n := i
+			n := j
 			go func() {
 				defer wg.Done()
 				alive := ping(batch[n], sender.UDPSender)
 				if !alive {
+					lock.Lock()
+					defer lock.Unlock()
 					deadNodes = append(deadNodes, n)
 				}
 			}()
