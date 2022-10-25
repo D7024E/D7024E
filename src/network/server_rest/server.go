@@ -15,7 +15,7 @@ func RestServer(ip string, port int) {
 	router := mux.NewRouter()
 	registerRoutes(router)
 	log.INFO("Setup for rest over %v:%v", ip, port)
-	log.FATAL("Rest router has stopped working", http.ListenAndServe(":4000", router)) //ip+":"+strconv.Itoa(port)
+	log.FATAL("Rest router has stopped working %v", http.ListenAndServe(":4000", router)) //ip+":"+strconv.Itoa(port)
 }
 
 // Register routes and middleware.
