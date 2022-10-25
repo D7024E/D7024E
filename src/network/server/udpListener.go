@@ -22,7 +22,6 @@ func UDPListener(ip net.IP, port int) {
 		buffer := make([]byte, 4096)
 		n, addr, _ := connection.ReadFromUDP(buffer)
 		res := handler.HandleCMD((buffer[0:n]))
-		//connection.WriteToUDP(retMessage, addr)
 		connection.WriteToUDP(res, addr)
 
 	}

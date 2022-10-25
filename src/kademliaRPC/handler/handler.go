@@ -15,11 +15,13 @@ func HandleCMD(msg []byte) []byte {
 
 	go algorithms.AddContact(rpcMessage.Contact, rpc.Ping)
 
-	log.INFO("OPERATION - [%s] SENDER - [%s]", rpcMessage.Cmd, rpcMessage.Contact.ID.String())
+	log.INFO(
+		"OPERATION - [%s] SENDER - [%s]",
+		rpcMessage.Cmd,
+		rpcMessage.Contact.ID.String())
 	startTime := time.Now()
 
 	var res []byte
-
 	switch rpcMessage.Cmd {
 	case "PING":
 		res = rpc.Pong(rpcMessage.Contact)
@@ -32,7 +34,7 @@ func HandleCMD(msg []byte) []byte {
 	case "FIVA":
 		res = rpc.FindValueResponse(rpcMessage.Contact, rpcMessage.ID)
 	default:
-		log.ERROR("UNKNOWN CMD")
+		log.ERROR("OPERATION - [%s] SENDER - [%s] STATUS - FAILED")
 	}
 	log.INFO(
 		"OPERATION - [%s] SENDER - [%s] DURATION - [%s]",
