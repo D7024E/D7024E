@@ -2,14 +2,13 @@ package rpc
 
 import (
 	"D7024E/kademliaRPC/rpcmarshal"
-	"D7024E/network/requestHandler"
 	"D7024E/node/contact"
 	"net"
 	"testing"
 )
 
 // UDPSender mockup that simulates a successful response.
-func senderPingMockSuccess(_ net.IP, _ int, message []byte) {
+func senderPingMockSuccess(_ net.IP, _ int, message []byte) ([]byte, error) {
 	var request rpcmarshal.RPC
 	rpcmarshal.RpcUnmarshal(message, &request)
 
@@ -18,26 +17,14 @@ func senderPingMockSuccess(_ net.IP, _ int, message []byte) {
 		rpcmarshal.RPC{
 			Cmd:     "RESP",
 			Contact: *contact.GetInstance(),
-			ReqID:   request.ReqID,
 		},
 		&response)
-
-	requestHandler.GetInstance().WriteRespone(
-		request.ReqID,
-		response)
+	return response, nil
 }
 
 // UDPSender mockup that simulates no response.
-func senderPingMockFail(_ net.IP, _ int, _ []byte) {}
-
-// UDPSender mockup that simulates a response.
-func senderPingMock(_ net.IP, _ int, message []byte) {
-	var request rpcmarshal.RPC
-	rpcmarshal.RpcUnmarshal(message, &request)
-
-	requestHandler.GetInstance().WriteRespone(
-		request.ReqID,
-		message)
+func senderPingMockFail(_ net.IP, _ int, _ []byte) ([]byte, error) {
+	return nil, nil
 }
 
 // Test Ping request to node that responds.
@@ -62,23 +49,14 @@ func TestPingFail(t *testing.T) {
 
 // Test if pong does respond and that it returns correct response.
 func TestPong(t *testing.T) {
-	target := contact.Contact{
-		Address: "0.0.0.0"}
-	reqID := newValidRequestID()
-	Pong(target, reqID, senderPingMock)
-
-	var response []byte
-	err := requestHandler.GetInstance().ReadResponse(reqID, &response)
-	if err != nil {
-		t.Fatalf("no response, when given a valid response")
-	}
-
+	target := contact.Contact{Address: "0.0.0.0"}
+	response := Pong(target)
 	var rpcResponse rpcmarshal.RPC
 	rpcmarshal.RpcUnmarshal(response, &rpcResponse)
 	if !rpcResponse.Equals(&rpcmarshal.RPC{
 		Cmd:     "RESP",
 		Contact: *contact.GetInstance(),
-		ReqID:   reqID}) {
+	}) {
 		t.Fatalf("wrong rpc response")
 	}
 }

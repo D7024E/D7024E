@@ -2,17 +2,17 @@ package rpc
 
 import (
 	"D7024E/kademliaRPC/rpcmarshal"
-	"D7024E/network/requestHandler"
 	"D7024E/node/contact"
 	"D7024E/node/id"
 	"D7024E/node/stored"
+	"errors"
 	"net"
 	"testing"
 	"time"
 )
 
 // UDPSender mockup that simulates a successful response.
-func senderStoreMockSuccess(_ net.IP, _ int, message []byte) {
+func senderStoreMockSuccess(_ net.IP, _ int, message []byte) ([]byte, error) {
 	var request rpcmarshal.RPC
 	rpcmarshal.RpcUnmarshal(message, &request)
 
@@ -21,27 +21,15 @@ func senderStoreMockSuccess(_ net.IP, _ int, message []byte) {
 		rpcmarshal.RPC{
 			Cmd:     "RESP",
 			Contact: *contact.GetInstance(),
-			ReqID:   request.ReqID,
 		},
 		&response,
 	)
-
-	requestHandler.GetInstance().WriteRespone(
-		request.ReqID,
-		response)
+	return response, nil
 }
 
 // UDPSender mockup that simulates no response.
-func senderStoreMockFail(_ net.IP, _ int, _ []byte) {}
-
-// UDPSender mockup that simulates a response.
-func senderStoreMock(_ net.IP, _ int, message []byte) {
-	var request rpcmarshal.RPC
-	rpcmarshal.RpcUnmarshal(message, &request)
-
-	requestHandler.GetInstance().WriteRespone(
-		request.ReqID,
-		message)
+func senderStoreMockFail(_ net.IP, _ int, _ []byte) ([]byte, error) {
+	return nil, errors.New("sender error")
 }
 
 // Test StoreRequest when valid response is given.
@@ -87,7 +75,6 @@ func TestStoreResponseSuccess(t *testing.T) {
 		ID:      id.NewRandomKademliaID(),
 		Address: "ADDRESS",
 	}
-	reqID := newValidRequestID()
 	value := stored.Value{
 		Data:   "DATA",
 		ID:     *id.NewRandomKademliaID(),
@@ -95,17 +82,11 @@ func TestStoreResponseSuccess(t *testing.T) {
 		DeadAt: time.Now().Add(time.Hour),
 	}
 
-	StoreResponse(target, reqID, value, senderStoreMock)
+	response := StoreResponse(target, value)
 
 	_, err := stored.GetInstance().FindValue(value.ID)
 	if err != nil {
 		t.Errorf("value not stored")
-	}
-
-	var response []byte
-	err = requestHandler.GetInstance().ReadResponse(reqID, &response)
-	if err != nil {
-		t.Fatalf("no response received")
 	}
 
 	var rpcResponse rpcmarshal.RPC
@@ -114,7 +95,6 @@ func TestStoreResponseSuccess(t *testing.T) {
 		&rpcmarshal.RPC{
 			Cmd:     "RESP",
 			Contact: *contact.GetInstance(),
-			ReqID:   reqID,
 		}) {
 		t.Fatalf("invalid response message sent")
 	}
