@@ -7,6 +7,7 @@ import (
 	"D7024E/node/contact"
 	"D7024E/node/id"
 	"D7024E/node/stored"
+	"fmt"
 	"sync"
 )
 
@@ -24,6 +25,7 @@ func AlphaNodeStoreRec(value stored.Value, store storeRPC, lookup lookupAlgorith
 	if len(alphaClosest) > environment.Alpha {
 		alphaClosest = alphaClosest[:environment.Alpha]
 	}
+	fmt.Println(alphaClosest)
 	var wg sync.WaitGroup
 	lock := sync.Mutex{}
 	completed := true

@@ -2,7 +2,7 @@ package get
 
 import (
 	"D7024E/node/id"
-	"D7024E/node/stored"
+	"D7024E/node/kademlia/algorithms"
 	"encoding/json"
 	"net/http"
 
@@ -17,7 +17,7 @@ func Objects(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 	}
-	value, err := stored.GetInstance().FindValue(*valueID)
+	value, err := algorithms.NodeValueLookup(*valueID)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 	} else {

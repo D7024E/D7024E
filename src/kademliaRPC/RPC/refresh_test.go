@@ -18,8 +18,9 @@ func senderRefreshMockSuccess(_ net.IP, _ int, message []byte) ([]byte, error) {
 	var response []byte
 	rpcmarshal.RpcMarshal(
 		rpcmarshal.RPC{
-			Cmd:     "RESP",
-			Contact: *contact.GetInstance(),
+			Cmd:         "RESP",
+			Contact:     *contact.GetInstance(),
+			Acknowledge: true,
 		},
 		&response)
 	return response, nil
@@ -74,8 +75,9 @@ func TestRefreshResponse(t *testing.T) {
 	var rpcResponse rpcmarshal.RPC
 	rpcmarshal.RpcUnmarshal(response, &rpcResponse)
 	if !rpcResponse.Equals(&rpcmarshal.RPC{
-		Cmd:     "RESP",
-		Contact: *contact.GetInstance()}) {
+		Cmd:         "RESP",
+		Contact:     *contact.GetInstance(),
+		Acknowledge: true}) {
 		t.Fatalf("wrong rpc response")
 	}
 

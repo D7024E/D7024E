@@ -42,7 +42,7 @@ func alphaNodeValueLookup(valueID id.KademliaID, alphaClosest []contact.Contact,
 	}
 	wg.Wait()
 	for _, v := range result {
-		if v.ID == valueID {
+		if id.NewKademliaID(v.Data).Equals(&valueID) {
 			return v, nil
 		}
 	}

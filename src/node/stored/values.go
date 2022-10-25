@@ -70,6 +70,7 @@ func GetInstance() *Stored {
 
 // Store a value within stored values if values id is not already within stored values.
 func (stored *Stored) Store(val Value) error {
+	val.ID = *id.NewKademliaID(val.Data)
 	_, err := stored.FindValue(val.ID)
 	lock.Lock()
 	defer lock.Unlock()
