@@ -4,7 +4,6 @@ import (
 	rpc "D7024E/kademliaRPC/RPC"
 	"D7024E/kademliaRPC/rpcmarshal"
 	"D7024E/log"
-	"D7024E/network/sender"
 	"D7024E/node/kademlia/algorithms"
 	"time"
 )
@@ -27,7 +26,7 @@ func HandleCMD(msg []byte) []byte {
 	case "RESH":
 		res = rpc.RefreshResponse(rpcMessage.ID, rpcMessage.Contact)
 	case "STRE":
-		res = rpc.StoreResponse(rpcMessage.Contact, rpcMessage.Content, sender.UDPSender)
+		res = rpc.StoreResponse(rpcMessage.Contact, rpcMessage.Content)
 	case "FINO":
 		res = rpc.FindNodeResponse(rpcMessage.ID, rpcMessage.Contact)
 	case "FIVA":

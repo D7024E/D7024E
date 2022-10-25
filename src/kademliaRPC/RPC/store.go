@@ -21,7 +21,7 @@ func StoreRequest(target contact.Contact, value stored.Value, sender UDPSender) 
 		&message,
 	)
 	resMessage, err := sender(parseIP(target.Address), 4001, message)
-	if err != nil {
+	if isError(err) || resMessage == nil {
 		log.ERROR("Error when sending rpc")
 		return false
 	}
@@ -29,14 +29,14 @@ func StoreRequest(target contact.Contact, value stored.Value, sender UDPSender) 
 	var rpcMessage rpcmarshal.RPC
 	rpcmarshal.RpcUnmarshal(resMessage, &rpcMessage)
 
-	return !isError(err)
+	return true
 
 }
 
 // STORE RPC Response
 // Stores the given value. Then return a rpc message to inform the requesting
 // node that the value is stored.
-func StoreResponse(target contact.Contact, value stored.Value, sender UDPSender) []byte {
+func StoreResponse(target contact.Contact, value stored.Value) []byte {
 	stored.GetInstance().Store(value)
 	var message []byte
 	rpcmarshal.RpcMarshal(
