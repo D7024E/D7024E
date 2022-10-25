@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func Handle(text string) string {
+func Handler(text string) string {
 	cmd, content := parseInput(text)
 
 	var result string
@@ -15,6 +15,8 @@ func Handle(text string) string {
 		result = Put(content, algorithms.NodeStore)
 	case "get":
 		result = Get(content, algorithms.NodeValueLookup)
+	case "forget":
+		result = Forget(content)
 	case "exit":
 		os.Exit(1)
 	default:
