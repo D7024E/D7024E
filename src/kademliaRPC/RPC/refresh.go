@@ -15,6 +15,7 @@ func RefreshRequest(valueID id.KademliaID, target contact.Contact, sender UDPSen
 		rpcmarshal.RPC{
 			Cmd:     "RESH",
 			Contact: *contact.GetInstance(),
+			ID:      valueID,
 		},
 		&message)
 
@@ -32,16 +33,10 @@ func RefreshRequest(valueID id.KademliaID, target contact.Contact, sender UDPSen
 // Respond to a refresh unless the node does not hold the value.
 func RefreshResponse(valueID id.KademliaID, target contact.Contact) []byte {
 	_, err := stored.GetInstance().FindValue(valueID)
-
 	rpcMessage := rpcmarshal.RPC{
-		Cmd:     "RESP",
-		Contact: *contact.GetInstance(),
-	}
-
-	if isError(err) {
-		rpcMessage.Acknowledge = false
-	} else {
-		rpcMessage.Acknowledge = true
+		Cmd:         "RESP",
+		Contact:     *contact.GetInstance(),
+		Acknowledge: !isError(err),
 	}
 
 	var message []byte

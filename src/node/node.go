@@ -21,7 +21,7 @@ func StartKademliaNode() {
 	} else {
 		algorithms.NodeLookup(*id.NewKademliaID("172.21.0.2"))
 	}
-	log.INFO("CONNECTED - [KADEMLIA NETWORK]")
+	log.INFO("[NODE] - CONNECTED - [KADEMLIA NETWORK]")
 	go func() {
 		time.Sleep(5 * time.Second)
 		kClosest := algorithms.NodeLookup(*id.NewKademliaID("172.21.0.2"))
@@ -30,6 +30,6 @@ func StartKademliaNode() {
 			kID = append(kID, c.ID.String())
 		}
 		res := "\n" + strings.Join(kID, "          \n")
-		fmt.Println("TABLE: [" + res + "]")
+		fmt.Println("[NODE] - TABLE: [" + res + "]")
 	}()
 }

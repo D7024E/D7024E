@@ -4,7 +4,6 @@ import (
 	"D7024E/node/id"
 	"D7024E/node/kademlia/algorithms"
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -15,7 +14,6 @@ func Objects(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
 	valueID, err := id.String2KademliaID(params["hash"])
-	fmt.Println("get value with id: ", valueID.String())
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 	}

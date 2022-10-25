@@ -32,7 +32,7 @@ func NodeRefresh(value stored.Value) {
 // Refresh a stored value in alpha closest nodes.
 func NodeRefreshRec(value stored.Value, alphaClosest []contact.Contact, refresh RefreshRPC) bool {
 	if !stored.GetInstance().IsRefreshed(value.ID) {
-		fmt.Println("stopped refresh for: ", value.ID.String())
+		fmt.Println("[NODE REFRESH] - stopped refresh for: ", value.ID.String())
 		return false
 	} else {
 		go func() {
@@ -48,6 +48,7 @@ func NodeRefreshRec(value stored.Value, alphaClosest []contact.Contact, refresh 
 
 	lock := sync.Mutex{}
 	restore := false
+	var failed []string
 	var wg sync.WaitGroup
 	for _, c := range alphaClosest {
 		wg.Add(1)
@@ -59,13 +60,15 @@ func NodeRefreshRec(value stored.Value, alphaClosest []contact.Contact, refresh 
 				lock.Lock()
 				defer lock.Unlock()
 				restore = true
+				failed = append(failed, target.Address)
 			}
 		}()
 	}
 	wg.Wait()
-	fmt.Println("finished refresh for: ", value.ID.String())
+	fmt.Println(failed)
+	fmt.Println("[NODE REFRESH] - sent refresh for value: ", value.ID.String())
 	if restore {
-		fmt.Println("store value again, for value: ", value.ID.String())
+		fmt.Println("[NODE REFRESH] - store value again, for value: ", value.ID.String())
 		go NodeStore(value)
 	}
 	return true
