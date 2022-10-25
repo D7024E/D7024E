@@ -16,7 +16,7 @@ func Ping(target contact.Contact, sender UDPSender) bool {
 		&msg)
 
 	resMessage, err := sender(parseIP(target.Address), 4001, msg)
-	if err != nil || resMessage == nil {
+	if isError(err) || resMessage == nil {
 		return false
 	}
 

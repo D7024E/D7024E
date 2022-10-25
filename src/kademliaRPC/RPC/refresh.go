@@ -19,7 +19,7 @@ func RefreshRequest(valueID id.KademliaID, target contact.Contact, sender UDPSen
 		&message)
 
 	resMessage, err := sender(parseIP(target.Address), 4001, message)
-	if err != nil || resMessage == nil {
+	if isError(err) || resMessage == nil {
 		log.ERROR("Error when sending rpc")
 		return false
 	}

@@ -21,7 +21,7 @@ func FindNodeRequest(target contact.Contact, kademliaID id.KademliaID, sender UD
 		&message,
 	)
 	resMessage, err := sender(parseIP(target.Address), environment.Port, message)
-	if isError(err) {
+	if isError(err) || resMessage == nil {
 		return nil, err
 	}
 	var rpcMessage rpcmarshal.RPC
@@ -31,7 +31,7 @@ func FindNodeRequest(target contact.Contact, kademliaID id.KademliaID, sender UD
 
 // Creates a response RPC struct and populates it with the K, (K = 20), closest nodes to the destination node.
 // Which is then sent back to the sender.
-func FindNodeResponse(kademliaID id.KademliaID, target contact.Contact, sender UDPSender) []byte {
+func FindNodeResponse(kademliaID id.KademliaID, target contact.Contact) []byte {
 	rpcMessage := rpcmarshal.RPC{
 		Cmd:     "RESP",
 		Contact: *contact.GetInstance(),
