@@ -226,12 +226,12 @@ func TestDeleteValueInAnNonEmptyListFail(t *testing.T) {
 // Test if dead values are cleaned by function correctly.
 func TestCleaningDeadValues(t *testing.T) {
 	stored := Stored{}
-	values := []Value{{ID: *id.NewRandomKademliaID()}}
+	values := []Value{{ID: *id.NewRandomKademliaID(), Ttl: time.Nanosecond}}
 	stored.values = values
 	go stored.cleaningDeadValues(time.Duration(0))
 	time.Sleep(1)
 	if len(stored.values) != 0 {
-		t.FailNow()
+		t.Fatalf("cleaning not cleaning dead values")
 	}
 }
 
