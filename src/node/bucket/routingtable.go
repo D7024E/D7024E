@@ -1,7 +1,6 @@
 package bucket
 
 import (
-	"D7024E/log"
 	"D7024E/node/contact"
 	"D7024E/node/id"
 	"sync"
@@ -19,7 +18,7 @@ func GetInstance() *RoutingTable {
 		lock.Lock()
 		defer lock.Unlock()
 		if instance == nil {
-			instance = newRoutingTable()
+			instance = NewRoutingTable()
 		}
 	}
 	return instance
@@ -72,8 +71,7 @@ func (rt *RoutingTable) FindClosestContacts(target *id.KademliaID, count int) []
 	return candidates.GetContacts(count)
 }
 
-func newRoutingTable() *RoutingTable {
-	log.INFO("New routing table created")
+func NewRoutingTable() *RoutingTable {
 	rt := &RoutingTable{}
 	for i := 0; i < id.IDLength*8; i++ {
 		rt.buckets[i] = newBucket()

@@ -17,16 +17,9 @@ func init() {
 }
 
 func StartKademliaNode() {
-	log.INFO("[NODE] - CONNECTED - [KADEMLIA NETWORK]")
 	time.Sleep(time.Duration(rand.Intn(1000)) * time.Millisecond)
-	kClosest := algorithms.NodeLookup(*contact.GetInstance().ID)
-	kAddress := []string{}
-	for _, c := range kClosest {
-		kAddress = append(kAddress, c.Address)
-	}
-	res := "\n" + strings.Join(kAddress, "          \n")
-	fmt.Println("[NODE] - TABLE: [" + res + "]")
-	fmt.Println(contact.GetInstance().Address)
+	algorithms.NodeLookup(*contact.GetInstance().ID)
+	log.INFO("[NODE] - CONNECTED - [KADEMLIA NETWORK]")
 
 	go func() {
 		time.Sleep(10 * time.Second)

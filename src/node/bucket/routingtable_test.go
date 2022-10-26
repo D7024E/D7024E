@@ -19,7 +19,7 @@ func TestGetInstance(t *testing.T) {
 
 // Verify that AddContact is called correctly.
 func TestAddContactRouting(t *testing.T) {
-	rt := newRoutingTable()
+	rt := NewRoutingTable()
 	newContact := generateContact()
 	bucketIndex := rt.getBucketIndex(newContact.ID)
 	bucket := rt.buckets[bucketIndex]
@@ -31,7 +31,7 @@ func TestAddContactRouting(t *testing.T) {
 
 // Verify that duplicate contacts can't be added.
 func TestAddContactRoutingDuplicates(t *testing.T) {
-	rt := newRoutingTable()
+	rt := NewRoutingTable()
 	newContact := generateContact()
 	bucketIndex := rt.getBucketIndex(newContact.ID)
 	bucket := rt.buckets[bucketIndex]
@@ -44,7 +44,7 @@ func TestAddContactRoutingDuplicates(t *testing.T) {
 
 // Verify that a remove contact is called correctly.
 func TestRemoveContactRouting(t *testing.T) {
-	rt := newRoutingTable()
+	rt := NewRoutingTable()
 	newContact := generateContact()
 	bucketIndex := rt.getBucketIndex(newContact.ID)
 	bucket := rt.buckets[bucketIndex]
@@ -57,7 +57,7 @@ func TestRemoveContactRouting(t *testing.T) {
 
 // Verify that the closest returned contact is correct.
 func TestFindClosestContactsKnownTarget(t *testing.T) {
-	rt := newRoutingTable()
+	rt := NewRoutingTable()
 	keyContact := generateContact()
 	rt.AddContact(keyContact)
 	for i := 0; i < BucketSize-1; i++ {
@@ -71,7 +71,7 @@ func TestFindClosestContactsKnownTarget(t *testing.T) {
 
 // Verify that FindClosestContacts does not return more contacts than exist the routing table
 func TestFindClosestContactsFewerContacts(t *testing.T) {
-	rt := newRoutingTable()
+	rt := NewRoutingTable()
 	keyContact := generateContact()
 	rt.AddContact(keyContact)
 	for i := 0; i < 4; i++ {
@@ -85,7 +85,7 @@ func TestFindClosestContactsFewerContacts(t *testing.T) {
 
 // Verify that FindClosestContacts doesn't break on a empty routing table.
 func TestFindClosestContactsEmpty(t *testing.T) {
-	rt := newRoutingTable()
+	rt := NewRoutingTable()
 	keyContact := generateContact()
 	res := rt.FindClosestContacts(keyContact.ID, 10)
 	if len(res) > 0 {
@@ -95,8 +95,8 @@ func TestFindClosestContactsEmpty(t *testing.T) {
 
 // Test that a new routing table is different.
 func TestNewRoutingTable(t *testing.T) {
-	rt1 := newRoutingTable()
-	rt2 := newRoutingTable()
+	rt1 := NewRoutingTable()
+	rt2 := NewRoutingTable()
 	rt3 := rt1
 	if rt1 == rt2 {
 		t.FailNow()
@@ -107,7 +107,7 @@ func TestNewRoutingTable(t *testing.T) {
 
 // Verify that the returned bucket index is consistent.
 func TestGetBucketIndex(t *testing.T) {
-	rt := newRoutingTable()
+	rt := NewRoutingTable()
 	keyContact := id.NewRandomKademliaID()
 	bucketIndex := rt.getBucketIndex(keyContact)
 	for i := 0; i < 100; i++ {
