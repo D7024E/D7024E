@@ -20,6 +20,7 @@ type findNodeRPC func(contact.Contact, id.KademliaID, rpc.UDPSender) ([]contact.
 // Node lookup initiator.
 func NodeLookup(targetID id.KademliaID) []contact.Contact {
 	batch := kademlia.GetInstance().RoutingTable.FindClosestContacts(&targetID, environment.Alpha)
+	batch = removeDeadNodes(batch, rpc.Ping)
 	return NodeLookupRec(targetID, batch, rpc.FindNodeRequest, rpc.Ping)
 }
 
@@ -29,8 +30,6 @@ func NodeLookupRec(targetID id.KademliaID, batch []contact.Contact, findNode fin
 	if len(batch) == 0 {
 		newBatch = findNodes(targetID, []contact.Contact{{ID: id.NewKademliaID("172.21.0.2"), Address: "172.21.0.2"}}, findNode)
 	} else {
-		batch = getAllDistances(batch)
-		batch = removeDeadNodes(batch, ping)
 		newBatch = findNodes(targetID, batch, findNode)
 	}
 	updatedBatch := mergeBatch(newBatch)
@@ -39,7 +38,7 @@ func NodeLookupRec(targetID id.KademliaID, batch []contact.Contact, findNode fin
 	updatedBatch = getAllDistances(updatedBatch)
 	updatedBatch = kademliaSort.SortContacts(updatedBatch)
 	updatedBatch = resize(updatedBatch)
-	if isSame(batch, updatedBatch) && len(batch) >= environment.Alpha {
+	if isSame(batch, updatedBatch) && len(batch) >= 2 {
 		return updatedBatch
 	} else {
 		return NodeLookupRec(targetID, updatedBatch, findNode, ping)
@@ -88,6 +87,7 @@ func findNodes(targetID id.KademliaID, batch []contact.Contact, findNode findNod
 		}
 		wg.Wait()
 	}
+	newBatch = append(newBatch, batch)
 	return newBatch
 }
 

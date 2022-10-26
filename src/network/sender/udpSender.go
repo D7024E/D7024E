@@ -30,7 +30,7 @@ func UDPSender(ip net.IP, port int, message []byte) ([]byte, error) {
 	}
 
 	res := make([]byte, 4096)
-	err = conn.SetReadDeadline(time.Now().Add(3 * time.Second))
+	err = conn.SetReadDeadline(time.Now().Add(5 * time.Second))
 	if err != nil {
 		log.ERROR("Sender - [%v]", err)
 		return nil, err
