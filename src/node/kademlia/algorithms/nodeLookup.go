@@ -7,7 +7,6 @@ import (
 	"D7024E/node/bucket"
 	"D7024E/node/contact"
 	"D7024E/node/id"
-	"D7024E/node/kademlia"
 
 	"sort"
 	"sync"
@@ -18,7 +17,7 @@ type findNodeRPC func(contact.Contact, id.KademliaID, rpc.UDPSender) ([]contact.
 
 // Node lookup initiator.
 func NodeLookup(targetID id.KademliaID) []contact.Contact {
-	batch := kademlia.GetInstance().RoutingTable.FindClosestContacts(&targetID, environment.Alpha)
+	batch := bucket.GetInstance().FindClosestContacts(&targetID, environment.Alpha)
 	var nextBatch []contact.Contact
 	for {
 		nextBatch = NodeLookupRec(targetID, batch, rpc.FindNodeRequest, rpc.Ping)
