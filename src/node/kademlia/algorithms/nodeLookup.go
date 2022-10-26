@@ -38,7 +38,15 @@ func NodeLookupRec(targetID id.KademliaID, batch []contact.Contact, findNode fin
 	updatedBatch = getAllDistances(targetID, updatedBatch)
 	updatedBatch = kademliaSort.SortContacts(updatedBatch)
 	updatedBatch = resize(updatedBatch)
-	if isSame(batch, updatedBatch) && len(batch) >= 2 {
+	// fmt.Println("previous batch:")
+	// for i := 0; i < len(batch); i++ {
+	// 	fmt.Println(batch[i])
+	// }
+	// fmt.Println("new batch:")
+	// for i := 0; i < len(updatedBatch); i++ {
+	// 	fmt.Println(updatedBatch[i])
+	// }
+	if isSame(batch, updatedBatch) && len(batch) >= 1 {
 		return updatedBatch
 	} else {
 		return NodeLookupRec(targetID, updatedBatch, findNode, ping)

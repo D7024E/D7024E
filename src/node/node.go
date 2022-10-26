@@ -29,7 +29,7 @@ func StartKademliaNode() {
 	fmt.Println(contact.GetInstance().Address)
 
 	go func() {
-		time.Sleep(time.Minute)
+		time.Sleep(10 * time.Second)
 		kClosest := bucket.GetInstance().FindClosestContacts(id.NewRandomKademliaID(), 100)
 		kAddress := []string{}
 		for _, c := range kClosest {
