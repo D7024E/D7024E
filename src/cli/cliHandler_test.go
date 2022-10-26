@@ -13,3 +13,10 @@ func TestParseInput(t *testing.T) {
 		t.FailNow()
 	}
 }
+
+func TestParseInvalidInput(t *testing.T) {
+	_, content := parseInput("a")
+	if content != "" {
+		t.FailNow()
+	}
+}
