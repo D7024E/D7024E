@@ -22,7 +22,6 @@ func NodeLookup(targetID id.KademliaID) []contact.Contact {
 	batch := bucket.GetInstance().FindClosestContacts(&targetID, environment.Alpha)
 	for {
 		fmt.Println(batch)
-		AddContacts(rt, batch, rpc.Ping)
 		if isSame(rt.FindClosestContacts(&targetID, bucket.BucketSize), batch) && len(batch) >= 2 {
 			return batch
 		} else {
@@ -40,7 +39,7 @@ func AddContacts(rt *bucket.RoutingTable, batch []contact.Contact, ping pingRPC)
 			wg.Add(1)
 			go func(target contact.Contact) {
 				defer wg.Done()
-				if (rt.FindClosestContacts(target.ID, 1)[0].ID).Equals(target.ID) {
+				if !(rt.FindClosestContacts(target.ID, 1)[0].ID).Equals(target.ID) {
 					if rpc.Ping(target, sender.UDPSender) {
 						rt.AddContact(target)
 					}
@@ -64,9 +63,7 @@ func NodeLookupRec(targetID id.KademliaID, rt *bucket.RoutingTable, findNode fin
 				kN, err := findNode(target, targetID, sender.UDPSender)
 				if err == nil {
 					rt.AddContact(target)
-					for _, nodeContact := range kN {
-						rt.AddContact(nodeContact)
-					}
+					AddContacts(rt, kN, rpc.Ping)
 				}
 			}()
 		}
