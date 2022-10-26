@@ -1,27 +1,22 @@
 package node
 
 import (
-	"D7024E/log"
 	"D7024E/node/bucket"
 	"D7024E/node/contact"
 	"D7024E/node/kademlia/algorithms"
 	"fmt"
-	"math/rand"
 	"strings"
 	"time"
 )
 
-func init() {
-	rand.Seed(time.Now().UTC().UnixNano())
-}
-
 func StartKademliaNode() {
-	time.Sleep(time.Duration(rand.Intn(1000)) * time.Millisecond)
-	algorithms.NodeLookup(*contact.GetInstance().ID)
-	log.INFO("[NODE] - CONNECTED - [KADEMLIA NETWORK]")
+	kClosest := algorithms.NodeLookup(*contact.GetInstance().ID)
+	for _, c := range kClosest {
+		bucket.GetInstance().AddContact(c)
+	}
 
 	go func() {
-		time.Sleep(10 * time.Second)
+		time.Sleep(time.Minute)
 		kClosest := bucket.GetInstance().FindClosestContacts(contact.GetInstance().ID, 100)
 		kAddress := []string{}
 		for _, c := range kClosest {

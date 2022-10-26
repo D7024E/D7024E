@@ -7,8 +7,8 @@ import (
 	"D7024E/node/bucket"
 	"D7024E/node/contact"
 	"D7024E/node/id"
+	"fmt"
 
-	"sort"
 	"sync"
 )
 
@@ -17,33 +17,53 @@ type findNodeRPC func(contact.Contact, id.KademliaID, rpc.UDPSender) ([]contact.
 
 // Node lookup initiator.
 func NodeLookup(targetID id.KademliaID) []contact.Contact {
+	rt := bucket.NewRoutingTable()
+	rt.AddContact(contact.Contact{ID: id.NewKademliaID("172.21.0.2"), Address: "172.21.0.2"})
 	batch := bucket.GetInstance().FindClosestContacts(&targetID, environment.Alpha)
-	var nextBatch []contact.Contact
 	for {
-		nextBatch = NodeLookupRec(targetID, batch, rpc.FindNodeRequest, rpc.Ping)
-		if isSame(batch, nextBatch) && len(nextBatch) >= 1 {
-			return nextBatch
+		fmt.Println(batch)
+		AddContacts(rt, batch, rpc.Ping)
+		if isSame(rt.FindClosestContacts(&targetID, bucket.BucketSize), batch) && len(batch) >= 2 {
+			return batch
 		} else {
-			batch = nextBatch
+			batch = NodeLookupRec(targetID, rt, rpc.FindNodeRequest)
 		}
+
+	}
+}
+
+// Add multiple contacts to routing table if they respond to a ping.
+func AddContacts(rt *bucket.RoutingTable, batch []contact.Contact, ping pingRPC) {
+	var wg sync.WaitGroup
+	for i := 0; i < len(batch); i += environment.Alpha {
+		for j := 0; j < min(len(batch), environment.Alpha); j++ {
+			wg.Add(1)
+			go func(target contact.Contact) {
+				defer wg.Done()
+				if (rt.FindClosestContacts(target.ID, 1)[0].ID).Equals(target.ID) {
+					if rpc.Ping(target, sender.UDPSender) {
+						rt.AddContact(target)
+					}
+				}
+			}(batch[j])
+		}
+		wg.Wait()
 	}
 }
 
 // Algorithm for Node lookup.
-func NodeLookupRec(targetID id.KademliaID, batch []contact.Contact, findNode findNodeRPC, ping pingRPC) []contact.Contact {
-	if len(batch) == 0 {
-		batch = append(batch, contact.Contact{ID: id.NewKademliaID("172.21.0.2"), Address: "172.21.0.2"})
-	}
-	rt := bucket.NewRoutingTable()
+func NodeLookupRec(targetID id.KademliaID, rt *bucket.RoutingTable, findNode findNodeRPC) []contact.Contact {
+	batch := rt.FindClosestContacts(&targetID, bucket.BucketSize)
 	var wg sync.WaitGroup
 	for i := 0; i < len(batch); i += environment.Alpha {
 		for j := i; j < min((i+environment.Alpha), len(batch)); j++ {
 			wg.Add(1)
-			n := j
+			target := batch[j]
 			go func() {
 				defer wg.Done()
-				kN, err := findNode(batch[n], targetID, sender.UDPSender)
+				kN, err := findNode(target, targetID, sender.UDPSender)
 				if err == nil {
+					rt.AddContact(target)
 					for _, nodeContact := range kN {
 						rt.AddContact(nodeContact)
 					}
@@ -52,7 +72,7 @@ func NodeLookupRec(targetID id.KademliaID, batch []contact.Contact, findNode fin
 		}
 		wg.Wait()
 	}
-	return removeDeadNodes(rt.FindClosestContacts(&targetID, bucket.BucketSize), ping)
+	return rt.FindClosestContacts(&targetID, bucket.BucketSize)
 }
 
 // min value of a and b.
@@ -62,41 +82,6 @@ func min(a, b int) int {
 	} else {
 		return b
 	}
-}
-
-// Removes dead contacts by pinging and verifying if they are alive.
-func removeDeadNodes(batch []contact.Contact, ping pingRPC) []contact.Contact {
-	lock := sync.Mutex{}
-	var deadNodes []int
-	var wg sync.WaitGroup
-	for i := 0; i < len(batch); i += environment.Alpha {
-		for j := i; j < min((i+environment.Alpha), len(batch)); j++ {
-			wg.Add(1)
-			n := j
-			go func() {
-				defer wg.Done()
-				alive := ping(batch[n], sender.UDPSender)
-				if !alive {
-					lock.Lock()
-					defer lock.Unlock()
-					deadNodes = append(deadNodes, n)
-				}
-			}()
-		}
-		wg.Wait()
-	}
-
-	sort.Ints(deadNodes)
-	for i := 0; i < len(deadNodes); i++ {
-		idx := deadNodes[i] - i
-		if idx != len(batch)-1 {
-			batch = append(batch[:idx], batch[idx+1:]...)
-		} else {
-			batch = batch[:idx]
-		}
-	}
-
-	return batch
 }
 
 // Check if two slices of contacts are the same.
