@@ -37,7 +37,7 @@ func FindNodeResponse(kademliaID id.KademliaID, target contact.Contact) []byte {
 		Cmd:     "RESP",
 		Contact: *contact.GetInstance(),
 	}
-	rpcMessage.KNodes = bucket.GetInstance().FindClosestContacts(&kademliaID, 20)
+	rpcMessage.KNodes = bucket.GetInstance().FindClosestContacts(&kademliaID, bucket.BucketSize)
 	var message []byte
 	rpcmarshal.RpcMarshal(rpcMessage, &message)
 	return message
