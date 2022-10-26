@@ -15,7 +15,7 @@ func Put(input string, NS NodeStore, RA RefreshAlgorithm) string {
 	value := stored.Value{
 		Data: input,
 		ID:   id,
-		Ttl:  time.Minute,
+		TTL:  time.Minute,
 	}
 	res := NS(value)
 	if res {

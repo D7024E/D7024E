@@ -18,8 +18,8 @@ func Objects(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 	} else {
 		value.ID = *id.NewKademliaID(value.Data)
-		if value.Ttl.Nanoseconds() == 0 {
-			value.Ttl = time.Minute
+		if value.TTL.Nanoseconds() == 0 {
+			value.TTL = time.Minute
 		}
 		go algorithms.NodeStore(value)
 		go algorithms.NodeRefresh(value)

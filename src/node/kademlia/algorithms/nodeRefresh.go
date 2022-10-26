@@ -19,7 +19,7 @@ type NodeStoreAlgorithm func(value stored.Value) bool
 func NodeRefresh(value stored.Value) {
 	stored.GetInstance().AddRefresh(value.ID)
 	go func() {
-		deadline := time.Now().Add(value.Ttl - 5*time.Second)
+		deadline := time.Now().Add(value.TTL - 5*time.Second)
 		alphaClosest := NodeLookup(value.ID)
 		if len(alphaClosest) > environment.Alpha {
 			alphaClosest = alphaClosest[:environment.Alpha]
@@ -36,7 +36,7 @@ func NodeRefreshRec(value stored.Value, alphaClosest []contact.Contact, refresh 
 		return false
 	} else {
 		go func() {
-			deadline := time.Now().Add(value.Ttl - 5*time.Second)
+			deadline := time.Now().Add(value.TTL - 5*time.Second)
 			alphaClosest := NodeLookup(value.ID)
 			if len(alphaClosest) > environment.Alpha {
 				alphaClosest = alphaClosest[:environment.Alpha]
