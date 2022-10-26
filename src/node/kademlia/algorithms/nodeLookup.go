@@ -35,7 +35,7 @@ func NodeLookupRec(targetID id.KademliaID, batch []contact.Contact, findNode fin
 	updatedBatch := mergeBatch(newBatch)
 	updatedBatch = removeDuplicates(updatedBatch)
 	updatedBatch = removeDeadNodes(updatedBatch, ping)
-	updatedBatch = getAllDistances(updatedBatch)
+	updatedBatch = getAllDistances(targetID, updatedBatch)
 	updatedBatch = kademliaSort.SortContacts(updatedBatch)
 	updatedBatch = resize(updatedBatch)
 	if isSame(batch, updatedBatch) && len(batch) >= 2 {
@@ -47,9 +47,9 @@ func NodeLookupRec(targetID id.KademliaID, batch []contact.Contact, findNode fin
 
 // Updates the distances in "batch" to be the distances to the current node
 // then returns the new batch.
-func getAllDistances(batch []contact.Contact) []contact.Contact {
+func getAllDistances(targetID id.KademliaID, batch []contact.Contact) []contact.Contact {
 	for i := 0; i < len(batch); i++ {
-		relativeDistance := *batch[i].ID.CalcDistance(contact.GetInstance().ID)
+		relativeDistance := *batch[i].ID.CalcDistance(&targetID)
 		batch[i].SetDistance(&relativeDistance)
 	}
 	return batch
