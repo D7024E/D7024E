@@ -20,26 +20,33 @@ type findNodeRPC func(contact.Contact, id.KademliaID, rpc.UDPSender) ([]contact.
 // Node lookup initiator.
 func NodeLookup(targetID id.KademliaID) []contact.Contact {
 	batch := kademlia.GetInstance().RoutingTable.FindClosestContacts(&targetID, environment.Alpha)
+	batch = removeDeadNodes(batch, rpc.Ping)
 	return NodeLookupRec(targetID, batch, rpc.FindNodeRequest, rpc.Ping)
 }
 
 // Algorithm for Node lookup.
 func NodeLookupRec(targetID id.KademliaID, batch []contact.Contact, findNode findNodeRPC, ping pingRPC) []contact.Contact {
 	var newBatch [][]contact.Contact
-	if batch == nil {
+	if len(batch) == 0 {
 		newBatch = findNodes(targetID, []contact.Contact{{ID: id.NewKademliaID("172.21.0.2"), Address: "172.21.0.2"}}, findNode)
 	} else {
-		batch = getAllDistances(batch)
-		batch = removeDeadNodes(batch, ping)
 		newBatch = findNodes(targetID, batch, findNode)
 	}
 	updatedBatch := mergeBatch(newBatch)
 	updatedBatch = removeDuplicates(updatedBatch)
 	updatedBatch = removeDeadNodes(updatedBatch, ping)
-	updatedBatch = getAllDistances(updatedBatch)
+	updatedBatch = getAllDistances(targetID, updatedBatch)
 	updatedBatch = kademliaSort.SortContacts(updatedBatch)
 	updatedBatch = resize(updatedBatch)
-	if isSame(batch, updatedBatch) {
+	// fmt.Println("previous batch:")
+	// for i := 0; i < len(batch); i++ {
+	// 	fmt.Println(batch[i])
+	// }
+	// fmt.Println("new batch:")
+	// for i := 0; i < len(updatedBatch); i++ {
+	// 	fmt.Println(updatedBatch[i])
+	// }
+	if isSame(batch, updatedBatch) && len(batch) >= 1 {
 		return updatedBatch
 	} else {
 		return NodeLookupRec(targetID, updatedBatch, findNode, ping)
@@ -48,9 +55,9 @@ func NodeLookupRec(targetID id.KademliaID, batch []contact.Contact, findNode fin
 
 // Updates the distances in "batch" to be the distances to the current node
 // then returns the new batch.
-func getAllDistances(batch []contact.Contact) []contact.Contact {
+func getAllDistances(targetID id.KademliaID, batch []contact.Contact) []contact.Contact {
 	for i := 0; i < len(batch); i++ {
-		relativeDistance := *batch[i].ID.CalcDistance(contact.GetInstance().ID)
+		relativeDistance := *batch[i].ID.CalcDistance(&targetID)
 		batch[i].SetDistance(&relativeDistance)
 	}
 	return batch
@@ -88,6 +95,7 @@ func findNodes(targetID id.KademliaID, batch []contact.Contact, findNode findNod
 		}
 		wg.Wait()
 	}
+	newBatch = append(newBatch, batch)
 	return newBatch
 }
 

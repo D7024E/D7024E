@@ -4,7 +4,6 @@ import (
 	rpc "D7024E/kademliaRPC/RPC"
 	"D7024E/kademliaRPC/rpcmarshal"
 	"D7024E/log"
-	"D7024E/node/kademlia/algorithms"
 	"time"
 )
 
@@ -13,12 +12,12 @@ func HandleCMD(msg []byte) []byte {
 	var rpcMessage rpcmarshal.RPC
 	rpcmarshal.RpcUnmarshal(msg, &rpcMessage)
 
-	go algorithms.AddContact(rpcMessage.Contact, rpc.Ping)
+	go rpc.AddContact(rpcMessage.Contact, rpc.Ping)
 
 	log.INFO(
 		"OPERATION - [%s] SENDER - [%s]",
 		rpcMessage.Cmd,
-		rpcMessage.Contact.ID.String())
+		rpcMessage.Contact.Address)
 	startTime := time.Now()
 
 	var res []byte
@@ -37,12 +36,12 @@ func HandleCMD(msg []byte) []byte {
 		log.ERROR(
 			"OPERATION - [%s] SENDER - [%s] STATUS - FAILED",
 			rpcMessage.Cmd,
-			rpcMessage.Contact.ID.String())
+			rpcMessage.Contact.Address)
 	}
 	log.INFO(
 		"OPERATION - [%s] SENDER - [%s] DURATION - [%s]",
 		rpcMessage.Cmd,
-		rpcMessage.Contact.ID.String(),
+		rpcMessage.Contact.Address,
 		time.Since(startTime).String())
 	return res
 }

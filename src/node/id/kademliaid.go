@@ -1,7 +1,7 @@
 package id
 
 import (
-	"crypto/sha1"
+	"crypto/sha256"
 	"encoding/hex"
 	"errors"
 	"math/rand"
@@ -19,7 +19,7 @@ func init() {
 
 // Creates new kademlia id by hashing data.
 func NewKademliaID(data string) *KademliaID {
-	sha := sha1.New()
+	sha := sha256.New()
 	hash := sha.Sum([]byte(data))
 	newKademliaID := KademliaID{}
 	for i := 0; i < IDLength; i++ {

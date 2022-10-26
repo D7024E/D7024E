@@ -56,7 +56,7 @@ func TestNodeLookupRecFail(t *testing.T) {
 	kademlia.GetInstance()
 	contactID := id.NewRandomKademliaID()
 	result := NodeLookupRec(
-		*id.NewKademliaID("127.21.0.2"),
+		*contactID,
 		[]contact.Contact{{ID: contactID}},
 		findNodeFail,
 		pingSuccess)
@@ -76,7 +76,7 @@ func TestGetAllDistances(t *testing.T) {
 	id2[id.IDLength-1] += 1
 	id3[id.IDLength-1] += 2
 	batch := []contact.Contact{{ID: &id2}, {ID: &id3}}
-	result := getAllDistances(batch)
+	result := getAllDistances(*contact.GetInstance().ID, batch)
 	for i := 0; i < len(batch); i++ {
 		num, err := strconv.Atoi(result[i].GetDistance().String())
 		if err != nil {

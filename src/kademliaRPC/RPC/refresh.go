@@ -25,6 +25,8 @@ func RefreshRequest(valueID id.KademliaID, target contact.Contact, sender UDPSen
 		return false
 	}
 
+	go AddContact(target, Ping)
+
 	var rpcMessage rpcmarshal.RPC
 	rpcmarshal.RpcUnmarshal(resMessage, &rpcMessage)
 	return rpcMessage.Acknowledge

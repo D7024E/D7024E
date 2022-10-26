@@ -22,9 +22,9 @@ func GetInstance() *Contact {
 		if me == nil {
 			log.INFO("New \"me\" instance created")
 			me = &Contact{
-				ID:      id.NewRandomKademliaID(),
 				Address: getAddress(),
 			}
+			me.ID = id.NewKademliaID(me.Address)
 			// Makes sure that the distance to itself is zero.
 			me.distance = me.ID.CalcDistance(me.ID)
 		}

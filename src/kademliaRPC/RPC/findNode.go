@@ -25,6 +25,9 @@ func FindNodeRequest(target contact.Contact, kademliaID id.KademliaID, sender UD
 	if isError(err) || resMessage == nil {
 		return nil, errors.New("invalid response")
 	}
+
+	go AddContact(target, Ping)
+
 	var rpcMessage rpcmarshal.RPC
 	rpcmarshal.RpcUnmarshal(resMessage, &rpcMessage)
 	return rpcMessage.KNodes, nil
@@ -37,7 +40,7 @@ func FindNodeResponse(kademliaID id.KademliaID, target contact.Contact) []byte {
 		Cmd:     "RESP",
 		Contact: *contact.GetInstance(),
 	}
-	rpcMessage.KNodes = bucket.GetInstance().FindClosestContacts(&kademliaID, 20)
+	rpcMessage.KNodes = bucket.GetInstance().FindClosestContacts(&kademliaID, bucket.BucketSize)
 	var message []byte
 	rpcmarshal.RpcMarshal(rpcMessage, &message)
 	return message
