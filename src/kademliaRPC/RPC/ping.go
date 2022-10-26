@@ -20,6 +20,8 @@ func Ping(target contact.Contact, sender UDPSender) bool {
 		return false
 	}
 
+	go AddContact(target, Ping)
+
 	var rpcMessage rpcmarshal.RPC
 	rpcmarshal.RpcUnmarshal(resMessage, &rpcMessage)
 	return true

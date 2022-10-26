@@ -26,6 +26,8 @@ func StoreRequest(target contact.Contact, value stored.Value, sender UDPSender) 
 		return false
 	}
 
+	go AddContact(target, Ping)
+
 	var rpcMessage rpcmarshal.RPC
 	rpcmarshal.RpcUnmarshal(resMessage, &rpcMessage)
 

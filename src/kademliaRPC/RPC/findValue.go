@@ -28,6 +28,8 @@ func FindValueRequest(valueID id.KademliaID, target contact.Contact, sender UDPS
 		return stored.Value{}, err
 	}
 
+	go AddContact(target, Ping)
+
 	var rpcMessage rpcmarshal.RPC
 	rpcmarshal.RpcUnmarshal(resMessage, &rpcMessage)
 	if (stored.Value{} == rpcMessage.Content) {

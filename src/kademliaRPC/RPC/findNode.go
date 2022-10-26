@@ -25,6 +25,9 @@ func FindNodeRequest(target contact.Contact, kademliaID id.KademliaID, sender UD
 	if isError(err) || resMessage == nil {
 		return nil, errors.New("invalid response")
 	}
+
+	go AddContact(target, Ping)
+
 	var rpcMessage rpcmarshal.RPC
 	rpcmarshal.RpcUnmarshal(resMessage, &rpcMessage)
 	return rpcMessage.KNodes, nil

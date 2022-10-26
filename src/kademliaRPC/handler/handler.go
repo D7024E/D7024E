@@ -4,7 +4,6 @@ import (
 	rpc "D7024E/kademliaRPC/RPC"
 	"D7024E/kademliaRPC/rpcmarshal"
 	"D7024E/log"
-	"D7024E/node/kademlia/algorithms"
 	"time"
 )
 
@@ -13,7 +12,7 @@ func HandleCMD(msg []byte) []byte {
 	var rpcMessage rpcmarshal.RPC
 	rpcmarshal.RpcUnmarshal(msg, &rpcMessage)
 
-	go algorithms.AddContact(rpcMessage.Contact, rpc.Ping)
+	go rpc.AddContact(rpcMessage.Contact, rpc.Ping)
 
 	log.INFO(
 		"OPERATION - [%s] SENDER - [%s]",
