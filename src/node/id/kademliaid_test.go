@@ -1,7 +1,6 @@
 package id
 
 import (
-	"fmt"
 	"math/rand"
 	"testing"
 )
@@ -187,8 +186,8 @@ func TestString(t *testing.T) {
 }
 
 func TestStringError(t *testing.T) {
-	kademliaID := NewKademliaID("")
-	str := kademliaID.String()
-	fmt.Println("this is the id", str)
-
+	_, err := String2KademliaID("")
+	if err == nil {
+		t.FailNow()
+	}
 }
