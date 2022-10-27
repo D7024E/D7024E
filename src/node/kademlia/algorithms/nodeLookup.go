@@ -32,15 +32,15 @@ func NodeLookup(targetID id.KademliaID) []contact.Contact {
 }
 
 // Add multiple contacts to routing table if they respond to a ping.
-func AddContacts(rt *bucket.RoutingTable, batch []contact.Contact, ping pingRPC) {
+func addContacts(rt *bucket.RoutingTable, batch []contact.Contact, ping pingRPC) {
 	var wg sync.WaitGroup
 	for i := 0; i < len(batch); i += environment.Alpha {
-		for j := 0; j < min(len(batch), environment.Alpha); j++ {
+		for j := i; j < min(len(batch), i+environment.Alpha); j++ {
 			wg.Add(1)
 			go func(target contact.Contact) {
 				defer wg.Done()
 				if !(rt.FindClosestContacts(target.ID, 1)[0].ID).Equals(target.ID) {
-					if rpc.Ping(target, sender.UDPSender) {
+					if ping(target, sender.UDPSender) {
 						rt.AddContact(target)
 					}
 				}
@@ -63,7 +63,7 @@ func nodeLookup(targetID id.KademliaID, rt *bucket.RoutingTable, ping pingRPC, f
 				kN, err := findNode(target, targetID, sender.UDPSender)
 				if err == nil {
 					rt.AddContact(target)
-					AddContacts(rt, kN, ping)
+					addContacts(rt, kN, ping)
 				}
 			}()
 		}
