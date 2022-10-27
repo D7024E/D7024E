@@ -25,7 +25,7 @@ func AlphaNodeStoreRec(value stored.Value, store storeRPC, lookup lookupAlgorith
 	if len(alphaClosest) > environment.Alpha {
 		alphaClosest = alphaClosest[:environment.Alpha]
 	}
-	log.INFO("[NODE STORE] - storing value with id: ", value.ID.String(), " in \n", alphaClosest)
+	log.INFO("[NODE STORE] - storing value with id: %v in \n %v", value.ID.String(), alphaClosest)
 	var wg sync.WaitGroup
 	lock := sync.Mutex{}
 	completed := true

@@ -86,11 +86,11 @@ func (stored *Stored) Store(val Value) error {
 	defer lock.Unlock()
 	val.DeadAt = time.Now().Add(val.TTL)
 	if err != nil {
-		log.INFO("[VALUES] - storing value with id: ", val.ID.String())
+		log.INFO("[VALUES] - storing value with id: %v", val.ID.String())
 		stored.values = append(stored.values, val)
 		return nil
 	} else {
-		log.INFO("[VALUES] - attempt to store duplicate value with id: ", val.ID.String())
+		log.INFO("[VALUES] - attempt to store duplicate value with id: %v", val.ID.String())
 		return &errors.ValueAlreadyExist{}
 	}
 }
@@ -102,7 +102,7 @@ func (stored *Stored) FindValue(valueID id.KademliaID) (Value, error) {
 	for i, item := range stored.values {
 		if valueID.Equals(&item.ID) {
 			go stored.values[i].refresh()
-			log.INFO("[VALUES] - find value: ", item)
+			log.INFO("[VALUES] - find value: %v", item)
 			if !item.isDead() {
 				return item, nil
 			} else {
@@ -115,7 +115,7 @@ func (stored *Stored) FindValue(valueID id.KademliaID) (Value, error) {
 
 // Delete a value with id in stored values.
 func (stored *Stored) deleteValue(valueID id.KademliaID) error {
-	log.INFO("[VALUES] - delete value with id: ", valueID.String())
+	log.INFO("[VALUES] - delete value with id: %v", valueID.String())
 	for i, val := range stored.values {
 		if val.ID.Equals(&valueID) {
 			stored.values = append(stored.values[:i], stored.values[i+1:]...)

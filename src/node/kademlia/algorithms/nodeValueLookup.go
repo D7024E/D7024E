@@ -25,7 +25,7 @@ func NodeValueLookup(valueID id.KademliaID) (stored.Value, error) {
 
 // Lookup value with valueID in alpha closest nodes using fn.
 func alphaNodeValueLookup(valueID id.KademliaID, alphaClosest []contact.Contact, fn findValueRPC) (stored.Value, error) {
-	log.INFO("[NODE VALUE LOOKUP] - lookup value with id: ", valueID.String(), " in \n", alphaClosest)
+	log.INFO("[NODE VALUE LOOKUP] - lookup value with id: %v in \n %v", valueID.String(), alphaClosest)
 	var wg sync.WaitGroup
 	var result []stored.Value
 	lock := sync.Mutex{}
