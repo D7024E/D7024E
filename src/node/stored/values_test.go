@@ -229,7 +229,7 @@ func TestCleaningDeadValues(t *testing.T) {
 	values := []Value{{ID: *id.NewRandomKademliaID(), TTL: time.Nanosecond}}
 	stored.values = values
 	go stored.cleaningDeadValues(time.Duration(0))
-	time.Sleep(1)
+	time.Sleep(1 * time.Second)
 	if len(stored.values) != 0 {
 		t.Fatalf("cleaning not cleaning dead values")
 	}
