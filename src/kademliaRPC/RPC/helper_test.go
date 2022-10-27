@@ -14,7 +14,7 @@ func testValue() stored.Value {
 	return stored.Value{
 		Data:   "DATA",
 		ID:     *id.NewKademliaID("DATA"),
-		Ttl:    time.Hour,
+		TTL:    time.Hour,
 		DeadAt: time.Now().Add(time.Hour),
 	}
 }

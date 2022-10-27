@@ -12,7 +12,7 @@ func TestValueEqualsTrue(t *testing.T) {
 	value := Value{
 		Data:   "Erik",
 		ID:     *id.NewRandomKademliaID(),
-		Ttl:    time.Hour,
+		TTL:    time.Hour,
 		DeadAt: time.Now().Add(time.Hour),
 	}
 
@@ -27,14 +27,14 @@ func TestFindValueEqualsFalse(t *testing.T) {
 	value1 := Value{
 		Data:   "Erik",
 		ID:     *id.NewRandomKademliaID(),
-		Ttl:    time.Hour,
+		TTL:    time.Hour,
 		DeadAt: time.Now().Add(time.Hour),
 	}
 
 	value2 := Value{
 		Data:   "Dennis",
 		ID:     *id.NewRandomKademliaID(),
-		Ttl:    time.Hour,
+		TTL:    time.Hour,
 		DeadAt: time.Now().Add(time.Hour),
 	}
 	if !(value1.Equals(&value2) == false) {
@@ -58,7 +58,7 @@ func TestRefreshDeadValue(t *testing.T) {
 // See if value is refreshed when value is still alive.
 func TestRefreshAliveValue(t *testing.T) {
 	t0 := time.Now().Add(time.Minute)
-	value := Value{ID: *id.NewRandomKademliaID(), Ttl: time.Hour, DeadAt: t0}
+	value := Value{ID: *id.NewRandomKademliaID(), TTL: time.Hour, DeadAt: t0}
 	res := value.refresh()
 	if !res {
 		t.FailNow()
@@ -97,7 +97,7 @@ func TestStoreValueSuccess(t *testing.T) {
 	value := Value{
 		Data:   "Erik",
 		ID:     *id.NewRandomKademliaID(),
-		Ttl:    time.Hour,
+		TTL:    time.Hour,
 		DeadAt: time.Now().Add(time.Hour),
 	}
 	err := stored.Store(value)
@@ -112,7 +112,7 @@ func TestStoreValueDuplicate(t *testing.T) {
 	value := Value{
 		Data:   "Erik",
 		ID:     *id.NewRandomKademliaID(),
-		Ttl:    time.Hour,
+		TTL:    time.Hour,
 		DeadAt: time.Now().Add(time.Hour),
 	}
 	err := stored.Store(value)
@@ -131,7 +131,7 @@ func TestFindValueSuccess(t *testing.T) {
 	stored := Stored{values: []Value{{
 		Data:   "Erik",
 		ID:     *id.NewRandomKademliaID(),
-		Ttl:    time.Hour,
+		TTL:    time.Hour,
 		DeadAt: time.Now().Add(time.Hour),
 	}}}
 
@@ -157,7 +157,7 @@ func TestDeleteValueSuccessWithOneElementStored(t *testing.T) {
 	stored := Stored{values: []Value{{
 		Data:   "Erik",
 		ID:     *id.NewRandomKademliaID(),
-		Ttl:    time.Hour,
+		TTL:    time.Hour,
 		DeadAt: time.Now().Add(time.Hour),
 	}}}
 
@@ -172,17 +172,17 @@ func TestDeleteValueSuccessWithThreeElementStored(t *testing.T) {
 	values := []Value{{
 		Data:   "Erik",
 		ID:     *id.NewRandomKademliaID(),
-		Ttl:    time.Hour,
+		TTL:    time.Hour,
 		DeadAt: time.Now().Add(time.Hour),
 	}, {
 		Data:   "Dennis",
 		ID:     *id.NewRandomKademliaID(),
-		Ttl:    time.Hour,
+		TTL:    time.Hour,
 		DeadAt: time.Now().Add(time.Hour),
 	}, {
 		Data:   "Anders",
 		ID:     *id.NewRandomKademliaID(),
-		Ttl:    time.Hour,
+		TTL:    time.Hour,
 		DeadAt: time.Now().Add(time.Hour),
 	}}
 
@@ -206,14 +206,14 @@ func TestDeleteValueInAnNonEmptyListFail(t *testing.T) {
 	stored := Stored{values: []Value{{
 		Data:   "Erik",
 		ID:     *id.NewRandomKademliaID(),
-		Ttl:    time.Hour,
+		TTL:    time.Hour,
 		DeadAt: time.Now().Add(time.Hour),
 	}}}
 
 	value2 := Value{
 		Data:   "Dennis",
 		ID:     *id.NewRandomKademliaID(),
-		Ttl:    time.Hour,
+		TTL:    time.Hour,
 		DeadAt: time.Now().Add(time.Hour),
 	}
 
@@ -226,7 +226,7 @@ func TestDeleteValueInAnNonEmptyListFail(t *testing.T) {
 // Test if dead values are cleaned by function correctly.
 func TestCleaningDeadValues(t *testing.T) {
 	stored := Stored{}
-	values := []Value{{ID: *id.NewRandomKademliaID(), Ttl: time.Nanosecond}}
+	values := []Value{{ID: *id.NewRandomKademliaID(), TTL: time.Nanosecond}}
 	stored.values = values
 	go stored.cleaningDeadValues(time.Duration(0))
 	time.Sleep(1)

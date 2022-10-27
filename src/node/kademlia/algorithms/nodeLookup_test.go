@@ -5,234 +5,170 @@ import (
 	"D7024E/node/bucket"
 	"D7024E/node/contact"
 	"D7024E/node/id"
-	"D7024E/node/kademlia"
 	"errors"
-	"strconv"
 	"testing"
 )
 
-// Mockup of ping RPC that always succeed.
-func pingSuccess(contact.Contact, rpc.UDPSender) bool {
+func nodeLookupPingMockSuccess(contact.Contact, rpc.UDPSender) bool {
 	return true
 }
 
-// Mockup of ping RPC that always fail.
-func pingFail(contact.Contact, rpc.UDPSender) bool {
+func nodeLookupPingMockTimeout(contact.Contact, rpc.UDPSender) bool {
 	return false
 }
 
-// Mockup of find node rpc that will succeed.
-func findNodeSuccess(contact.Contact, id.KademliaID, rpc.UDPSender) ([]contact.Contact, error) {
-	return []contact.Contact{
-		{ID: id.NewKademliaID("127.21.0.2"), Address: "127.21.0.2"},
-		{ID: id.NewKademliaID("127.21.0.3"), Address: "127.21.0.3"},
-		{ID: id.NewKademliaID("127.21.0.4"), Address: "127.21.0.4"},
-		{ID: id.NewKademliaID("127.21.0.5"), Address: "127.21.0.5"}}, nil
+func nodeLookupTestContacts() []contact.Contact {
+	rt := bucket.NewRoutingTable()
+	rt.AddContact(contact.Contact{ID: id.NewKademliaID("1"), Address: "0.0.0.1"})
+	rt.AddContact(contact.Contact{ID: id.NewKademliaID("2"), Address: "0.0.0.2"})
+	rt.AddContact(contact.Contact{ID: id.NewKademliaID("3"), Address: "0.0.0.3"})
+	return rt.FindClosestContacts(id.NewKademliaID("1"), 3)
 }
 
-// Mockup of find node rpc that will fail.
-func findNodeFail(contact.Contact, id.KademliaID, rpc.UDPSender) ([]contact.Contact, error) {
-	return []contact.Contact{}, errors.New("not found")
+func nodeLookupTestContacts2() []contact.Contact {
+	rt := bucket.NewRoutingTable()
+	rt.AddContact(contact.Contact{ID: id.NewKademliaID("1"), Address: "0.0.0.1"})
+	rt.AddContact(contact.Contact{ID: id.NewKademliaID("2"), Address: "0.0.0.2"})
+	rt.AddContact(contact.Contact{ID: id.NewKademliaID("3"), Address: "0.0.0.3"})
+	return rt.FindClosestContacts(id.NewKademliaID("3"), 3)
 }
 
-// Validate if correct when no responses received.
-func TestNodeLookupRecSuccess(t *testing.T) {
-	kademlia.GetInstance()
-	batch := []contact.Contact{{ID: id.NewKademliaID("a")}}
-	result := NodeLookupRec(
-		*id.NewKademliaID("127.21.0.2"),
-		batch,
-		findNodeSuccess,
-		pingSuccess)
-	if len(result) > bucket.BucketSize {
-		t.FailNow()
-	} else if len(result) != 5 {
-		t.FailNow()
+func nodeLookupFindNodeMockSuccess(contact.Contact, id.KademliaID, rpc.UDPSender) ([]contact.Contact, error) {
+	return nodeLookupTestContacts(), nil
+}
+
+func nodeLookupFindNodeMockSFail(contact.Contact, id.KademliaID, rpc.UDPSender) ([]contact.Contact, error) {
+	return nil, errors.New("this is a error")
+}
+
+// Add multiple contacts and verify that they are added to routing table.
+func TestAddContactsSuccess(t *testing.T) {
+	rt := bucket.NewRoutingTable()
+	c := contact.Contact{ID: id.NewKademliaID("0"), Address: "0.0.0.0"}
+	rt.AddContact(c)
+	batch := []contact.Contact{
+		c,
+		{ID: id.NewKademliaID("1"), Address: "0.0.0.1"},
+		{ID: id.NewKademliaID("2"), Address: "0.0.0.2"},
+		{ID: id.NewKademliaID("3"), Address: "0.0.0.3"},
 	}
-}
 
-// Validate if correct when no responses received.
-func TestNodeLookupRecFail(t *testing.T) {
-	kademlia.GetInstance()
-	contactID := id.NewRandomKademliaID()
-	result := NodeLookupRec(
-		*contactID,
-		[]contact.Contact{{ID: contactID}},
-		findNodeFail,
-		pingSuccess)
-	if len(result) != 1 {
-		t.FailNow()
-	} else if !contactID.Equals(result[0].ID) {
-		t.FailNow()
+	addContacts(rt, batch, nodeLookupPingMockSuccess)
+	res := rt.FindClosestContacts(id.NewKademliaID("0"), len(batch)+1)
+	if len(res) != len(batch) {
+		t.Fatalf("invalid length of added contacts")
 	}
-}
 
-// Verify that all contacts in batch gets a correct distance.
-func TestGetAllDistances(t *testing.T) {
-	contact.GetInstance().ID = id.NewKademliaID("TEST")
-	id1 := *contact.GetInstance().ID
-	id2 := id1
-	id3 := id1
-	id2[id.IDLength-1] += 1
-	id3[id.IDLength-1] += 2
-	batch := []contact.Contact{{ID: &id2}, {ID: &id3}}
-	result := getAllDistances(*contact.GetInstance().ID, batch)
-	for i := 0; i < len(batch); i++ {
-		num, err := strconv.Atoi(result[i].GetDistance().String())
-		if err != nil {
-			t.FailNow()
-		} else if num != i+1 {
-			t.FailNow()
+	var found bool
+	for _, r := range res {
+		found = false
+		for _, b := range batch {
+			if r.Equals(&b) {
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Fatalf("did not found value")
 		}
 	}
 }
 
-// Verify that min works as intended.
-func TestMin1(t *testing.T) {
-	if min(1, 2) != 1 {
-		t.FailNow()
+// Attempt to add multiple nodes to routing table, when ping fail so that they
+// are never added.
+func TestAddContactsFail(t *testing.T) {
+	rt := bucket.NewRoutingTable()
+	c := contact.Contact{ID: id.NewKademliaID("0"), Address: "0.0.0.0"}
+	rt.AddContact(c)
+	batch := []contact.Contact{
+		c,
+		{ID: id.NewKademliaID("1"), Address: "0.0.0.1"},
+		{ID: id.NewKademliaID("2"), Address: "0.0.0.2"},
+		{ID: id.NewKademliaID("3"), Address: "0.0.0.3"},
+	}
+
+	addContacts(rt, batch, nodeLookupPingMockTimeout)
+	res := rt.FindClosestContacts(id.NewKademliaID("0"), len(batch)+1)
+	if len(res) != 1 {
+		t.Fatalf("invalid length of added contacts")
 	}
 }
 
-// Verify that min works as intended.
-func TestMin2(t *testing.T) {
-	if min(2, 1) != 1 {
-		t.FailNow()
+// TestNodeLookup and verify that the correct values are returned.
+func TestNodeLookupSuccess(t *testing.T) {
+	rt := bucket.NewRoutingTable()
+	targetID := id.NewKademliaID("1")
+	rt.AddContact(contact.Contact{ID: targetID, Address: "0.0.0.1"})
+	res := nodeLookup(*targetID, rt, nodeLookupPingMockSuccess, nodeLookupFindNodeMockSuccess)
+	if len(nodeLookupTestContacts()) != len(res) {
+		t.Fatalf("invalid length")
 	}
-}
-
-// Verify that all nodes are found.
-func TestFindNodesSuccess(t *testing.T) {
-	kademlia.GetInstance()
-	batch := []contact.Contact{{ID: id.NewRandomKademliaID()}}
-	result := findNodes(*id.NewRandomKademliaID(), batch, findNodeSuccess)
-	if !batch[0].Equals(&result[0][0]) {
-		t.FailNow()
-	} else if len(result[1]) != 4 {
-		t.FailNow()
-	}
-}
-
-// Verify that all nodes are found.
-func TestFindNodesFail(t *testing.T) {
-	kademlia.GetInstance()
-	batch := []contact.Contact{{ID: id.NewRandomKademliaID()}}
-	result := findNodes(*id.NewRandomKademliaID(), batch, findNodeFail)
-	if !batch[0].Equals(&result[0][0]) {
-		t.FailNow()
-	} else if len(result) != 1 {
-		t.FailNow()
-	}
-}
-
-// Validate the merge batch input with output.
-func TestMergeBatch(t *testing.T) {
-	contacts1 := []contact.Contact{
-		{ID: id.NewRandomKademliaID(), Address: "127.21.0.2"},
-		{ID: id.NewRandomKademliaID(), Address: "127.21.0.3"},
-		{ID: id.NewRandomKademliaID(), Address: "127.21.0.4"},
-		{ID: id.NewRandomKademliaID(), Address: "127.21.0.5"}}
-	contacts2 := []contact.Contact{
-		{ID: id.NewRandomKademliaID(), Address: "127.21.0.4"},
-		{ID: id.NewRandomKademliaID(), Address: "127.21.0.5"},
-		{ID: id.NewRandomKademliaID(), Address: "127.21.0.6"},
-		{ID: id.NewRandomKademliaID(), Address: "127.21.0.7"}}
-	batch := [][]contact.Contact{contacts1, contacts2}
-	result := mergeBatch(batch)
-
-	validator := []contact.Contact{
-		contacts1[0],
-		contacts1[1],
-		contacts1[2],
-		contacts1[3],
-		contacts2[0],
-		contacts2[1],
-		contacts2[2],
-		contacts2[3]}
-
-	for i := 0; i < len(result); i++ {
-		if !result[i].Equals(&validator[i]) {
-			t.FailNow()
+	for i, c := range nodeLookupTestContacts() {
+		if !res[i].Equals(&c) {
+			t.Fatalf("invalid contacts, expected %v got %v", c, res[i])
 		}
 	}
 }
 
-// Verify that duplicates are removed.
-func TestRemoveDuplicates(t *testing.T) {
-	batch := []contact.Contact{
-		{ID: id.NewKademliaID("1")},
-		{ID: id.NewKademliaID("2")},
-		{ID: id.NewKademliaID("1")},
-		{ID: id.NewKademliaID("2")}}
-	result := removeDuplicates(batch)
-	if len(result) != 2 {
-		t.FailNow()
+// Test node lookup when find node rpc fails, and verify result.
+func TestNodeLookupFail(t *testing.T) {
+	rt := bucket.NewRoutingTable()
+	targetID := id.NewKademliaID("1")
+	rt.AddContact(contact.Contact{ID: targetID, Address: "0.0.0.1"})
+	res := nodeLookup(*targetID, rt, nodeLookupPingMockSuccess, nodeLookupFindNodeMockSFail)
+	if len(res) != 1 {
+		t.Fatalf("invalid length, expected 1, got %v", len(res))
+	} else if !res[0].Equals(&rt.FindClosestContacts(targetID, 1)[0]) {
+		t.Fatalf("invalid contact, expected %v, got %v", rt.FindClosestContacts(targetID, 1)[0], res[0])
 	}
 }
 
-// Verify that alive nodes are kept.
-func TestRemoveDeadNodesAllAlive(t *testing.T) {
-	batch := []contact.Contact{
-		{ID: id.NewRandomKademliaID(), Address: "127.21.0.2"},
-		{ID: id.NewRandomKademliaID(), Address: "127.21.0.3"},
-		{ID: id.NewRandomKademliaID(), Address: "127.21.0.4"},
-		{ID: id.NewRandomKademliaID(), Address: "127.21.0.5"}}
-	result := removeDeadNodes(batch, pingSuccess)
-	if len(result) != len(batch) {
-		t.FailNow()
+// Test min with different values.
+func TestMin(t *testing.T) {
+	a := 1
+	b := 0
+	if min(a, b) != 0 {
+		t.Fatalf("expected %v, got %v", b, min(a, b))
+	} else if min(b, a) != 0 {
+		t.Fatalf("expected %v, got %v", b, min(b, a))
 	}
 }
 
-// Verify that dead nodes are deleted.
-func TestRemoveDeadNodesAllDead(t *testing.T) {
-	batch := []contact.Contact{
-		{ID: id.NewRandomKademliaID(), Address: "127.21.0.2"},
-		{ID: id.NewRandomKademliaID(), Address: "127.21.0.3"},
-		{ID: id.NewRandomKademliaID(), Address: "127.21.0.4"},
-		{ID: id.NewRandomKademliaID(), Address: "127.21.0.5"}}
-	result := removeDeadNodes(batch, pingFail)
-	if len(result) != 0 {
-		t.FailNow()
+// Test min for two equal values.
+func TestMinEqual(t *testing.T) {
+	a := 1
+	b := 1
+	if min(a, b) != 1 {
+		t.Fatalf("expected %v, got %v", b, min(a, b))
+	} else if min(b, a) != 1 {
+		t.Fatalf("expected %v, got %v", b, min(b, a))
 	}
 }
 
-// Test if batch is resized correctly, when larger then bucketSize.
-func TestResizeLarger(t *testing.T) {
-	var batch []contact.Contact
-	for i := 0; i < 2*bucket.BucketSize; i++ {
-		batch = append(batch, contact.Contact{})
-	}
-	result := resize(batch)
-	if len(result) > bucket.BucketSize {
-		t.FailNow()
+// Test is same on equal batches.
+func TestIsSameEquals(t *testing.T) {
+	batch := nodeLookupTestContacts()
+	newBatch := nodeLookupTestContacts()
+	if !isSame(batch, newBatch) {
+		t.Fatalf("not equal when values are equal")
 	}
 }
 
-// Test if batch is resized correctly, when smaller then bucketSize.
-func TestResizeSmaller(t *testing.T) {
-	var batch []contact.Contact
-	for i := 0; i < 0.5*bucket.BucketSize; i++ {
-		batch = append(batch, contact.Contact{})
-	}
-	result := resize(batch)
-	if len(result) > bucket.BucketSize {
-		t.FailNow()
+// Test is two different length of batches if is same returns correctly.
+func TestIsSameInvalidLength(t *testing.T) {
+	batch := nodeLookupTestContacts()
+	newBatch := nodeLookupTestContacts()
+	newBatch = append(newBatch, contact.Contact{ID: id.NewRandomKademliaID()})
+	if isSame(batch, newBatch) {
+		t.Fatalf("not equal when values are equal")
 	}
 }
 
-// Test if two batches are the same.
-func TestIsSameTrue(t *testing.T) {
-	batch := []contact.Contact{{ID: id.NewRandomKademliaID()}, {ID: id.NewRandomKademliaID()}}
-	if !isSame(batch, batch) {
-		t.FailNow()
-	}
-}
-
-// Test if two batches are the same.
-func TestIsSameFail(t *testing.T) {
-	batch1 := []contact.Contact{{ID: id.NewKademliaID("a")}, {ID: id.NewKademliaID("b")}}
-	batch2 := []contact.Contact{{ID: id.NewKademliaID("b")}, {ID: id.NewKademliaID("a")}}
-	if isSame(batch1, batch2) {
-		t.FailNow()
+// Test is two different batches.
+func TestIsSameNotSame(t *testing.T) {
+	batch := nodeLookupTestContacts()
+	newBatch := nodeLookupTestContacts2()
+	if isSame(batch, newBatch) {
+		t.Fatalf("not equal when values are equal")
 	}
 }

@@ -20,7 +20,7 @@ func TestRpcMarshalSuccess(t *testing.T) {
 		ID: *id.NewRandomKademliaID(),
 		Content: stored.Value{
 			Data: "THIS IS DATA",
-			Ttl:  time.Second,
+			TTL:  time.Second,
 		},
 		Acknowledge: true,
 	}
@@ -52,7 +52,7 @@ func TestRpcMarshalFail(t *testing.T) {
 		Content: stored.Value{
 			Data:   "THIS IS DATA 2",
 			ID:     *id.NewRandomKademliaID(),
-			Ttl:    time.Second,
+			TTL:    time.Second,
 			DeadAt: time.Now().Add(time.Second),
 		},
 	}
@@ -88,7 +88,7 @@ func TestRPCEqualsSuccess(t *testing.T) {
 		Content: stored.Value{
 			Data:   "THIS IS DATA",
 			ID:     *id.NewRandomKademliaID(),
-			Ttl:    time.Second,
+			TTL:    time.Second,
 			DeadAt: time.Now().Add(time.Second),
 		},
 	}
@@ -109,7 +109,7 @@ func TestRPCEqualsFail(t *testing.T) {
 		Content: stored.Value{
 			Data:   "THIS IS DATA",
 			ID:     *id.NewRandomKademliaID(),
-			Ttl:    time.Second,
+			TTL:    time.Second,
 			DeadAt: time.Now().Add(time.Second),
 		},
 	}
@@ -123,7 +123,7 @@ func TestRPCEqualsFail(t *testing.T) {
 		Content: stored.Value{
 			Data:   "THIS IS DATA 2",
 			ID:     *id.NewRandomKademliaID(),
-			Ttl:    time.Second,
+			TTL:    time.Second,
 			DeadAt: time.Now().Add(time.Second),
 		},
 	}
@@ -180,7 +180,7 @@ func TestRPCEqualsFailMissingContent(t *testing.T) {
 	rpc2.Content = stored.Value{
 		Data:   "THIS IS DATA",
 		ID:     *id.NewRandomKademliaID(),
-		Ttl:    time.Second,
+		TTL:    time.Second,
 		DeadAt: time.Now().Add(time.Second),
 	}
 	if rpc.Equals(&rpc2) {

@@ -40,7 +40,7 @@ func TestKNodeStoreRecSuccess(t *testing.T) {
 	value := stored.Value{
 		Data:   "DATA",
 		ID:     *id.NewKademliaID("DATA"),
-		Ttl:    time.Hour,
+		TTL:    time.Hour,
 		DeadAt: time.Now().Add(time.Hour),
 	}
 	success := AlphaNodeStoreRec(value, storeSuccess, nodeLookupMock)
@@ -54,7 +54,7 @@ func TestKNodeStoreRecRandomSuccess(t *testing.T) {
 	value := stored.Value{
 		Data:   "DATA",
 		ID:     *id.NewKademliaID("DATA"),
-		Ttl:    time.Hour,
+		TTL:    time.Hour,
 		DeadAt: time.Now().Add(time.Hour),
 	}
 	success := AlphaNodeStoreRec(value, store50RandomSuccess, nodeLookupMock)

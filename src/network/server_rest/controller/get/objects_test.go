@@ -24,7 +24,7 @@ func TestObjects200(t *testing.T) {
 	// Create value
 	value := stored.Value{
 		Data: "this is data",
-		Ttl:  time.Hour,
+		TTL:  time.Hour,
 	}
 	valueID := *id.NewKademliaID(value.Data)
 
