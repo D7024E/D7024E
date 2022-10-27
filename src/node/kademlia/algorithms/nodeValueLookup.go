@@ -17,10 +17,6 @@ type findValueRPC func(id.KademliaID, contact.Contact, rpc.UDPSender) (stored.Va
 // Initiates NodeValueLookup with alpha nodes.
 func NodeValueLookup(valueID id.KademliaID) (stored.Value, error) {
 	alphaClosest := NodeLookup(valueID)
-	kAddress := []string{}
-	for _, c := range alphaClosest {
-		kAddress = append(kAddress, c.Address)
-	}
 	if len(alphaClosest) > environment.Alpha {
 		alphaClosest = alphaClosest[:environment.Alpha]
 	}
