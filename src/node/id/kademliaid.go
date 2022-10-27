@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"math/rand"
+	"reflect"
 	"time"
 )
 
@@ -49,6 +50,13 @@ func (kademliaID KademliaID) Less(otherKademliaID *KademliaID) bool {
 
 // Checks if kademliaID is equal to otherKademliaID.
 func (kademliaID KademliaID) Equals(otherKademliaID *KademliaID) bool {
+	if reflect.ValueOf(kademliaID).IsZero() && reflect.ValueOf(*otherKademliaID).IsZero() {
+		return true
+	} else if reflect.ValueOf(kademliaID).IsZero() {
+		return false
+	} else if reflect.ValueOf(*otherKademliaID).IsZero() {
+		return false
+	}
 	for i := 0; i < IDLength; i++ {
 		if kademliaID[i] != otherKademliaID[i] {
 			return false

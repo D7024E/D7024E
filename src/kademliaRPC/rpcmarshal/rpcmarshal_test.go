@@ -201,3 +201,81 @@ func TestRPCEqualsFailMissingKNodes(t *testing.T) {
 		t.FailNow()
 	}
 }
+
+// test equals for kNodes when length of kNodes is 1 and 0
+func TestRPCEqualsKNodesNotSameLength(t *testing.T) {
+	rpc1 := RPC{}
+	rpc2 := RPC{}
+	rpc1.KNodes = []contact.Contact{{ID: id.NewRandomKademliaID()}}
+	if rpc1.Equals(&rpc2) {
+		t.FailNow()
+	}
+}
+
+// test equals for kNodes when length of kNodes is 2 and 1
+func TestRPCEqualsKNodesNotSameLength2Elements(t *testing.T) {
+	rpc1 := RPC{}
+	rpc2 := RPC{}
+	rpc1.KNodes = []contact.Contact{{ID: id.NewRandomKademliaID()}, {ID: id.NewRandomKademliaID()}}
+	rpc2.KNodes = []contact.Contact{{ID: id.NewRandomKademliaID()}}
+	if rpc1.Equals(&rpc2) {
+		t.FailNow()
+	}
+}
+
+// Test if two different rpc based on KNodes is equal.
+func TestRPCEqualsKNodesSuccess(t *testing.T) {
+	rpc1 := RPC{}
+	rpc2 := RPC{}
+	id := id.NewRandomKademliaID()
+	rpc1.KNodes = []contact.Contact{{ID: id}}
+	rpc2.KNodes = []contact.Contact{{ID: id}}
+	if !rpc1.Equals(&rpc2) {
+		t.FailNow()
+	}
+}
+
+// Test if the same RPC is equal based on KNodes
+func TestRPCEqualsKNodesSuccessSameRPC(t *testing.T) {
+	rpc1 := RPC{}
+	id := id.NewRandomKademliaID()
+	rpc1.KNodes = []contact.Contact{{ID: id}}
+	if !rpc1.Equals(&rpc1) {
+		t.FailNow()
+	}
+}
+
+// Test if two different KNodes ids are different
+func TestRPCEqualsKNodesFail(t *testing.T) {
+	rpc1 := RPC{}
+	rpc2 := RPC{}
+	rpc1.KNodes = []contact.Contact{{ID: id.NewRandomKademliaID()}}
+	rpc2.KNodes = []contact.Contact{{ID: id.NewRandomKademliaID()}}
+	if rpc1.Equals(&rpc2) {
+		t.FailNow()
+	}
+}
+
+// Test KNodes on one rpc with one element and one empty
+func TestRPCEqualsKNodesFailOneEmpty(t *testing.T) {
+	rpc1 := RPC{}
+	rpc2 := RPC{}
+	rpc1.KNodes = []contact.Contact{{ID: id.NewRandomKademliaID()}}
+	rpc2.KNodes = []contact.Contact{{}}
+	if rpc1.Equals(&rpc2) {
+		t.FailNow()
+	}
+}
+
+func TestRPCEqualsKNodesSuccessTwoElementsInEach(t *testing.T) {
+	rpc1 := RPC{}
+	rpc2 := RPC{}
+	id1 := id.NewRandomKademliaID()
+	id2 := id.NewRandomKademliaID()
+	rpc1.KNodes = []contact.Contact{{ID: id1}, {ID: id2}}
+	rpc2.KNodes = []contact.Contact{{ID: id1}, {ID: id2}}
+
+	if !rpc1.Equals(&rpc2) {
+		t.FailNow()
+	}
+}

@@ -3,6 +3,7 @@ package contact
 import (
 	"D7024E/node/id"
 	"fmt"
+	"reflect"
 	"sort"
 )
 
@@ -23,6 +24,14 @@ func (contact *Contact) SetDistance(dist *id.KademliaID) {
 }
 
 func (c1 *Contact) Equals(c2 *Contact) bool {
+	if reflect.ValueOf(*c2).IsZero() && reflect.ValueOf(*c1).IsZero() {
+		return true
+	} else if reflect.ValueOf(*c2).IsZero() {
+		return false
+	} else if reflect.ValueOf(*c1).IsZero() {
+		return false
+	}
+
 	res := c1.ID.Equals(c2.ID)
 	res = res && (c1.Address == c2.Address)
 	return res
