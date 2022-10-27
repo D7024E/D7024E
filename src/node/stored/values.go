@@ -20,13 +20,14 @@ var lock = &sync.Mutex{}
 
 // Equals for two Value, true if equal otherwise false.
 func (v1 *Value) Equals(v2 *Value) bool {
-	if reflect.ValueOf(*v2).IsZero() && reflect.ValueOf(v1).IsZero() {
+	if reflect.ValueOf(*v2).IsZero() && reflect.ValueOf(*v1).IsZero() {
 		return true
 	} else if reflect.ValueOf(*v2).IsZero() {
 		return false
-	} else if reflect.ValueOf(v1).IsZero() {
+	} else if reflect.ValueOf(*v1).IsZero() {
 		return false
 	}
+
 	lock.Lock()
 	defer lock.Unlock()
 	res := v1.Data == v2.Data

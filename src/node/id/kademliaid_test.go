@@ -1,6 +1,7 @@
 package id
 
 import (
+	"fmt"
 	"math/rand"
 	"testing"
 )
@@ -162,12 +163,14 @@ func TestCalcDistanceOneDifference(t *testing.T) {
 
 // Test if calcDistance is 2 when the difference is 2.
 func TestCalcDistanceTwoDifference(t *testing.T) {
-	kademliaID1 := NewKademliaID("id")
-	kademliaID2 := NewKademliaID("id")
+	kademliaID1 := NewKademliaID("0")
+	kademliaID2 := NewKademliaID("0")
 	kademliaID2[IDLength-1] += 2
 	distance := kademliaID1.CalcDistance(kademliaID2)
 	result := emptyKademliaID()
 	result[IDLength-1] += 2
+	fmt.Println(distance)
+	fmt.Println(result)
 	if !distance.Equals(result) {
 		t.FailNow()
 	}
