@@ -1,6 +1,7 @@
 package rpc
 
 import (
+	"D7024E/environment"
 	"D7024E/kademliaRPC/rpcmarshal"
 	"D7024E/log"
 	"D7024E/node/contact"
@@ -20,7 +21,7 @@ func StoreRequest(target contact.Contact, value stored.Value, sender UDPSender) 
 		},
 		&message,
 	)
-	resMessage, err := sender(parseIP(target.Address), 4001, message)
+	resMessage, err := sender(parseIP(target.Address), environment.Port, message)
 	if isError(err) || resMessage == nil {
 		log.ERROR("Error when sending rpc")
 		return false
