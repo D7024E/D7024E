@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"math/rand"
+	"reflect"
 	"time"
 )
 
@@ -38,7 +39,7 @@ func NewRandomKademliaID() *KademliaID {
 }
 
 // Checks if otherKademliaID is smaller then kademliaID.
-func (kademliaID KademliaID) Less(otherKademliaID *KademliaID) bool {
+func (kademliaID *KademliaID) Less(otherKademliaID *KademliaID) bool {
 	for i := 0; i < IDLength; i++ {
 		if kademliaID[i] != otherKademliaID[i] {
 			return kademliaID[i] < otherKademliaID[i]
@@ -48,7 +49,14 @@ func (kademliaID KademliaID) Less(otherKademliaID *KademliaID) bool {
 }
 
 // Checks if kademliaID is equal to otherKademliaID.
-func (kademliaID KademliaID) Equals(otherKademliaID *KademliaID) bool {
+func (kademliaID *KademliaID) Equals(otherKademliaID *KademliaID) bool {
+	if reflect.ValueOf(*kademliaID).IsZero() && reflect.ValueOf(*otherKademliaID).IsZero() {
+		return true
+	} else if reflect.ValueOf(*kademliaID).IsZero() {
+		return false
+	} else if reflect.ValueOf(*otherKademliaID).IsZero() {
+		return false
+	}
 	for i := 0; i < IDLength; i++ {
 		if kademliaID[i] != otherKademliaID[i] {
 			return false
@@ -58,7 +66,7 @@ func (kademliaID KademliaID) Equals(otherKademliaID *KademliaID) bool {
 }
 
 // Calculate distance between two nodes.
-func (kademliaID KademliaID) CalcDistance(target *KademliaID) *KademliaID {
+func (kademliaID *KademliaID) CalcDistance(target *KademliaID) *KademliaID {
 	result := KademliaID{}
 	for i := 0; i < IDLength; i++ {
 		result[i] = kademliaID[i] ^ target[i]
