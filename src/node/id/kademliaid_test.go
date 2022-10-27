@@ -187,3 +187,10 @@ func TestString(t *testing.T) {
 		t.FailNow()
 	}
 }
+
+func TestStringError(t *testing.T) {
+	_, err := String2KademliaID("")
+	if err == nil {
+		t.FailNow()
+	}
+}
