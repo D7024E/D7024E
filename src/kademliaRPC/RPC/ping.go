@@ -1,6 +1,7 @@
 package rpc
 
 import (
+	"D7024E/environment"
 	"D7024E/kademliaRPC/rpcmarshal"
 	"D7024E/node/contact"
 )
@@ -15,7 +16,7 @@ func Ping(target contact.Contact, sender UDPSender) bool {
 		},
 		&msg)
 
-	resMessage, err := sender(parseIP(target.Address), 4001, msg)
+	resMessage, err := sender(parseIP(target.Address), environment.Port, msg)
 	if isError(err) || resMessage == nil {
 		return false
 	}
