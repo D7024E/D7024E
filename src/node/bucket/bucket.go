@@ -1,12 +1,13 @@
 package bucket
 
 import (
+	"D7024E/environment"
 	"D7024E/node/contact"
 	"D7024E/node/id"
 	"container/list"
 )
 
-const BucketSize = 20
+const BucketSize = environment.BucketSize
 
 // bucket definition
 // contains a List

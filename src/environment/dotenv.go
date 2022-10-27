@@ -7,6 +7,10 @@ import (
 	"github.com/joho/godotenv"
 )
 
+const (
+	BucketSize int = 20
+)
+
 var (
 	Port       int
 	Alpha      int
