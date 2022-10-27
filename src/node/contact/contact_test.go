@@ -2,7 +2,6 @@ package contact
 
 import (
 	"D7024E/node/id"
-	"fmt"
 	"testing"
 )
 
@@ -62,9 +61,8 @@ func TestEqualsFail(t *testing.T) {
 func TestContactToStringSuccess(t *testing.T) {
 	contact := GenreateAContact()
 	var conString interface{} = contact.String()
-	if _, ok := conString.(string); ok {
-		fmt.Println("do nothing")
-	} else {
+	_, ok := conString.(string)
+	if !ok {
 		t.FailNow()
 	}
 }
@@ -72,8 +70,6 @@ func TestContactToStringSuccess(t *testing.T) {
 func TestSetAndGetDistanceSuccess(t *testing.T) {
 	contact := GenreateAContact()
 	contact.SetDistance(id.NewRandomKademliaID())
-
-	fmt.Println(contact.GetDistance())
 	if contact.GetDistance() == nil {
 		t.FailNow()
 	}
@@ -81,8 +77,6 @@ func TestSetAndGetDistanceSuccess(t *testing.T) {
 
 func TestSetAndGetDistanceFail(t *testing.T) {
 	contact := GenreateAContact()
-
-	fmt.Println(contact.GetDistance())
 	if contact.GetDistance() != nil {
 		t.FailNow()
 	}
@@ -91,9 +85,6 @@ func TestSetAndGetDistanceFail(t *testing.T) {
 func TestContactAppend(t *testing.T) {
 
 	candidates := GenerateACandidateList()
-
-	fmt.Println(&candidates)
-
 	if !(candidates.Len() != 0) {
 		t.FailNow()
 	}

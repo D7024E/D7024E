@@ -2,7 +2,6 @@ package stored
 
 import (
 	"D7024E/node/id"
-	"fmt"
 	"testing"
 	"time"
 )
@@ -121,7 +120,6 @@ func TestStoreValueDuplicate(t *testing.T) {
 	}
 	err = stored.Store(value)
 	if err == nil {
-		fmt.Println(err)
 		t.FailNow()
 	}
 }

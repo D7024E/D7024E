@@ -3,11 +3,11 @@ package algorithms
 import (
 	"D7024E/environment"
 	rpc "D7024E/kademliaRPC/RPC"
+	"D7024E/log"
 	"D7024E/network/sender"
 	"D7024E/node/contact"
 	"D7024E/node/id"
 	"D7024E/node/stored"
-	"fmt"
 	"sync"
 )
 
@@ -25,7 +25,7 @@ func AlphaNodeStoreRec(value stored.Value, store storeRPC, lookup lookupAlgorith
 	if len(alphaClosest) > environment.Alpha {
 		alphaClosest = alphaClosest[:environment.Alpha]
 	}
-	fmt.Println("[NODE STORE] - storing value with id: ", value.ID.String(), " in \n", alphaClosest)
+	log.INFO("[NODE STORE] - storing value with id: ", value.ID.String(), " in \n", alphaClosest)
 	var wg sync.WaitGroup
 	lock := sync.Mutex{}
 	completed := true
