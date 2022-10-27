@@ -3,11 +3,11 @@ package algorithms
 import (
 	"D7024E/environment"
 	rpc "D7024E/kademliaRPC/RPC"
+	"D7024E/log"
 	"D7024E/network/sender"
 	"D7024E/node/contact"
 	"D7024E/node/id"
 	"D7024E/node/stored"
-	"fmt"
 	"sync"
 	"time"
 )
@@ -32,7 +32,7 @@ func NodeRefresh(value stored.Value) {
 // Refresh a stored value in alpha closest nodes.
 func NodeRefreshRec(value stored.Value, alphaClosest []contact.Contact, refresh RefreshRPC) bool {
 	if !stored.GetInstance().IsRefreshed(value.ID) {
-		fmt.Println("[NODE REFRESH] - stopped refresh for: ", value.ID.String())
+		log.INFO("[NODE REFRESH] - stopped refresh for: ", value.ID.String())
 		return false
 	} else {
 		go func() {
@@ -63,9 +63,9 @@ func NodeRefreshRec(value stored.Value, alphaClosest []contact.Contact, refresh 
 		}()
 	}
 	wg.Wait()
-	fmt.Println("[NODE REFRESH] - sent refresh for value: ", value.ID.String())
+	log.INFO("[NODE REFRESH] - sent refresh for value: ", value.ID.String())
 	if restore {
-		fmt.Println("[NODE REFRESH] - store value again, for value: ", value.ID.String())
+		log.INFO("[NODE REFRESH] - store value again, for value: ", value.ID.String())
 		go NodeStore(value)
 	}
 	return true

@@ -7,7 +7,6 @@ import (
 	"D7024E/node/bucket"
 	"D7024E/node/contact"
 	"D7024E/node/id"
-	"fmt"
 
 	"sync"
 )
@@ -21,7 +20,6 @@ func NodeLookup(targetID id.KademliaID) []contact.Contact {
 	rt.AddContact(contact.Contact{ID: id.NewKademliaID("172.21.0.2"), Address: "172.21.0.2"})
 	batch := bucket.GetInstance().FindClosestContacts(&targetID, environment.Alpha)
 	for {
-		fmt.Println(batch)
 		if isSame(rt.FindClosestContacts(&targetID, environment.BucketSize), batch) && len(batch) >= 2 {
 			return batch
 		} else {

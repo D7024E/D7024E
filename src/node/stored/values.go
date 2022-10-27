@@ -2,8 +2,8 @@ package stored
 
 import (
 	"D7024E/errors"
+	"D7024E/log"
 	"D7024E/node/id"
-	"fmt"
 	"reflect"
 	"sync"
 	"time"
@@ -86,11 +86,11 @@ func (stored *Stored) Store(val Value) error {
 	defer lock.Unlock()
 	val.DeadAt = time.Now().Add(val.TTL)
 	if err != nil {
-		fmt.Println("[VALUES] - storing value with id: ", val.ID.String())
+		log.INFO("[VALUES] - storing value with id: ", val.ID.String())
 		stored.values = append(stored.values, val)
 		return nil
 	} else {
-		fmt.Println("[VALUES] - attempt to store duplicate value with id: ", val.ID.String())
+		log.INFO("[VALUES] - attempt to store duplicate value with id: ", val.ID.String())
 		return &errors.ValueAlreadyExist{}
 	}
 }
@@ -102,7 +102,7 @@ func (stored *Stored) FindValue(valueID id.KademliaID) (Value, error) {
 	for i, item := range stored.values {
 		if valueID.Equals(&item.ID) {
 			go stored.values[i].refresh()
-			fmt.Println("[VALUES] - find value: ", item)
+			log.INFO("[VALUES] - find value: ", item)
 			if !item.isDead() {
 				return item, nil
 			} else {
@@ -115,7 +115,7 @@ func (stored *Stored) FindValue(valueID id.KademliaID) (Value, error) {
 
 // Delete a value with id in stored values.
 func (stored *Stored) deleteValue(valueID id.KademliaID) error {
-	fmt.Println("[VALUES] - delete value with id: ", valueID.String())
+	log.INFO("[VALUES] - delete value with id: ", valueID.String())
 	for i, val := range stored.values {
 		if val.ID.Equals(&valueID) {
 			stored.values = append(stored.values[:i], stored.values[i+1:]...)

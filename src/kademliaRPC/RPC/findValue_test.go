@@ -6,7 +6,6 @@ import (
 	"D7024E/node/contact"
 	"D7024E/node/stored"
 	"errors"
-	"fmt"
 	"net"
 	"testing"
 )
@@ -64,8 +63,6 @@ func TestFindValueRequestNoResponse(t *testing.T) {
 	if err == nil {
 		t.Fatalf("received no error from request that got a no response")
 	} else if !val.Equals(&stored.Value{}) {
-		fmt.Println(val)
-		fmt.Println(stored.Value{})
 		t.Fatalf("received a value containing data, when no response")
 	}
 }

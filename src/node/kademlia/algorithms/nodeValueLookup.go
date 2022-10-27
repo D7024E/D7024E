@@ -3,13 +3,12 @@ package algorithms
 import (
 	"D7024E/environment"
 	rpc "D7024E/kademliaRPC/RPC"
+	"D7024E/log"
 	"D7024E/network/sender"
 	"D7024E/node/contact"
 	"D7024E/node/id"
 	"D7024E/node/stored"
 	"errors"
-	"fmt"
-	"strings"
 	"sync"
 )
 
@@ -18,12 +17,6 @@ type findValueRPC func(id.KademliaID, contact.Contact, rpc.UDPSender) (stored.Va
 // Initiates NodeValueLookup with alpha nodes.
 func NodeValueLookup(valueID id.KademliaID) (stored.Value, error) {
 	alphaClosest := NodeLookup(valueID)
-	kAddress := []string{}
-	for _, c := range alphaClosest {
-		kAddress = append(kAddress, c.Address)
-	}
-	res := "\n" + strings.Join(kAddress, "          \n")
-	fmt.Println("[NODE] - TABLE: [" + res + "]")
 	if len(alphaClosest) > environment.Alpha {
 		alphaClosest = alphaClosest[:environment.Alpha]
 	}
@@ -32,7 +25,7 @@ func NodeValueLookup(valueID id.KademliaID) (stored.Value, error) {
 
 // Lookup value with valueID in alpha closest nodes using fn.
 func alphaNodeValueLookup(valueID id.KademliaID, alphaClosest []contact.Contact, fn findValueRPC) (stored.Value, error) {
-	fmt.Println("[NODE VALUE LOOKUP] - lookup value with id: ", valueID.String(), " in \n", alphaClosest)
+	log.INFO("[NODE VALUE LOOKUP] - lookup value with id: ", valueID.String(), " in \n", alphaClosest)
 	var wg sync.WaitGroup
 	var result []stored.Value
 	lock := sync.Mutex{}

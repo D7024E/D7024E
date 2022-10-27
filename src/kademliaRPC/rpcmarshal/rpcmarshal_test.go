@@ -4,7 +4,6 @@ import (
 	"D7024E/node/contact"
 	"D7024E/node/id"
 	"D7024E/node/stored"
-	"fmt"
 	"testing"
 	"time"
 )
@@ -31,9 +30,6 @@ func TestRpcMarshalSuccess(t *testing.T) {
 		t.FailNow()
 	}
 	RpcUnmarshal(message, &rpc2)
-
-	fmt.Println(rpc)
-	fmt.Println(rpc2)
 
 	if !rpc.Equals(&rpc2) {
 		t.FailNow()
