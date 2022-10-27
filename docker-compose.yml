@@ -31,6 +31,8 @@ services:
     environment:
       - LOG_CONSOLE=false
       - PORT=4001
+      - BUCKET_SIZE=20
+      - ALPHA=3
     networks:
       - kademlia_network
       

@@ -1,6 +1,7 @@
 package bucket
 
 import (
+	"D7024E/environment"
 	"D7024E/node/contact"
 	"D7024E/node/id"
 	"testing"
@@ -60,7 +61,7 @@ func TestFindClosestContactsKnownTarget(t *testing.T) {
 	rt := NewRoutingTable()
 	keyContact := generateContact()
 	rt.AddContact(keyContact)
-	for i := 0; i < BucketSize-1; i++ {
+	for i := 0; i < environment.BucketSize-1; i++ {
 		rt.AddContact(generateContact())
 	}
 	res := rt.FindClosestContacts(keyContact.ID, 10)
