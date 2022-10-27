@@ -68,7 +68,7 @@ func TestObjects200(t *testing.T) {
 // Test GET "/objects/{hash}" if correct status and response is given.
 // Test request that will get status 400.
 func TestObjects400(t *testing.T) {
-	valueID := id.NewRandomKademliaID().String() + "a"
+	valueID := id.NewRandomKademliaID().String() + "ab"
 	// Create request
 	route := "/objects/" + valueID
 	req, err := http.NewRequest("GET", route, nil)

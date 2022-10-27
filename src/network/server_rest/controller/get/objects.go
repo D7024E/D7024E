@@ -20,6 +20,7 @@ func Objects(w http.ResponseWriter, r *http.Request) {
 	valueID, err := id.String2KademliaID(params["hash"])
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
 	value, err := nvl(*valueID)
 	if err != nil {
