@@ -1,6 +1,7 @@
 package id
 
 import (
+	"fmt"
 	"math/rand"
 	"testing"
 )
@@ -183,4 +184,11 @@ func TestString(t *testing.T) {
 	} else if !kademliaID1.Equals(kademliaID2) {
 		t.FailNow()
 	}
+}
+
+func TestStringError(t *testing.T) {
+	kademliaID := NewKademliaID("")
+	str := kademliaID.String()
+	fmt.Println("this is the id", str)
+
 }
