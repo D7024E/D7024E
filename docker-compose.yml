@@ -30,6 +30,7 @@ services:
         mode: ingress 
     environment:
       - LOG_CONSOLE=false
+      - PORT=4001
     networks:
       - kademlia_network
       
