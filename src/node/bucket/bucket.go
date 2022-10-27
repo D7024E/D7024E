@@ -7,8 +7,6 @@ import (
 	"container/list"
 )
 
-const BucketSize = environment.BucketSize
-
 // bucket definition
 // contains a List
 type bucket struct {
@@ -27,7 +25,7 @@ func newBucket() *bucket {
 // or moves it to the front of the bucket if it already existed
 func (bucket *bucket) AddContact(newContact contact.Contact) (oldContact contact.Contact, res bool) {
 	var head contact.Contact
-	if bucket.list.Len() == BucketSize {
+	if bucket.list.Len() == environment.BucketSize {
 		head = contact.Contact(bucket.list.Back().Value.(contact.Contact))
 		bucket.list.Remove(bucket.list.Back())
 		return head, false
