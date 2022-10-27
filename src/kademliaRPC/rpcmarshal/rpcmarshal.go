@@ -23,6 +23,10 @@ type RPC struct {
 func (r1 *RPC) Equals(r2 *RPC) bool {
 	var res bool
 	// Cmd
+	if reflect.ValueOf(*r1).IsZero() && reflect.ValueOf(*r2).IsZero() {
+		return true
+	}
+
 	if !(reflect.ValueOf(*r1).FieldByName("Cmd").IsZero()) {
 		res = r1.Cmd == r2.Cmd
 	} else if !(reflect.ValueOf(*r2).FieldByName("Cmd").IsZero()) {
@@ -52,7 +56,16 @@ func (r1 *RPC) Equals(r2 *RPC) bool {
 
 	// KNodes
 	if !(reflect.ValueOf(*r1).FieldByName("KNodes").IsZero()) {
-		// TODO CHANGE TYPE OF KNODES
+		if len(r1.KNodes) != len(r2.KNodes) {
+			return false
+		} else {
+			for i, c := range r1.KNodes {
+				if !c.Equals(&r2.KNodes[i]) {
+					return false
+				}
+			}
+			return true
+		}
 	} else if !(reflect.ValueOf(*r2).FieldByName("KNodes").IsZero()) {
 		return false
 	}

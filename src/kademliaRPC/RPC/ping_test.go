@@ -3,6 +3,7 @@ package rpc
 import (
 	"D7024E/kademliaRPC/rpcmarshal"
 	"D7024E/node/contact"
+	"D7024E/node/id"
 	"net"
 	"testing"
 )
@@ -30,6 +31,7 @@ func senderPingMockFail(_ net.IP, _ int, _ []byte) ([]byte, error) {
 // Test Ping request to node that responds.
 func TestPingSuccess(t *testing.T) {
 	target := contact.Contact{
+		ID:      id.NewRandomKademliaID(),
 		Address: "0.0.0.0"}
 	res := Ping(target, senderPingMockSuccess)
 	if !res {
@@ -40,6 +42,7 @@ func TestPingSuccess(t *testing.T) {
 // Test Ping request to node that does not responds.
 func TestPingFail(t *testing.T) {
 	target := contact.Contact{
+		ID:      id.NewRandomKademliaID(),
 		Address: "0.0.0.0"}
 	res := Ping(target, senderPingMockFail)
 	if res {
