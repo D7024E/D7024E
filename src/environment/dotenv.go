@@ -1,6 +1,7 @@
 package environment
 
 import (
+	"D7024E/log"
 	"os"
 	"strconv"
 
@@ -10,8 +11,7 @@ import (
 var (
 	Port       int
 	Alpha      int
-	LogConsole bool  // Log Console mode
-	err        error // error given from enviroment
+	LogConsole bool // Log Console mode
 )
 
 /**
@@ -19,8 +19,15 @@ var (
  */
 func init() {
 	Alpha = 3
-	_ = godotenv.Load("../.env")
-	// err := nil
+	err := godotenv.Load("../.env")
+	if err != nil {
+		log.ERROR("[DOTENV] - [%v]", err)
+		LogConsole = false
+		Port = 4001
+		Alpha = 3
+		return
+	}
+
 	LogConsole, err = strconv.ParseBool(os.Getenv("LOG_CONSOLE"))
 	if err != nil {
 		LogConsole = false
