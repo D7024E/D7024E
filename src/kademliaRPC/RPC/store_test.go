@@ -41,7 +41,7 @@ func TestStoreRequestWithResponse(t *testing.T) {
 	value := stored.Value{
 		Data:   "Data",
 		ID:     *id.NewRandomKademliaID(),
-		Ttl:    time.Hour,
+		TTL:    time.Hour,
 		DeadAt: time.Now().Add(time.Hour),
 	}
 	res := StoreRequest(target, value, senderStoreMockSuccess)
@@ -59,7 +59,7 @@ func TestStoreRequestWithoutResponse(t *testing.T) {
 	value := stored.Value{
 		Data:   "Data",
 		ID:     *id.NewRandomKademliaID(),
-		Ttl:    time.Hour,
+		TTL:    time.Hour,
 		DeadAt: time.Now().Add(time.Hour),
 	}
 	res := StoreRequest(target, value, senderStoreMockFail)
@@ -78,7 +78,7 @@ func TestStoreResponseSuccess(t *testing.T) {
 	value := stored.Value{
 		Data:   "DATA",
 		ID:     *id.NewKademliaID("DATA"),
-		Ttl:    time.Hour,
+		TTL:    time.Hour,
 		DeadAt: time.Now().Add(time.Hour),
 	}
 

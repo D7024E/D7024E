@@ -14,7 +14,7 @@ import (
 func findValueSuccess(valueID id.KademliaID, _ contact.Contact, _ rpc.UDPSender) (stored.Value, error) {
 	return stored.Value{
 		Data: "DATA",
-		Ttl:  time.Hour,
+		TTL:  time.Hour,
 	}, nil
 }
 

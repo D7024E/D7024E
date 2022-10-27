@@ -28,6 +28,10 @@ func Handler(text string) string {
 func parseInput(input string) (string, string) {
 	split := strings.Split(input, " ")
 
+	if len(split) < 2 {
+		return split[0], ""
+	}
+
 	var cmd string = split[0]
 	var content string
 	for i := 1; i < len(split); i++ {

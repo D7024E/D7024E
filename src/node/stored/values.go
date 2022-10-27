@@ -12,7 +12,7 @@ import (
 type Value struct {
 	Data   string        `json:"data"` // json data as string.
 	ID     id.KademliaID `json:"-"`    // json id as kademlia id.
-	Ttl    time.Duration `json:"ttl"`  // json time-to-live.
+	TTL    time.Duration `json:"ttl"`  // json time-to-live.
 	DeadAt time.Time     `json:"-"`    // json time where value is dead.
 }
 
@@ -32,7 +32,7 @@ func (v1 *Value) Equals(v2 *Value) bool {
 	defer lock.Unlock()
 	res := v1.Data == v2.Data
 	res = res && v1.ID.Equals(&v2.ID)
-	res = res && (v1.Ttl.String() == v2.Ttl.String())
+	res = res && (v1.TTL.String() == v2.TTL.String())
 	return res
 }
 
@@ -42,7 +42,7 @@ func (value *Value) refresh() bool {
 	lock.Lock()
 	defer lock.Unlock()
 	if !value.isDead() {
-		value.DeadAt = time.Now().Add(value.Ttl)
+		value.DeadAt = time.Now().Add(value.TTL)
 		return true
 	} else {
 		stored.deleteValue(value.ID)
@@ -84,7 +84,7 @@ func (stored *Stored) Store(val Value) error {
 	_, err := stored.FindValue(val.ID)
 	lock.Lock()
 	defer lock.Unlock()
-	val.DeadAt = time.Now().Add(val.Ttl)
+	val.DeadAt = time.Now().Add(val.TTL)
 	if err != nil {
 		fmt.Println("[VALUES] - storing value with id: ", val.ID.String())
 		stored.values = append(stored.values, val)

@@ -22,7 +22,7 @@ func TestNodeRefreshRecSuccessfulRefresh(t *testing.T) {
 	value := stored.Value{
 		Data:   "SuccessfulRefresh",
 		ID:     *id.NewKademliaID("SuccessfulRefresh"),
-		Ttl:    time.Second,
+		TTL:    time.Second,
 		DeadAt: time.Now().Add(time.Hour),
 	}
 	stored.GetInstance().AddRefresh(value.ID)
@@ -38,7 +38,7 @@ func TestNodeRefreshRecFailedRefresh(t *testing.T) {
 	value := stored.Value{
 		Data:   "FailedRefresh",
 		ID:     *id.NewKademliaID("FailedRefresh"),
-		Ttl:    time.Second,
+		TTL:    time.Second,
 		DeadAt: time.Now().Add(time.Hour),
 	}
 	stored.GetInstance().AddRefresh(value.ID)
@@ -54,7 +54,7 @@ func TestNodeRefreshRecNotRefreshed(t *testing.T) {
 	value := stored.Value{
 		Data:   "NotRefreshed",
 		ID:     *id.NewKademliaID("NotRefreshed"),
-		Ttl:    time.Second,
+		TTL:    time.Second,
 		DeadAt: time.Now().Add(time.Hour),
 	}
 	res := NodeRefreshRec(value, nil, RefreshMockupFail)

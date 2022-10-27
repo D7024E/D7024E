@@ -10,9 +10,9 @@ import (
 // Contact definition
 // stores the KademliaID, the ip address and the distance
 type Contact struct {
-	ID       *id.KademliaID
-	Address  string
-	distance *id.KademliaID
+	ID       *id.KademliaID `json:"id"`
+	Address  string         `json:"address"`
+	distance *id.KademliaID `JSON:"-"`
 }
 
 func (contact *Contact) GetDistance() *id.KademliaID {

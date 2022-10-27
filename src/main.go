@@ -6,12 +6,10 @@ import (
 	"D7024E/network/server_rest"
 	"D7024E/node"
 	"D7024E/node/contact"
-	"D7024E/node/kademlia"
 	"net"
 )
 
 func main() {
-	kademlia.GetInstance()
 	go server_rest.RestServer(contact.GetInstance().Address, 4000)
 	go server.UDPListener(net.ParseIP(contact.GetInstance().Address), 4001)
 	go node.StartKademliaNode()

@@ -66,7 +66,7 @@ func TestRefreshResponse(t *testing.T) {
 	}
 	stored.GetInstance().Store(stored.Value{
 		Data: "TestRefreshResponse",
-		Ttl:  time.Hour,
+		TTL:  time.Hour,
 	})
 
 	response := RefreshResponse(valueID, target)

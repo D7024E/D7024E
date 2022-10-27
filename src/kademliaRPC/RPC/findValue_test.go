@@ -96,7 +96,7 @@ func TestFindValueResponseFoundValue(t *testing.T) {
 			Contact: *contact.GetInstance(),
 			Content: stored.Value{
 				Data: value.Data,
-				Ttl:  value.Ttl,
+				TTL:  value.TTL,
 			},
 		}) {
 		t.Fatalf("invalid response")
