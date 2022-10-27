@@ -18,12 +18,16 @@ var (
  * Load enviroment variables
  */
 func init() {
-	Port = 4001
 	Alpha = 3
 	_ = godotenv.Load("../.env")
 	// err := nil
 	LogConsole, err = strconv.ParseBool(os.Getenv("LOG_CONSOLE"))
 	if err != nil {
 		LogConsole = false
+	}
+
+	Port, err = strconv.Atoi(os.Getenv("PORT"))
+	if err != nil {
+		Port = 4001
 	}
 }
