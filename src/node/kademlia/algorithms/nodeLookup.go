@@ -25,7 +25,7 @@ func NodeLookup(targetID id.KademliaID) []contact.Contact {
 		if isSame(rt.FindClosestContacts(&targetID, bucket.BucketSize), batch) && len(batch) >= 2 {
 			return batch
 		} else {
-			batch = NodeLookupRec(targetID, rt, rpc.FindNodeRequest)
+			batch = nodeLookup(targetID, rt, rpc.Ping, rpc.FindNodeRequest)
 		}
 
 	}
@@ -51,7 +51,7 @@ func AddContacts(rt *bucket.RoutingTable, batch []contact.Contact, ping pingRPC)
 }
 
 // Algorithm for Node lookup.
-func NodeLookupRec(targetID id.KademliaID, rt *bucket.RoutingTable, findNode findNodeRPC) []contact.Contact {
+func nodeLookup(targetID id.KademliaID, rt *bucket.RoutingTable, ping pingRPC, findNode findNodeRPC) []contact.Contact {
 	batch := rt.FindClosestContacts(&targetID, bucket.BucketSize)
 	var wg sync.WaitGroup
 	for i := 0; i < len(batch); i += environment.Alpha {
@@ -63,7 +63,7 @@ func NodeLookupRec(targetID id.KademliaID, rt *bucket.RoutingTable, findNode fin
 				kN, err := findNode(target, targetID, sender.UDPSender)
 				if err == nil {
 					rt.AddContact(target)
-					AddContacts(rt, kN, rpc.Ping)
+					AddContacts(rt, kN, ping)
 				}
 			}()
 		}
